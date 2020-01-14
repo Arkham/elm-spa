@@ -1,7 +1,7 @@
 module Internals.Transition exposing
     ( Transition
     , duration, view
-    , optOut, none, fadeHtml, fadeElmUi
+    , optOut, none, fade
     , Visibility
     , visible, invisible
     , custom
@@ -11,17 +11,15 @@ module Internals.Transition exposing
 
 @docs Transition
 @docs duration, view, chooseFrom
-@docs optOut, none, fadeHtml, fadeElmUi
+@docs optOut, none, fade
 
 @docs Visibility
 @docs visible, invisible
 
 -}
 
-import Element exposing (Element)
 import Html exposing (Html)
 import Html.Attributes as Attr
-import Url exposing (Url)
 
 
 type Visibility
@@ -39,25 +37,24 @@ invisible =
     Invisible
 
 
-type Transition ui_msg
+type Transition msg
     = OptOut
     | None
-    | Transition (Options ui_msg)
+    | Transition (Options msg)
 
 
-type alias Options ui_msg =
+type alias Options msg =
     { duration : Int
-    , invisible : View ui_msg
-    , visible : View ui_msg
+    , invisible : View msg
+    , visible : View msg
     }
 
 
-type alias View ui_msg =
-    ui_msg
-    -> ui_msg
+type alias View msg =
+    Html msg -> Html msg
 
 
-duration : Transition ui_msg -> Int
+duration : Transition msg -> Int
 duration transition =
     case transition of
         OptOut ->
@@ -71,10 +68,10 @@ duration transition =
 
 
 view :
-    Transition ui_msg
+    Transition msg
     -> Visibility
-    -> ui_msg
-    -> ui_msg
+    -> Html msg
+    -> Html msg
 view transition visibility page =
     case transition of
         OptOut ->
@@ -96,20 +93,20 @@ view transition visibility page =
 -- TRANSITIONS
 
 
-optOut : Transition ui_msg
+optOut : Transition msg
 optOut =
     OptOut
 
 
-none : Transition ui_msg
+none : Transition msg
 none =
     None
 
 
-fadeHtml : Int -> Transition (Html msg)
-fadeHtml duration_ =
+fade : Int -> Transition msg
+fade duration_ =
     let
-        withOpacity : Int -> View (Html msg)
+        withOpacity : Int -> View msg
         withOpacity opacity page =
             Html.div
                 [ Attr.style "opacity" (String.fromInt opacity)
@@ -122,33 +119,7 @@ fadeHtml duration_ =
                 ]
                 [ page ]
     in
-    Transition <|
-        { duration = duration_
-        , invisible = withOpacity 0
-        , visible = withOpacity 1
-        }
-
-
-fadeElmUi : Int -> Transition (Element msg)
-fadeElmUi duration_ =
-    let
-        withOpacity : Float -> View (Element msg)
-        withOpacity opacity page =
-            Element.el
-                [ Element.width Element.fill
-                , Element.height Element.fill
-                , Element.alpha opacity
-                , Element.htmlAttribute <|
-                    Attr.style "transition" <|
-                        String.concat
-                            [ "opacity "
-                            , String.fromInt duration_
-                            , "ms ease-in-out"
-                            ]
-                ]
-                page
-    in
-    Transition <|
+    Transition
         { duration = duration_
         , invisible = withOpacity 0
         , visible = withOpacity 1
@@ -157,9 +128,9 @@ fadeElmUi duration_ =
 
 custom :
     { duration : Int
-    , invisible : View ui_msg
-    , visible : View ui_msg
+    , invisible : View msg
+    , visible : View msg
     }
-    -> Transition ui_msg
+    -> Transition msg
 custom =
     Transition

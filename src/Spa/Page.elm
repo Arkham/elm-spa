@@ -136,8 +136,9 @@ You only create **one** case expression: (woohoo, less typing!)
 
 -}
 
+import Html exposing (Html)
 import Internals.Page exposing (..)
-import Internals.Path as Path exposing (Path)
+import Internals.Path exposing (Path)
 import Internals.Transition as Transition exposing (Transition)
 import Internals.Utils as Utils
 
@@ -146,8 +147,8 @@ type alias PageContext route globalModel =
     Internals.Page.PageContext route globalModel
 
 
-type alias Page route pageParams pageModel pageMsg ui_pageMsg layoutModel layoutMsg ui_layoutMsg globalModel globalMsg msg ui_msg =
-    Internals.Page.Page route pageParams pageModel pageMsg ui_pageMsg layoutModel layoutMsg ui_layoutMsg globalModel globalMsg msg ui_msg
+type alias Page route pageParams pageModel pageMsg layoutModel layoutMsg globalModel globalMsg msg =
+    Internals.Page.Page route pageParams pageModel pageMsg layoutModel layoutMsg globalModel globalMsg msg
 
 
 {-| Implementing the `init`, `update` and `bundle` functions is much easier
@@ -183,9 +184,8 @@ A `Recipe` is just an Elm record waiting for its page specific data.
 
 -}
 recipe :
-    ((pageMsg -> layoutMsg) -> ui_pageMsg -> ui_layoutMsg)
-    -> Upgrade route pageParams pageModel pageMsg ui_pageMsg layoutModel layoutMsg ui_layoutMsg globalModel globalMsg msg ui_msg
-    -> Recipe route pageParams pageModel pageMsg layoutModel layoutMsg ui_layoutMsg globalModel globalMsg msg ui_msg
+    Upgrade route pageParams pageModel pageMsg layoutModel layoutMsg globalModel globalMsg msg
+    -> Recipe route pageParams pageModel pageMsg layoutModel layoutMsg globalModel globalMsg msg
 recipe =
     Internals.Page.upgrade
 
@@ -238,12 +238,12 @@ keep model =
 -}
 static :
     { title : { global : globalModel } -> String
-    , view : PageContext route globalModel -> ui_pageMsg
+    , view : PageContext route globalModel -> Html Never
     }
-    -> Page route pageParams () Never ui_pageMsg layoutModel layoutMsg ui_layoutMsg globalModel globalMsg msg ui_msg
+    -> Page route pageParams () Never layoutModel layoutMsg globalModel globalMsg msg
 static page =
     Page
-        (\{ toModel, toMsg, map } ->
+        (\{ toModel, toMsg } ->
             { init = \_ _ -> ( toModel (), Cmd.none, Cmd.none )
             , update = \_ model _ -> ( toModel model, Cmd.none, Cmd.none )
             , bundle =
@@ -255,8 +255,8 @@ static page =
                     , view =
                         page.view
                             context
-                            |> map toMsg
-                            |> private.map private.fromPageMsg
+                            |> Html.map toMsg
+                            |> Html.map private.fromPageMsg
                     , subscriptions = Sub.none
                     }
             }
@@ -317,12 +317,12 @@ sandbox :
     { title : { global : globalModel, model : pageModel } -> String
     , init : PageContext route globalModel -> pageParams -> pageModel
     , update : PageContext route globalModel -> pageMsg -> pageModel -> pageModel
-    , view : PageContext route globalModel -> pageModel -> ui_pageMsg
+    , view : PageContext route globalModel -> pageModel -> Html pageMsg
     }
-    -> Page route pageParams pageModel pageMsg ui_pageMsg layoutModel layoutMsg ui_layoutMsg globalModel globalMsg msg ui_msg
+    -> Page route pageParams pageModel pageMsg layoutModel layoutMsg globalModel globalMsg msg
 sandbox page =
     Page
-        (\{ toModel, toMsg, map } ->
+        (\{ toModel, toMsg } ->
             { init =
                 \pageParams context ->
                     ( toModel (page.init context pageParams)
@@ -345,8 +345,7 @@ sandbox page =
                             }
                     , view =
                         page.view context model
-                            |> map toMsg
-                            |> private.map private.fromPageMsg
+                            |> Html.map (toMsg >> private.fromPageMsg)
                     , subscriptions = Sub.none
                     }
             }
@@ -396,13 +395,13 @@ element :
     { title : { global : globalModel, model : pageModel } -> String
     , init : PageContext route globalModel -> pageParams -> ( pageModel, Cmd pageMsg )
     , update : PageContext route globalModel -> pageMsg -> pageModel -> ( pageModel, Cmd pageMsg )
-    , view : PageContext route globalModel -> pageModel -> ui_pageMsg
+    , view : PageContext route globalModel -> pageModel -> Html pageMsg
     , subscriptions : PageContext route globalModel -> pageModel -> Sub pageMsg
     }
-    -> Page route pageParams pageModel pageMsg ui_pageMsg layoutModel layoutMsg ui_layoutMsg globalModel globalMsg msg ui_msg
+    -> Page route pageParams pageModel pageMsg layoutModel layoutMsg globalModel globalMsg msg
 element page =
     Page
-        (\{ toModel, toMsg, map } ->
+        (\{ toModel, toMsg } ->
             { init =
                 \pageParams context ->
                     page.init context pageParams
@@ -420,8 +419,7 @@ element page =
                             }
                     , view =
                         page.view context model
-                            |> map toMsg
-                            |> private.map private.fromPageMsg
+                            |> Html.map (toMsg >> private.fromPageMsg)
                     , subscriptions =
                         page.subscriptions context model
                             |> Sub.map (toMsg >> private.fromPageMsg)
@@ -479,13 +477,13 @@ component :
     { title : { global : globalModel, model : pageModel } -> String
     , init : PageContext route globalModel -> pageParams -> ( pageModel, Cmd pageMsg, Cmd globalMsg )
     , update : PageContext route globalModel -> pageMsg -> pageModel -> ( pageModel, Cmd pageMsg, Cmd globalMsg )
-    , view : PageContext route globalModel -> pageModel -> ui_pageMsg
+    , view : PageContext route globalModel -> pageModel -> Html pageMsg
     , subscriptions : PageContext route globalModel -> pageModel -> Sub pageMsg
     }
-    -> Page route pageParams pageModel pageMsg ui_pageMsg layoutModel layoutMsg ui_layoutMsg globalModel globalMsg msg ui_msg
+    -> Page route pageParams pageModel pageMsg layoutModel layoutMsg globalModel globalMsg msg
 component page =
     Page
-        (\{ toModel, toMsg, map } ->
+        (\{ toModel, toMsg } ->
             { init =
                 \pageParams context ->
                     page.init context pageParams
@@ -503,8 +501,7 @@ component page =
                             }
                     , view =
                         page.view context model
-                            |> map toMsg
-                            |> private.map private.fromPageMsg
+                            |> Html.map (toMsg >> private.fromPageMsg)
                     , subscriptions =
                         page.subscriptions context model
                             |> Sub.map (toMsg >> private.fromPageMsg)
@@ -534,11 +531,13 @@ send =
 
 {-| In practice, we wrap `layout` in `Utils/Spa.elm` so we only have to provide `Html.map` or `Element.map` once)
 
+    import Spa.Path as Path
     import Utils.Spa as Spa
 
     page =
         Spa.layout
-            { layout = Layout.view
+            { path = []
+            , view = Layout.view
             , pages =
                 { init = init
                 , update = update
@@ -548,10 +547,9 @@ send =
 
 -}
 layout :
-    ((pageMsg -> msg) -> ui_pageMsg -> ui_msg)
-    -> Layout route pageParams pageModel pageMsg ui_pageMsg globalModel globalMsg msg ui_msg
-    -> Page route pageParams pageModel pageMsg ui_pageMsg layoutModel layoutMsg ui_layoutMsg globalModel globalMsg msg ui_msg
-layout map options =
+    Layout route pageParams pageModel pageMsg globalModel globalMsg msg
+    -> Page route pageParams pageModel pageMsg layoutModel layoutMsg globalModel globalMsg msg
+layout options =
     Page
         (\{ toModel, toMsg } ->
             { init =
@@ -581,13 +579,12 @@ layout map options =
                             else
                                 Transition.visible
 
-                        bundle : { title : String, view : ui_msg, subscriptions : Sub msg }
+                        bundle : { title : String, view : Html msg, subscriptions : Sub msg }
                         bundle =
                             options.recipe.bundle
                                 model
                                 { fromGlobalMsg = private.fromGlobalMsg
                                 , fromPageMsg = toMsg >> private.fromPageMsg
-                                , map = map
                                 , path = private.path
                                 , transitions = private.transitions
                                 , visibility = private.visibility

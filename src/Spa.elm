@@ -1,8 +1,4 @@
-module Spa exposing
-    ( create, Program
-    , usingElmUi
-    , usingHtml
-    )
+module Spa exposing (create, Program)
 
 {-|
 
@@ -22,44 +18,28 @@ as the entrypoint to your app.
     main : Utils.Spa.Program Pages.Model Pages.Msg
     main =
         Spa.create
-            { global =
-                { init = Global.init
-                , update = Global.update
-                , subscriptions = Global.subscriptions
-                }
-            , page = Pages.page
-            , routing =
+            { routing =
                 { routes = Routes.parsers
                 , toPath = Routes.toPath
                 , notFound = routes.notFound
                 , afterNavigate = Nothing
                 }
             , transitions = Transitions.transitions
-            , ui = Spa.usingElmUi
+            , global =
+                { init = Global.init
+                , update = Global.update
+                , subscriptions = Global.subscriptions
+                }
+            , page = Pages.page
             }
 
 @docs create, Program
-
-
-# using elm-ui?
-
-If you're a big fan of [mdgriffith/elm-ui](https://package.elm-lang.org/packages/mdgriffith/elm-ui/latest/) (or a "not-so-big-fan of CSS"),
-this package supports using `Element msg` instead of `Html msg` for your pages and components.
-
-@docs usingElmUi
-
-
-## using html?
-
-@docs usingHtml
 
 -}
 
 import Browser
 import Browser.Navigation as Nav
 import Dict exposing (Dict)
-import Element exposing (Element)
-import Html exposing (Html)
 import Internals.Page as Page
 import Internals.Path as Path exposing (Path)
 import Internals.Transition as Transition exposing (Transition)
@@ -78,53 +58,8 @@ type alias Program flags globalModel globalMsg layoutModel layoutMsg =
     Platform.Program flags (Model flags globalModel layoutModel) (Msg globalMsg layoutMsg)
 
 
-{-| If you're just using `elm/html`, you can pass this into `Spa.create`
-
-    main =
-        Spa.create
-            { ui = Spa.usingHtml
-            , -- ...
-            }
-
--}
-usingHtml :
-    { map :
-        (layoutMsg -> Msg globalMsg layoutMsg)
-        -> Html layoutMsg
-        -> Html (Msg globalMsg layoutMsg)
-    , toHtml : ui_msg -> ui_msg
-    }
-usingHtml =
-    { toHtml = identity
-    , map = Html.map
-    }
-
-
-{-| If you're just using `mdgriffith/elm-ui`, you can pass this into `Spa.create`
-
-    main =
-        Spa.create
-            { ui = Spa.usingElmUi
-            , -- ...
-            }
-
--}
-usingElmUi :
-    { map :
-        (layoutMsg -> Msg globalMsg layoutMsg)
-        -> Element layoutMsg
-        -> Element (Msg globalMsg layoutMsg)
-    , toHtml : Element msg -> Html msg
-    }
-usingElmUi =
-    { toHtml = Element.layout []
-    , map = Element.map
-    }
-
-
 {-| Creates a new `Program` given some one-time configuration:
 
-  - `ui` - How do we convert our views into `Html msg`?
   - `routing` - What are the app's routes?
   - `transitions` - How should we transition between routes?
   - `global` - How do we share state between pages?
@@ -146,7 +81,7 @@ create :
             -> ( globalModel, Cmd globalMsg, Cmd (Msg globalMsg layoutMsg) )
         , subscriptions : globalModel -> Sub globalMsg
         }
-    , page : Page.Page route route layoutModel layoutMsg ui_layoutMsg layoutModel layoutMsg ui_layoutMsg globalModel globalMsg (Msg globalMsg layoutMsg) ui_msg
+    , page : Page.Page route route layoutModel layoutMsg layoutModel layoutMsg globalModel globalMsg (Msg globalMsg layoutMsg)
     , routing :
         { routes : List (Parser (route -> route) route)
         , toPath : route -> String
@@ -154,24 +89,20 @@ create :
         , afterNavigate : Maybe ({ old : route, new : route } -> globalMsg)
         }
     , transitions :
-        { layout : Transition ui_msg
-        , page : Transition ui_msg
+        { layout : Transition (Msg globalMsg layoutMsg)
+        , page : Transition (Msg globalMsg layoutMsg)
         , pages :
             List
                 { path : Path
-                , transition : Transition ui_msg
+                , transition : Transition (Msg globalMsg layoutMsg)
                 }
-        }
-    , ui :
-        { toHtml : ui_msg -> Html (Msg globalMsg layoutMsg)
-        , map : (layoutMsg -> Msg globalMsg layoutMsg) -> ui_layoutMsg -> ui_msg
         }
     }
     -> Program flags globalModel globalMsg layoutModel layoutMsg
 create config =
     let
         page =
-            Page.upgrade (always identity)
+            Page.upgrade
                 { toModel = identity
                 , toMsg = identity
                 , page = config.page
@@ -208,16 +139,13 @@ create config =
         , subscriptions =
             subscriptions
                 { bundle = page.bundle
-                , map = config.ui.map
                 , global = config.global.subscriptions
                 , transition = config.transitions.layout
                 , fromUrl = fromUrl config.routing
                 }
         , view =
             view
-                { toHtml = config.ui.toHtml
-                , bundle = page.bundle
-                , map = config.ui.map
+                { bundle = page.bundle
                 , transitions = config.transitions
                 , fromUrl = fromUrl config.routing
                 }
@@ -476,7 +404,11 @@ update config msg model =
                    )
 
 
-navigate : (route -> String) -> Url -> route -> Cmd (Msg globalMsg layoutMsg)
+navigate :
+    (route -> String)
+    -> Url
+    -> route
+    -> Cmd (Msg globalMsg layoutMsg)
 navigate toPath url route =
     Utils.send <|
         ClickedLink (Browser.Internal { url | path = toPath route })
@@ -487,12 +419,11 @@ navigate toPath url route =
 
 
 subscriptions :
-    { map : (layoutMsg -> Msg globalMsg layoutMsg) -> ui_layoutMsg -> ui_msg
-    , bundle :
+    { bundle :
         layoutModel
-        -> Page.Bundle route layoutMsg ui_layoutMsg globalModel globalMsg (Msg globalMsg layoutMsg) ui_msg
+        -> Page.Bundle route layoutMsg globalModel globalMsg (Msg globalMsg layoutMsg)
     , global : globalModel -> Sub globalMsg
-    , transition : Transition ui_msg
+    , transition : Transition (Msg globalMsg layoutMsg)
     , fromUrl : Url -> route
     }
     -> Model flags globalModel layoutModel
@@ -503,7 +434,6 @@ subscriptions config model =
             model.page
             { fromGlobalMsg = Global
             , fromPageMsg = Page
-            , map = config.map
             , path = model.path
             , transitions = []
             , visibility = model.visibilities.page
@@ -521,25 +451,23 @@ subscriptions config model =
 -- VIEW
 
 
-type alias Transitions ui_msg =
-    { layout : Transition ui_msg
-    , page : Transition ui_msg
+type alias Transitions msg =
+    { layout : Transition msg
+    , page : Transition msg
     , pages :
         List
             { path : Path
-            , transition : Transition ui_msg
+            , transition : Transition msg
             }
     }
 
 
 view :
-    { map : (layoutMsg -> Msg globalMsg layoutMsg) -> ui_layoutMsg -> ui_msg
-    , toHtml : ui_msg -> Html (Msg globalMsg layoutMsg)
-    , bundle :
+    { bundle :
         layoutModel
-        -> Page.Bundle route layoutMsg ui_layoutMsg globalModel globalMsg (Msg globalMsg layoutMsg) ui_msg
+        -> Page.Bundle route layoutMsg globalModel globalMsg (Msg globalMsg layoutMsg)
     , fromUrl : Url -> route
-    , transitions : Transitions ui_msg
+    , transitions : Transitions (Msg globalMsg layoutMsg)
     }
     -> Model flags globalModel layoutModel
     -> Browser.Document (Msg globalMsg layoutMsg)
@@ -550,7 +478,6 @@ view config model =
                 model.page
                 { fromGlobalMsg = Global
                 , fromPageMsg = Page
-                , map = config.map
                 , path = model.path
                 , visibility = model.visibilities.page
                 , transitions = pageTransitions config.transitions
@@ -562,11 +489,10 @@ view config model =
     in
     { title = bundle.title
     , body =
-        [ config.toHtml <|
-            Transition.view
-                config.transitions.layout
-                model.visibilities.layout
-                bundle.view
+        [ Transition.view
+            config.transitions.layout
+            model.visibilities.layout
+            bundle.view
         ]
     }
 

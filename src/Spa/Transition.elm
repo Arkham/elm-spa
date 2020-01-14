@@ -1,7 +1,8 @@
 module Spa.Transition exposing
     ( Transition
-    , none, fadeElmUi, fadeHtml
+    , none
     , custom
+    , fade
     )
 
 {-|
@@ -28,24 +29,19 @@ This package is designed to make creating page transitions a breeze!
 
 -}
 
-import Element exposing (Element)
 import Html exposing (Html)
 import Internals.Transition
 
 
 {-| Describes how to move from one page to another.
 
-    transition : Transition (Html msg)
+    transition : Transition msg
     transition =
         Transition.none
 
-    otherTransition : Transition (Element msg)
-    otherTransition =
-        Transition.fadeElmUi 300
-
 -}
-type alias Transition ui_msg =
-    Internals.Transition.Transition ui_msg
+type alias Transition msg =
+    Internals.Transition.Transition msg
 
 
 
@@ -71,7 +67,7 @@ Can be used with `Html msg` or `Element msg` (or another view library)
         }
 
 -}
-none : Transition ui_msg
+none : Transition msg
 none =
     Internals.Transition.none
 
@@ -80,34 +76,17 @@ none =
 
 Animation duration is represented in **milliseconds**
 
-    transitions : Spa.Types.Transitions (Html msg)
+    transitions : Spa.Types.Transitions msg
     transitions =
         { layout = Transition.none
-        , page = Transition.fadeHtml 300 -- 300 milliseconds
+        , page = Transition.fade 300 -- 300 milliseconds
         , pages = []
         }
 
 -}
-fadeHtml : Int -> Transition (Html msg)
-fadeHtml =
-    Internals.Transition.fadeHtml
-
-
-{-| Fade one page out and another one in. (For use with `mdgriffith/elm-ui`)
-
-Animation duration is represented in **milliseconds**
-
-    transitions : Spa.Types.Transitions (Element msg)
-    transitions =
-        { layout = Transition.none
-        , page = Transition.fadeElmUi 300 -- 300 milliseconds
-        , pages = []
-        }
-
--}
-fadeElmUi : Int -> Transition (Element msg)
-fadeElmUi =
-    Internals.Transition.fadeElmUi
+fade : Int -> Transition msg
+fade =
+    Internals.Transition.fade
 
 
 {-| Create your own custom transition!
@@ -165,9 +144,9 @@ transitions =
 -}
 custom :
     { duration : Int
-    , invisible : ui_msg -> ui_msg
-    , visible : ui_msg -> ui_msg
+    , invisible : Html msg -> Html msg
+    , visible : Html msg -> Html msg
     }
-    -> Transition ui_msg
+    -> Transition msg
 custom =
     Internals.Transition.custom
