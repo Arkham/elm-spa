@@ -1,13 +1,13 @@
 {
   "name": "elm-spa",
   "version": "1.0.0",
-  "description": "a package for building single-page applications!",
+  "description": "single-page apps made easy",
   "main": "cli/src/index.js",
   "bin": "./cli/src/index.js",
   "scripts": {
     "start": "npm install && npm run dev",
     "build": "npm link && (cd cli && npm run build)",
-    "dev": "(cd examples/basic && npm start)",
+    "dev": "(cd examples/intro && npm start)",
     "docs": "elm-doc-preview"
   },
   "dependencies": {},
