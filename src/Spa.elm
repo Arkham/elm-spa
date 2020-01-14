@@ -3,28 +3,31 @@ module Spa exposing (create, Program)
 {-|
 
 
-## Let's build some single page applications!
+# creating an application
 
 `Spa.create` replaces [Browser.application](https://package.elm-lang.org/packages/elm/browser/latest/Browser#application)
 as the entrypoint to your app.
 
     import Global
     import Pages
-    import Routes exposing (routes)
+    import Routes
     import Spa
-    import Transitions
-    import Utils.Spa
+    import Spa.Transition
 
-    main : Utils.Spa.Program Pages.Model Pages.Msg
+    main : Spa.Program Global.Flags Global.Model Global.Msg Pages.Model Pages.Msg
     main =
         Spa.create
-            { routing =
-                { routes = Routes.parsers
+            { transitions =
+                { layout = Spa.Transition.none
+                , page = Spa.Transition.fade 300
+                , pages = []
+                }
+            , routing =
+                { routes = Routes.routes
                 , toPath = Routes.toPath
-                , notFound = routes.notFound
+                , notFound = Routes.NotFound
                 , afterNavigate = Nothing
                 }
-            , transitions = Transitions.transitions
             , global =
                 { init = Global.init
                 , update = Global.update

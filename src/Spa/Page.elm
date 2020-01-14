@@ -529,13 +529,12 @@ send =
 -- LAYOUT
 
 
-{-| In practice, we wrap `layout` in `Utils/Spa.elm` so we only have to provide `Html.map` or `Element.map` once)
+{-|
 
-    import Spa.Path as Path
-    import Utils.Spa as Spa
+    import Spa.Page
 
     page =
-        Spa.layout
+        Spa.Page.layout
             { path = []
             , view = Layout.view
             , pages =

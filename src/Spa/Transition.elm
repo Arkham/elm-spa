@@ -1,8 +1,7 @@
 module Spa.Transition exposing
     ( Transition
-    , none
+    , none, fade
     , custom
-    , fade
     )
 
 {-|
@@ -20,7 +19,7 @@ This package is designed to make creating page transitions a breeze!
 
 ## Use one of these transitions
 
-@docs none, fadeElmUi, fadeHtml
+@docs none, fade
 
 
 ## Or create your own
@@ -50,19 +49,10 @@ type alias Transition msg =
 
 {-| Don't transition from one page to another.
 
-Can be used with `Html msg` or `Element msg` (or another view library)
-
-    transitions : Transitions (Html msg)
+    transitions : Transitions msg
     transitions =
         { layout = Transition.none -- page loads instantly
-        , page = Transition.fadeHtml 300
-        , pages = []
-        }
-
-    otherTransitions : Transitions (Element msg)
-    otherTransitions =
-        { layout = Transition.none -- page loads instantly
-        , page = Transition.fadeElmUi 300
+        , page = Transition.fade 300
         , pages = []
         }
 
@@ -72,7 +62,7 @@ none =
     Internals.Transition.none
 
 
-{-| Fade one page out and another one in. (For use with `elm/html`)
+{-| Fade one page out and another one in.
 
 Animation duration is represented in **milliseconds**
 
@@ -95,45 +85,50 @@ Just provide three things:
 
   - `duration` – how long (in milliseconds) the transition should last.
 
-  - `invisible` – what the page looks like when **invisible**.
+  - `invisible` – what the page looks like when out of view.
 
-  - `visible` – what the page looks like when **visible**.
+  - `visible` – what the page looks like when in view.
 
 ```
-batmanNewspaper : Int -> Transition (Element msg)
+import Html
+import Html.Attributes as Attr
+
+batmanNewspaper : Int -> Transition msg
 batmanNewspaper duration =
+    let
+        transition : Html.Attribute msg
+        transition =
+            Attr.style "transition"
+                ("all " ++ String.fromInt duration ++ "ms")
+
+        invisible : Html msg -> Html msg
+        invisible page =
+            Html.div
+                [ Attr.style "opacity" "0"
+                , Attr.style "transform" "rotate(1800deg), scale(0)"
+                , transition
+                ]
+                [ page ]
+
+        visible : Html msg -> Html msg
+        visible page =
+            Html.div
+                [ Attr.style "opacity" "1"
+                , Attr.style "transform" "none"
+                , transition
+                ]
+                [ page ]
+    in
     Transition.custom
         { duration = duration
-        , invisible =
-            \page ->
-                el
-                    [ alpha 0
-                    , width fill
-                    , rotate (4 * pi)
-                    , scale 0
-                    , Styles.transition
-                        { property = "all"
-                        , duration = duration
-                        }
-                    ]
-                    page
+        , invisible = invisible
         , visible =
-            \page ->
-                el
-                    [ alpha 1
-                    , width fill
-                    , Styles.transition
-                        { property = "all"
-                        , duration = duration
-                        }
-                    ]
-                    page
         }
 
 --
 -- using it later on
 --
-transitions : Spa.Types.Transitions (Element msg)
+transitions : Spa.Types.Transitions msg
 transitions =
     { layout = batmanNewspaper 500 -- 🦇
     , page = Transition.none
