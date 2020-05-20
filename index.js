@@ -101,7 +101,7 @@ const help = {
   ${bold('elm-spa build')} [dir]
 
     Create "Generated.Route" and "Generated.Pages" modules for
-    this project, based on the files in "src/Pages"
+    this project, based on the file names in "src/Pages"
 
     Here are more details on how that works:
     https://www.npmjs.com/package/elm-spa#naming-conventions
