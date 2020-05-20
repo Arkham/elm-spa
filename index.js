@@ -8,7 +8,7 @@ const package = require('./package.json')
 const folders = {
   src: (dir) => path.join(process.cwd(), dir, 'src'),
   pages: (dir) => path.join(process.cwd(), dir, 'src', 'Pages'),
-  generated: (dir) => path.join(process.cwd(), dir, 'src', 'Generated')
+  generated: (dir) => path.join(process.cwd(), dir, 'src', 'Spa', 'Generated')
 }
 
 const rejectIfMissing = (dir) => new Promise((resolve, reject) =>
@@ -167,6 +167,8 @@ const commands = {
 
   '-v': _ => Promise.resolve(package.version),
 
+  'version': _ => Promise.resolve(package.version),
+
   'help': _ => Promise.resolve(help.general)
     
 }
@@ -179,7 +181,7 @@ const main = ([ command, ...args ] = []) =>
       console.info(`\n${bold('Congratulations!')} - you've found a bug!
     
   If you'd like, open an issue here with the following output:
-  https://github.com/ryannhg/elm-spa/issues/new?labels=cli
+  https://github.com/ryannhg/elm-spa/issues/new?labels=cli-crash
 
 
 ${bold(`### terminal output`)}
