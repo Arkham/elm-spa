@@ -1,10 +1,19 @@
-module Pages.NotFound exposing (Flags, Model, Msg, page)
+module Pages.NotFound exposing (Model, Msg, Params, page)
 
-import Html
-import Page exposing (Document, Page)
+import Html exposing (h1, text)
+import Html.Attributes exposing (class)
+import Spa.Document as Document exposing (Document)
+import Spa.Page as Page exposing (Page)
 
 
-type alias Flags =
+page : Page Params Model Msg
+page =
+    Page.static
+        { view = view
+        }
+
+
+type alias Params =
     ()
 
 
@@ -16,15 +25,10 @@ type alias Msg =
     Never
 
 
-page : Page Flags Model Msg
-page =
-    Page.static
-        { view = view
-        }
-
-
 view : Document Msg
 view =
-    { title = "NotFound"
-    , body = [ Html.text "NotFound" ]
+    { title = "404"
+    , body =
+        [ h1 [ class "font-h2" ] [ text "Page not found" ]
+        ]
     }

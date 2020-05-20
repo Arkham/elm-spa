@@ -1,11 +1,11 @@
 module Main exposing (main)
 
-import Browser exposing (Document)
-import Browser.Navigation as Nav exposing (Key)
-import Generated.Pages as Pages
-import Generated.Route as Route exposing (Route)
-import Global
-import Html
+import Browser
+import Browser.Navigation as Nav
+import Global exposing (Flags)
+import Spa.Document as Document exposing (Document)
+import Spa.Generated.Pages as Pages
+import Spa.Generated.Route as Route exposing (Route)
 import Url exposing (Url)
 
 
@@ -13,129 +13,116 @@ main : Program Flags Model Msg
 main =
     Browser.application
         { init = init
-        , view = view
         , update = update
         , subscriptions = subscriptions
+        , view = view >> Document.toBrowserDocument
         , onUrlRequest = LinkClicked
         , onUrlChange = UrlChanged
         }
+
+
+notFoundRoute : Route
+notFoundRoute =
+    Route.NotFound ()
 
 
 
 -- INIT
 
 
-type alias Flags =
-    ()
-
-
 type alias Model =
-    { key : Key
-    , url : Url
+    { url : Url
+    , key : Nav.Key
     , global : Global.Model
     , page : Pages.Model
     }
 
 
-init : Flags -> Url -> Key -> ( Model, Cmd Msg )
+init : Flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
     let
-        ( global, globalCmd ) =
-            Global.init flags url key
+        global =
+            Global.init flags key
 
-        ( page, pageCmd, pageGlobalCmd ) =
-            Pages.init (fromUrl url) global
+        ( page, pageCmd ) =
+            Pages.init (Route.fromUrl notFoundRoute url) global url
     in
-    ( Model key url global page
-    , Cmd.batch
-        [ Cmd.map Global globalCmd
-        , Cmd.map Global pageGlobalCmd
-        , Cmd.map Page pageCmd
-        ]
+    ( Model url key global page
+    , Cmd.map Pages pageCmd
     )
+
+
+
+-- UPDATE
 
 
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url
     | Global Global.Msg
-    | Page Pages.Msg
+    | Pages Pages.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         LinkClicked (Browser.Internal url) ->
-            ( model, Nav.pushUrl model.key (Url.toString url) )
+            ( model
+            , Nav.pushUrl model.key (Url.toString url)
+            )
 
         LinkClicked (Browser.External href) ->
-            ( model, Nav.load href )
+            ( model
+            , Nav.load href
+            )
 
         UrlChanged url ->
             let
-                ( page, pageCmd, globalCmd ) =
-                    Pages.init (fromUrl url) model.global
+                ( page, cmd ) =
+                    Pages.init (Route.fromUrl notFoundRoute url) model.global url
+
+                global =
+                    Pages.save page model.global
             in
-            ( { model | url = url, page = page }
-            , Cmd.batch
-                [ Cmd.map Page pageCmd
-                , Cmd.map Global globalCmd
-                ]
+            ( { model | url = url, page = page, global = global }
+            , Cmd.map Pages cmd
             )
 
         Global globalMsg ->
             let
-                ( global, globalCmd ) =
+                ( global, cmd ) =
                     Global.update globalMsg model.global
+
+                page =
+                    Pages.load model.page global
             in
-            ( { model | global = global }
-            , Cmd.map Global globalCmd
+            ( { model | page = page, global = global }
+            , Cmd.map Global cmd
             )
 
-        Page pageMsg ->
+        Pages pageMsg ->
             let
-                ( page, pageCmd, globalCmd ) =
-                    Pages.update pageMsg model.page model.global
+                ( page, cmd ) =
+                    Pages.update pageMsg model.page
+
+                global =
+                    Pages.save page model.global
             in
-            ( { model | page = page }
-            , Cmd.batch
-                [ Cmd.map Page pageCmd
-                , Cmd.map Global globalCmd
-                ]
+            ( { model | page = page, global = global }
+            , Cmd.map Pages cmd
             )
 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.batch
-        [ model.global
-            |> Global.subscriptions
-            |> Sub.map Global
-        , model.page
-            |> (\page -> Pages.subscriptions page model.global)
-            |> Sub.map Page
-        ]
-
-
-view : Model -> Browser.Document Msg
+view : Model -> Document Msg
 view model =
-    let
-        documentMap :
-            (msg1 -> msg2)
-            -> Document msg1
-            -> Document msg2
-        documentMap fn doc =
-            { title = doc.title
-            , body = List.map (Html.map fn) doc.body
-            }
-    in
     Global.view
-        { page = Pages.view model.page model.global |> documentMap Page
+        { page = Pages.view model.page |> Document.map Pages
         , global = model.global
         , toMsg = Global
         }
 
 
-fromUrl : Url -> Route
-fromUrl =
-    Route.fromUrl >> Maybe.withDefault Route.NotFound
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Pages.subscriptions model.page
+        |> Sub.map Pages

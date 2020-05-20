@@ -3,22 +3,17 @@ module Global exposing
     , Model
     , Msg
     , init
-    , navigate
     , subscriptions
     , update
     , view
     )
 
-import Browser exposing (Document)
 import Browser.Navigation as Nav
-import Components
-import Generated.Route as Route exposing (Route)
-import Task
-import Url exposing (Url)
-
-
-
--- INIT
+import Html exposing (a, div, footer, header, text)
+import Html.Attributes exposing (class, href)
+import Ports
+import Spa.Document exposing (Document)
+import Spa.Generated.Route as Route
 
 
 type alias Flags =
@@ -26,50 +21,31 @@ type alias Flags =
 
 
 type alias Model =
-    { flags : Flags
-    , url : Url
-    , key : Nav.Key
+    { key : Nav.Key
     }
 
 
-init : Flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init flags url key =
-    ( Model
-        flags
-        url
-        key
-    , Cmd.none
-    )
-
-
-
--- UPDATE
+init : Flags -> Nav.Key -> Model
+init _ key =
+    Model key
 
 
 type Msg
-    = Navigate Route
+    = NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Navigate route ->
+        NoOp ->
             ( model
-            , Nav.pushUrl model.key (Route.toHref route)
+            , Cmd.none
             )
-
-
-
--- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
-
-
-
--- VIEW
 
 
 view :
@@ -79,20 +55,15 @@ view :
     }
     -> Document msg
 view { page, global, toMsg } =
-    Components.layout
-        { page = page
-        }
-
-
-
--- COMMANDS
-
-
-send : msg -> Cmd msg
-send =
-    Task.succeed >> Task.perform identity
-
-
-navigate : Route -> Cmd Msg
-navigate route =
-    send (Navigate route)
+    { title = page.title
+    , body =
+        [ div [ class "column container padding-small spacing-small fill-y" ]
+            [ header [ class "row spacing-small spread" ]
+                [ a [ class "link", href (Route.toString (Route.Top ())) ] [ text "Home" ]
+                , a [ class "link", href (Route.toString (Route.NotFound ())) ] [ text "Nowhere" ]
+                ]
+            , Html.main_ [ class "flex" ] page.body
+            , footer [ class "footer" ] [ text "Built with elm-spa" ]
+            ]
+        ]
+    }
