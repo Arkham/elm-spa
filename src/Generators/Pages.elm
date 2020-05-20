@@ -45,18 +45,16 @@ import Page exposing (Bundle, Document)
 -- PAGES
 
 
-type alias UpgradedPage flags model msg =
+type alias Upgraded flags model msg =
     { init : flags -> Global.Model -> ( Model, Cmd Msg, Cmd Global.Msg )
     , update : msg -> model -> Global.Model -> ( Model, Cmd Msg, Cmd Global.Msg )
     , bundle : model -> Global.Model -> Bundle Msg
     }
 
 
-type alias UpgradedPages =
+
+pages :
 {{pagesUpgradedTypes}}
-
-
-pages : UpgradedPages
 pages =
 {{pagesUpgradedValues}}
 
@@ -128,7 +126,7 @@ pagesCustomType name paths =
             List.map
                 (\path ->
                     Path.toTypeName path
-                        ++ "_"
+                        ++ "__"
                         ++ name
                         ++ " Pages."
                         ++ Path.toModulePath path
@@ -149,7 +147,7 @@ pagesUpgradedTypes paths =
                         "Pages." ++ Path.toModulePath path
                 in
                 ( Path.toVariableName path
-                , "UpgradedPage "
+                , "Upgraded "
                     ++ name
                     ++ ".Flags "
                     ++ name
@@ -172,9 +170,9 @@ pagesUpgradedValues paths =
                     ++ Path.toModulePath path
                     ++ ".page |> Page.upgrade "
                     ++ Path.toTypeName path
-                    ++ "_Model "
+                    ++ "__Model "
                     ++ Path.toTypeName path
-                    ++ "_Msg"
+                    ++ "__Msg"
                 )
             )
         |> Utils.recordValue
@@ -236,9 +234,9 @@ pagesUpdate paths =
                                 in
                                 ( "( "
                                     ++ typeName
-                                    ++ "_Msg msg, "
+                                    ++ "__Msg msg, "
                                     ++ typeName
-                                    ++ "_Model model )"
+                                    ++ "__Model model )"
                                 , "pages." ++ Path.toVariableName path ++ ".update msg model"
                                 )
                             )
@@ -270,29 +268,9 @@ pagesBundle paths =
                                     typeName =
                                         Path.toTypeName path
                                 in
-                                ( typeName ++ "_Model model"
+                                ( typeName ++ "__Model model"
                                 , "pages." ++ Path.toVariableName path ++ ".bundle model"
                                 )
                             )
                 }
         }
-
-
-
--- bundle : Model -> Global.Model -> Spa.Bundle Msg
--- bundle appModel =
---     case appModel of
---         Top_Model model ->
---             pages.top.bundle model
---         Profile_Model model ->
---             pages.profile.bundle model
---         About_Model model ->
---             pages.about.bundle model
---         Authors_Dynamic_Posts_Dynamic_Model model ->
---             pages.authors_dynamic_posts_dynamic.bundle model
---         Posts_Top_Model model ->
---             pages.posts_top.bundle model
---         Posts_Dynamic_Model model ->
---             pages.posts_dynamic.bundle model
---         NotFound_Model model ->
---             pages.notFound.bundle model

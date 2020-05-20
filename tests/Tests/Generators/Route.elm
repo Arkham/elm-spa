@@ -21,8 +21,8 @@ paths =
         , Path.fromFilepath "About.elm"
         , Path.fromFilepath "NotFound.elm"
         , Path.fromFilepath "Posts/Top.elm"
-        , Path.fromFilepath "Posts/Dynamic.elm"
-        , Path.fromFilepath "Authors/Dynamic/Posts/Dynamic.elm"
+        , Path.fromFilepath "Posts/Id_Int.elm"
+        , Path.fromFilepath "Authors/Author_String/Posts/PostId_Int.elm"
         ]
     }
 
@@ -50,9 +50,9 @@ type Route
     = Top
     | About
     | NotFound
-    | Posts_Top
-    | Posts_Dynamic { param1 : String }
-    | Authors_Dynamic_Posts_Dynamic { param1 : String, param2 : String }
+    | Posts__Top
+    | Posts__Id_Int { id : Int }
+    | Authors__Author_String__Posts__PostId_Int { author : String, postId : Int }
 """)
             ]
         , describe "routeParsers"
@@ -73,13 +73,13 @@ type Route
                         |> Expect.equal """        [ Parser.map Top Parser.top
         , Parser.map About (Parser.s "about")
         , Parser.map NotFound (Parser.s "not-found")
-        , Parser.map Posts_Top (Parser.s "posts")
-        , (Parser.s "posts" </> Parser.string)
-          |> Parser.map (\\param1 -> { param1 = param1 })
-          |> Parser.map Posts_Dynamic
-        , (Parser.s "authors" </> Parser.string </> Parser.s "posts" </> Parser.string)
-          |> Parser.map (\\param1 param2 -> { param1 = param1, param2 = param2 })
-          |> Parser.map Authors_Dynamic_Posts_Dynamic
+        , Parser.map Posts__Top (Parser.s "posts")
+        , (Parser.s "posts" </> Parser.int)
+          |> Parser.map (\\id -> { id = id })
+          |> Parser.map Posts__Id_Int
+        , (Parser.s "authors" </> Parser.string </> Parser.s "posts" </> Parser.int)
+          |> Parser.map (\\author postId -> { author = author, postId = postId })
+          |> Parser.map Authors__Author_String__Posts__PostId_Int
         ]"""
             ]
         , describe "routeSegments"
@@ -109,13 +109,13 @@ type Route
                 NotFound ->
                     [ "not-found" ]
                 
-                Posts_Top ->
+                Posts__Top ->
                     [ "posts" ]
                 
-                Posts_Dynamic { param1 } ->
-                    [ "posts", param1 ]
+                Posts__Id_Int { id } ->
+                    [ "posts", id ]
                 
-                Authors_Dynamic_Posts_Dynamic { param1, param2 } ->
-                    [ "authors", param1, "posts", param2 ]"""
+                Authors__Author_String__Posts__PostId_Int { author, postId } ->
+                    [ "authors", author, "posts", postId ]"""
             ]
         ]

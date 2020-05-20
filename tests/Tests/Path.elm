@@ -13,7 +13,7 @@ suite =
                 \_ ->
                     Path.routingOrder
                         (Path.fromFilepath "Example/Top.elm")
-                        (Path.fromFilepath "Example/Dynamic.elm")
+                        (Path.fromFilepath "Example/Id_Int.elm")
                         |> Expect.equal LT
             , test "prioritizes files over folders with top" <|
                 \_ ->
@@ -25,8 +25,8 @@ suite =
                 \_ ->
                     [ Path.fromFilepath "Top.elm"
                     , Path.fromFilepath "About.elm"
-                    , Path.fromFilepath "Authors/Dynamic/Posts/Dynamic.elm"
-                    , Path.fromFilepath "Posts/Dynamic.elm"
+                    , Path.fromFilepath "Authors/Author_String/Posts/PostId_Int.elm"
+                    , Path.fromFilepath "Posts/Id_Int.elm"
                     , Path.fromFilepath "Posts.elm"
                     , Path.fromFilepath "Posts/Top.elm"
                     ]
@@ -36,8 +36,8 @@ suite =
                             , Path.fromFilepath "About.elm"
                             , Path.fromFilepath "Posts.elm"
                             , Path.fromFilepath "Posts/Top.elm"
-                            , Path.fromFilepath "Posts/Dynamic.elm"
-                            , Path.fromFilepath "Authors/Dynamic/Posts/Dynamic.elm"
+                            , Path.fromFilepath "Posts/Id_Int.elm"
+                            , Path.fromFilepath "Authors/Author_String/Posts/PostId_Int.elm"
                             ]
             ]
         , describe "fromFilepath"
@@ -61,10 +61,10 @@ suite =
                         |> Expect.equalLists [ "Posts", "Top" ]
             , test "works with nested folders" <|
                 \_ ->
-                    "Authors/Dynamic/Posts/Dynamic.elm"
+                    "Authors/Author_String/Posts/PostId_Int.elm"
                         |> Path.fromFilepath
                         |> Path.toList
-                        |> Expect.equalLists [ "Authors", "Dynamic", "Posts", "Dynamic" ]
+                        |> Expect.equalLists [ "Authors", "Author_String", "Posts", "PostId_Int" ]
             ]
         , describe "toModulePath"
             [ test "works without folders" <|
@@ -81,10 +81,10 @@ suite =
                         |> Expect.equal "Posts.Top"
             , test "works with nested folders" <|
                 \_ ->
-                    "Authors/Dynamic/Posts/Dynamic.elm"
+                    "Authors/Author_String/Posts/PostId_Int.elm"
                         |> Path.fromFilepath
                         |> Path.toModulePath
-                        |> Expect.equal "Authors.Dynamic.Posts.Dynamic"
+                        |> Expect.equal "Authors.Author_String.Posts.PostId_Int"
             ]
         , describe "toVariableName"
             [ test "works without folders" <|
@@ -104,13 +104,13 @@ suite =
                     "Posts/Top.elm"
                         |> Path.fromFilepath
                         |> Path.toVariableName
-                        |> Expect.equal "posts_top"
+                        |> Expect.equal "posts__top"
             , test "works with nested folders" <|
                 \_ ->
-                    "Authors/Dynamic/Posts/Dynamic.elm"
+                    "Authors/Author_String/Posts/PostId_Int.elm"
                         |> Path.fromFilepath
                         |> Path.toVariableName
-                        |> Expect.equal "authors_dynamic_posts_dynamic"
+                        |> Expect.equal "authors__author_string__posts__postId_int"
             ]
         , describe "toTypeName"
             [ test "works without folders" <|
@@ -124,13 +124,13 @@ suite =
                     "Posts/Top.elm"
                         |> Path.fromFilepath
                         |> Path.toTypeName
-                        |> Expect.equal "Posts_Top"
+                        |> Expect.equal "Posts__Top"
             , test "works with nested folders" <|
                 \_ ->
-                    "Authors/Dynamic/Posts/Dynamic.elm"
+                    "Authors/Author_String/Posts/PostId_Int.elm"
                         |> Path.fromFilepath
                         |> Path.toTypeName
-                        |> Expect.equal "Authors_Dynamic_Posts_Dynamic"
+                        |> Expect.equal "Authors__Author_String__Posts__PostId_Int"
             ]
         , describe "optionalParams"
             [ test "works without folders" <|
@@ -141,16 +141,16 @@ suite =
                         |> Expect.equal ""
             , test "works with a single folder" <|
                 \_ ->
-                    "Posts/Dynamic.elm"
+                    "Posts/Id_Int.elm"
                         |> Path.fromFilepath
                         |> Path.optionalParams
-                        |> Expect.equal " { param1 : String }"
+                        |> Expect.equal " { id : Int }"
             , test "works with nested folders" <|
                 \_ ->
-                    "Authors/Dynamic/Posts/Dynamic.elm"
+                    "Authors/Author_String/Posts/PostId_Int.elm"
                         |> Path.fromFilepath
                         |> Path.optionalParams
-                        |> Expect.equal " { param1 : String, param2 : String }"
+                        |> Expect.equal " { author : String, postId : Int }"
             ]
         , describe "toParser"
             [ test "works with top" <|
@@ -170,26 +170,26 @@ suite =
                     "About/Team.elm"
                         |> Path.fromFilepath
                         |> Path.toParser
-                        |> Expect.equal "Parser.map About_Team (Parser.s \"about\" </> Parser.s \"team\")"
+                        |> Expect.equal "Parser.map About__Team (Parser.s \"about\" </> Parser.s \"team\")"
             , test "works with single dynamic path" <|
                 \_ ->
-                    "Posts/Dynamic.elm"
+                    "Posts/Id_Int.elm"
                         |> Path.fromFilepath
                         |> Path.toParser
                         |> Expect.equal (String.trim """
-(Parser.s "posts" </> Parser.string)
-  |> Parser.map (\\param1 -> { param1 = param1 })
-  |> Parser.map Posts_Dynamic 
+(Parser.s "posts" </> Parser.int)
+  |> Parser.map (\\id -> { id = id })
+  |> Parser.map Posts__Id_Int
 """)
             , test "works with multiple dynamic paths" <|
                 \_ ->
-                    "Authors/Dynamic/Posts/Dynamic.elm"
+                    "Authors/Author_String/Posts/PostId_Int.elm"
                         |> Path.fromFilepath
                         |> Path.toParser
                         |> Expect.equal (String.trim """
-(Parser.s "authors" </> Parser.string </> Parser.s "posts" </> Parser.string)
-  |> Parser.map (\\param1 param2 -> { param1 = param1, param2 = param2 })
-  |> Parser.map Authors_Dynamic_Posts_Dynamic 
+(Parser.s "authors" </> Parser.string </> Parser.s "posts" </> Parser.int)
+  |> Parser.map (\\author postId -> { author = author, postId = postId })
+  |> Parser.map Authors__Author_String__Posts__PostId_Int 
 """)
             , describe "toFlags"
                 [ test "works with no dynamic params" <|
@@ -200,16 +200,16 @@ suite =
                             |> Expect.equal "()"
                 , test "works with one dynamic param" <|
                     \_ ->
-                        "Posts/Dynamic.elm"
+                        "Posts/Id_Int.elm"
                             |> Path.fromFilepath
                             |> Path.toFlags
-                            |> Expect.equal "{ param1 : String }"
+                            |> Expect.equal "{ id : Int }"
                 , test "works with multiple dynamic params" <|
                     \_ ->
-                        "Authors/Dynamic/Posts/Dynamic.elm"
+                        "Authors/Author_String/Posts/PostId_Int.elm"
                             |> Path.fromFilepath
                             |> Path.toFlags
-                            |> Expect.equal "{ param1 : String, param2 : String }"
+                            |> Expect.equal "{ author : String, postId : Int }"
                 ]
             ]
         ]

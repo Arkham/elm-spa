@@ -21,10 +21,17 @@ main =
                 ( ()
                 , case command of
                     "build" ->
-                        Ports.build (filepaths |> List.map Path.fromFilepath |> List.sortWith Path.routingOrder)
+                        Ports.build
+                            (filepaths
+                                |> List.map Path.fromFilepath
+                                |> List.sortWith Path.routingOrder
+                            )
 
                     "add" ->
-                        Ports.add { pageType = pageType, name = name }
+                        Ports.add
+                            { pageType = pageType
+                            , name = name
+                            }
 
                     _ ->
                         Ports.uhhh ()

@@ -21,8 +21,8 @@ paths =
         , Path.fromFilepath "About.elm"
         , Path.fromFilepath "NotFound.elm"
         , Path.fromFilepath "Posts/Top.elm"
-        , Path.fromFilepath "Posts/Dynamic.elm"
-        , Path.fromFilepath "Authors/Dynamic/Posts/Dynamic.elm"
+        , Path.fromFilepath "Posts/Id_Int.elm"
+        , Path.fromFilepath "Authors/Author_String/Posts/PostId_Int.elm"
         ]
     }
 
@@ -50,45 +50,45 @@ import Pages.Top
 import Pages.About
 import Pages.NotFound
 import Pages.Posts.Top
-import Pages.Posts.Dynamic
-import Pages.Authors.Dynamic.Posts.Dynamic
+import Pages.Posts.Id_Int
+import Pages.Authors.Author_String.Posts.PostId_Int
 """)
             , describe "pagesCustomType"
                 [ test "works with single path" <|
                     \_ ->
                         paths.single
                             |> Pages.pagesCustomType "Model"
-                            |> Expect.equal "type Model = Top_Model Pages.Top.Model"
+                            |> Expect.equal "type Model = Top__Model Pages.Top.Model"
                 , test "works with multiple paths" <|
                     \_ ->
                         paths.multiple
                             |> Pages.pagesCustomType "Model"
                             |> Expect.equal (String.trim """
 type Model
-    = Top_Model Pages.Top.Model
-    | About_Model Pages.About.Model
-    | NotFound_Model Pages.NotFound.Model
-    | Posts_Top_Model Pages.Posts.Top.Model
-    | Posts_Dynamic_Model Pages.Posts.Dynamic.Model
-    | Authors_Dynamic_Posts_Dynamic_Model Pages.Authors.Dynamic.Posts.Dynamic.Model
-""")
+    = Top__Model Pages.Top.Model
+    | About__Model Pages.About.Model
+    | NotFound__Model Pages.NotFound.Model
+    | Posts__Top__Model Pages.Posts.Top.Model
+    | Posts__Id_Int__Model Pages.Posts.Id_Int.Model
+    | Authors__Author_String__Posts__PostId_Int__Model Pages.Authors.Author_String.Posts.PostId_Int.Model
+            """)
                 ]
             , describe "pagesUpgradedTypes"
                 [ test "works with single path" <|
                     \_ ->
                         paths.single
                             |> Pages.pagesUpgradedTypes
-                            |> Expect.equal "    { top : UpgradedPage Pages.Top.Flags Pages.Top.Model Pages.Top.Msg }"
+                            |> Expect.equal "    { top : Upgraded Pages.Top.Flags Pages.Top.Model Pages.Top.Msg }"
                 , test "works with multiple paths" <|
                     \_ ->
                         paths.multiple
                             |> Pages.pagesUpgradedTypes
-                            |> Expect.equal """    { top : UpgradedPage Pages.Top.Flags Pages.Top.Model Pages.Top.Msg
-    , about : UpgradedPage Pages.About.Flags Pages.About.Model Pages.About.Msg
-    , notFound : UpgradedPage Pages.NotFound.Flags Pages.NotFound.Model Pages.NotFound.Msg
-    , posts_top : UpgradedPage Pages.Posts.Top.Flags Pages.Posts.Top.Model Pages.Posts.Top.Msg
-    , posts_dynamic : UpgradedPage Pages.Posts.Dynamic.Flags Pages.Posts.Dynamic.Model Pages.Posts.Dynamic.Msg
-    , authors_dynamic_posts_dynamic : UpgradedPage Pages.Authors.Dynamic.Posts.Dynamic.Flags Pages.Authors.Dynamic.Posts.Dynamic.Model Pages.Authors.Dynamic.Posts.Dynamic.Msg
+                            |> Expect.equal """    { top : Upgraded Pages.Top.Flags Pages.Top.Model Pages.Top.Msg
+    , about : Upgraded Pages.About.Flags Pages.About.Model Pages.About.Msg
+    , notFound : Upgraded Pages.NotFound.Flags Pages.NotFound.Model Pages.NotFound.Msg
+    , posts__top : Upgraded Pages.Posts.Top.Flags Pages.Posts.Top.Model Pages.Posts.Top.Msg
+    , posts__id_int : Upgraded Pages.Posts.Id_Int.Flags Pages.Posts.Id_Int.Model Pages.Posts.Id_Int.Msg
+    , authors__author_string__posts__postId_int : Upgraded Pages.Authors.Author_String.Posts.PostId_Int.Flags Pages.Authors.Author_String.Posts.PostId_Int.Model Pages.Authors.Author_String.Posts.PostId_Int.Msg
     }"""
                 ]
             , describe "pagesUpgradedValues"
@@ -96,17 +96,17 @@ type Model
                     \_ ->
                         paths.single
                             |> Pages.pagesUpgradedValues
-                            |> Expect.equal "    { top = Pages.Top.page |> Page.upgrade Top_Model Top_Msg }"
+                            |> Expect.equal "    { top = Pages.Top.page |> Page.upgrade Top__Model Top__Msg }"
                 , test "works with multiple paths" <|
                     \_ ->
                         paths.multiple
                             |> Pages.pagesUpgradedValues
-                            |> Expect.equal """    { top = Pages.Top.page |> Page.upgrade Top_Model Top_Msg
-    , about = Pages.About.page |> Page.upgrade About_Model About_Msg
-    , notFound = Pages.NotFound.page |> Page.upgrade NotFound_Model NotFound_Msg
-    , posts_top = Pages.Posts.Top.page |> Page.upgrade Posts_Top_Model Posts_Top_Msg
-    , posts_dynamic = Pages.Posts.Dynamic.page |> Page.upgrade Posts_Dynamic_Model Posts_Dynamic_Msg
-    , authors_dynamic_posts_dynamic = Pages.Authors.Dynamic.Posts.Dynamic.page |> Page.upgrade Authors_Dynamic_Posts_Dynamic_Model Authors_Dynamic_Posts_Dynamic_Msg
+                            |> Expect.equal """    { top = Pages.Top.page |> Page.upgrade Top__Model Top__Msg
+    , about = Pages.About.page |> Page.upgrade About__Model About__Msg
+    , notFound = Pages.NotFound.page |> Page.upgrade NotFound__Model NotFound__Msg
+    , posts__top = Pages.Posts.Top.page |> Page.upgrade Posts__Top__Model Posts__Top__Msg
+    , posts__id_int = Pages.Posts.Id_Int.page |> Page.upgrade Posts__Id_Int__Model Posts__Id_Int__Msg
+    , authors__author_string__posts__postId_int = Pages.Authors.Author_String.Posts.PostId_Int.page |> Page.upgrade Authors__Author_String__Posts__PostId_Int__Model Authors__Author_String__Posts__PostId_Int__Msg
     }"""
                 ]
             , describe "pagesInit"
@@ -138,14 +138,15 @@ init route =
         Route.NotFound ->
             pages.notFound.init ()
         
-        Route.Posts_Top ->
-            pages.posts_top.init ()
+        Route.Posts__Top ->
+            pages.posts__top.init ()
         
-        Route.Posts_Dynamic params ->
-            pages.posts_dynamic.init params
+        Route.Posts__Id_Int params ->
+            pages.posts__id_int.init params
         
-        Route.Authors_Dynamic_Posts_Dynamic params ->
-            pages.authors_dynamic_posts_dynamic.init params
+        Route.Authors__Author_String__Posts__PostId_Int params ->
+            pages.authors__author_string__posts__postId_int.init params
+
 """)
                 ]
             , describe "pagesUpdate" <|
@@ -157,9 +158,9 @@ init route =
 update : Msg -> Model -> Global.Model -> ( Model, Cmd Msg, Cmd Global.Msg )
 update bigMsg bigModel =
     case ( bigMsg, bigModel ) of
-        ( Top_Msg msg, Top_Model model ) ->
+        ( Top__Msg msg, Top__Model model ) ->
             pages.top.update msg model
-""")
+            """)
                 , test "works with multiple paths" <|
                     \_ ->
                         paths.multiple
@@ -168,27 +169,27 @@ update bigMsg bigModel =
 update : Msg -> Model -> Global.Model -> ( Model, Cmd Msg, Cmd Global.Msg )
 update bigMsg bigModel =
     case ( bigMsg, bigModel ) of
-        ( Top_Msg msg, Top_Model model ) ->
+        ( Top__Msg msg, Top__Model model ) ->
             pages.top.update msg model
         
-        ( About_Msg msg, About_Model model ) ->
+        ( About__Msg msg, About__Model model ) ->
             pages.about.update msg model
         
-        ( NotFound_Msg msg, NotFound_Model model ) ->
+        ( NotFound__Msg msg, NotFound__Model model ) ->
             pages.notFound.update msg model
         
-        ( Posts_Top_Msg msg, Posts_Top_Model model ) ->
-            pages.posts_top.update msg model
+        ( Posts__Top__Msg msg, Posts__Top__Model model ) ->
+            pages.posts__top.update msg model
         
-        ( Posts_Dynamic_Msg msg, Posts_Dynamic_Model model ) ->
-            pages.posts_dynamic.update msg model
+        ( Posts__Id_Int__Msg msg, Posts__Id_Int__Model model ) ->
+            pages.posts__id_int.update msg model
         
-        ( Authors_Dynamic_Posts_Dynamic_Msg msg, Authors_Dynamic_Posts_Dynamic_Model model ) ->
-            pages.authors_dynamic_posts_dynamic.update msg model
+        ( Authors__Author_String__Posts__PostId_Int__Msg msg, Authors__Author_String__Posts__PostId_Int__Model model ) ->
+            pages.authors__author_string__posts__postId_int.update msg model
         
         _ ->
             always ( bigModel, Cmd.none, Cmd.none )
-""")
+            """)
                 ]
             , describe "pagesBundle" <|
                 [ test "works with single path" <|
@@ -199,9 +200,9 @@ update bigMsg bigModel =
 bundle : Model -> Global.Model -> Bundle Msg
 bundle bigModel =
     case bigModel of
-        Top_Model model ->
+        Top__Model model ->
             pages.top.bundle model
-""")
+            """)
                 , test "works with multiple paths" <|
                     \_ ->
                         paths.multiple
@@ -210,23 +211,23 @@ bundle bigModel =
 bundle : Model -> Global.Model -> Bundle Msg
 bundle bigModel =
     case bigModel of
-        Top_Model model ->
+        Top__Model model ->
             pages.top.bundle model
         
-        About_Model model ->
+        About__Model model ->
             pages.about.bundle model
         
-        NotFound_Model model ->
+        NotFound__Model model ->
             pages.notFound.bundle model
         
-        Posts_Top_Model model ->
-            pages.posts_top.bundle model
+        Posts__Top__Model model ->
+            pages.posts__top.bundle model
         
-        Posts_Dynamic_Model model ->
-            pages.posts_dynamic.bundle model
+        Posts__Id_Int__Model model ->
+            pages.posts__id_int.bundle model
         
-        Authors_Dynamic_Posts_Dynamic_Model model ->
-            pages.authors_dynamic_posts_dynamic.bundle model
+        Authors__Author_String__Posts__PostId_Int__Model model ->
+            pages.authors__author_string__posts__postId_int.bundle model
 """)
                 ]
             ]

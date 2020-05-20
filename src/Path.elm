@@ -56,24 +56,29 @@ toModulePath =
 
 toTypeName : Path -> String
 toTypeName =
-    join "_"
+    join "__"
 
 
 toVariableName : Path -> String
 toVariableName (Internals list) =
-    let
-        lowercaseFirstLetter : String -> String
-        lowercaseFirstLetter str =
-            String.left 1 (String.toLower str) ++ String.dropLeft 1 str
-    in
-    list |> List.map lowercaseFirstLetter |> String.join "_"
+    list
+        |> List.map
+            (\piece ->
+                case getDynamicParameter piece of
+                    Just ( left, right ) ->
+                        lowercaseFirstLetter left ++ "_" ++ lowercaseFirstLetter right
+
+                    Nothing ->
+                        lowercaseFirstLetter piece
+            )
+        |> String.join "__"
 
 
 optionalParams : Path -> String
 optionalParams =
     toSingleLineParamRecord
         Utils.singleLineRecordType
-        (\num -> ( "param" ++ String.fromInt num, "String" ))
+        (\( left, right ) -> ( lowercaseFirstLetter left, right ))
 
 
 toFlags : Path -> String
@@ -89,10 +94,15 @@ toFlags path =
         String.dropLeft 1 params
 
 
+isDynamic : String -> Bool
+isDynamic =
+    String.contains "_"
+
+
 dynamicCount : Path -> Int
 dynamicCount (Internals list) =
     list
-        |> List.filter ((==) "Dynamic")
+        |> List.filter isDynamic
         |> List.length
 
 
@@ -105,11 +115,12 @@ toParser (Internals list) =
 
         toUrlSegment : String -> String
         toUrlSegment piece =
-            if piece == "Dynamic" then
-                "Parser.string"
+            case getDynamicParameter piece of
+                Just ( _, right ) ->
+                    "Parser." ++ String.toLower right
 
-            else
-                "Parser.s \"" ++ sluggify piece ++ "\""
+                Nothing ->
+                    "Parser.s \"" ++ sluggify piece ++ "\""
 
         toUrlParser : List String -> String
         toUrlParser list_ =
@@ -128,11 +139,17 @@ toParser (Internals list) =
         toParamMap =
             toSingleLineParamRecord
                 Utils.singleLineRecordValue
-                (\num -> ( "param" ++ String.fromInt num, "param" ++ String.fromInt num ))
+                (\( left, _ ) -> ( lowercaseFirstLetter left, lowercaseFirstLetter left ))
 
         dynamicParamsFn : List String -> String
         dynamicParamsFn list_ =
-            "\\" ++ (List.range 1 count |> List.map (\num -> "param" ++ String.fromInt num) |> String.join " ") ++ " ->" ++ toParamMap (Internals list_)
+            "\\"
+                ++ (List.filterMap getDynamicParameter list_
+                        |> List.map (\( left, _ ) -> lowercaseFirstLetter left)
+                        |> String.join " "
+                   )
+                ++ " ->"
+                ++ toParamMap (Internals list_)
 
         toDynamicParser : List String -> String
         toDynamicParser list_ =
@@ -198,32 +215,43 @@ toParamInputs path =
         ""
 
     else
-        " { " ++ (List.range 1 count |> List.map (\num -> "param" ++ String.fromInt num) |> String.join ", ") ++ " }"
+        " { "
+            ++ (List.filterMap getDynamicParameter (toList path)
+                    |> List.map (\( left, _ ) -> lowercaseFirstLetter left)
+                    |> String.join ", "
+               )
+            ++ " }"
 
 
 
 -- [ "authors", param1, "posts", param2 ]
 
 
+lowercaseFirstLetter : String -> String
+lowercaseFirstLetter str =
+    case String.toList str of
+        first :: rest ->
+            String.fromList (Char.toLower first :: rest)
+
+        [] ->
+            str
+
+
 toParamList : Path -> String
 toParamList (Internals list) =
     let
-        helper : String -> ( List String, Int ) -> ( List String, Int )
-        helper piece ( names, num ) =
-            if piece == "Dynamic" then
-                ( names ++ [ "param" ++ String.fromInt num ]
-                , num + 1
-                )
+        helper : String -> List String -> List String
+        helper piece names =
+            case getDynamicParameter piece of
+                Just ( left, _ ) ->
+                    names ++ [ lowercaseFirstLetter left ]
 
-            else
-                ( names ++ [ "\"" ++ sluggify piece ++ "\"" ]
-                , num
-                )
+                Nothing ->
+                    names ++ [ "\"" ++ sluggify piece ++ "\"" ]
     in
     list
         |> stripEndingTop
-        |> List.foldl helper ( [], 1 )
-        |> Tuple.first
+        |> List.foldl helper []
         |> (\items ->
                 if List.length items == 0 then
                     "[]"
@@ -238,21 +266,24 @@ hasParams path =
     dynamicCount path > 0
 
 
+last : List a -> Maybe a
+last list =
+    list
+        |> List.reverse
+        |> List.head
+
+
 routingOrder : Path -> Path -> Order
 routingOrder (Internals list1) (Internals list2) =
     let
-        endsIn : String -> List String -> Bool
-        endsIn str list =
-            list
-                |> List.reverse
-                |> List.head
-                |> (==) (Just str)
-
         endsInTop =
-            endsIn "Top"
+            last
+                >> (==) (Just "Top")
 
         endsInDynamic =
-            endsIn "Dynamic"
+            last
+                >> Maybe.map isDynamic
+                >> Maybe.withDefault False
     in
     if List.length list1 < List.length list2 then
         LT
@@ -285,9 +316,19 @@ join separator (Internals list) =
     String.join separator list
 
 
+getDynamicParameter : String -> Maybe ( String, String )
+getDynamicParameter str =
+    case String.split "_" str of
+        [ left, right ] ->
+            Just ( left, right )
+
+        _ ->
+            Nothing
+
+
 toSingleLineParamRecord :
     (List ( String, String ) -> String)
-    -> (Int -> ( String, String ))
+    -> (( String, String ) -> ( String, String ))
     -> Path
     -> String
 toSingleLineParamRecord toRecord toItem path =
@@ -299,7 +340,9 @@ toSingleLineParamRecord toRecord toItem path =
         ""
 
     else
-        List.range 1 count
+        path
+            |> toList
+            |> List.filterMap getDynamicParameter
             |> List.map toItem
             |> toRecord
             |> String.append " "

@@ -90,22 +90,3 @@ routeSegments paths =
                             )
                 }
                 |> Utils.indent 3
-
-
-
--- case route of
---     Top ->
---         []
---     About ->
---         [ "about" ]
---     Authors_Dynamic_Posts_Dynamic { param1, param2 } ->
---         [ "authors", param1, "posts", param2 ]
---     Posts_Top ->
---         [ "posts" ]
---     Posts_Dynamic { param1 } ->
---         [ "posts", param1 ]
---     Profile ->
---         [ "profile" ]
---     NotFound ->
---         [ "not-found" ]
---     """
