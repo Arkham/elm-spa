@@ -9,9 +9,9 @@
   },
   "scripts": {
     "build": "elm make src/Main.elm --optimize --output dist/elm.worker.js",
+    "ci": "npm run test && npm run test:cli",
     "test": "elm-test",
     "test:watch": "elm-test --watch",
-    "test:travis-ci": "npm run test && npm run test:cli",
     "test:cli": "(npm run build && cd tests && npm run test:cli:init && npm run test:cli:add && npm run test:cli:build && npm run test:cli:cleanup)",
     "test:cli:init": "./index.js init tests/demo && cd tests/demo && npm install && npm run build",
     "test:cli:add": "cd tests/demo && ../../index.js add static Top && ../../index.js add sandbox Posts.Top && ../../index.js add element Posts.Id_Int && ../../index.js add full Authors.Name_String.Posts.Post_Int && npm run build",
