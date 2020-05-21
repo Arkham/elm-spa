@@ -1,6 +1,6 @@
 # elm-spa 
 
-[![Build Status](https://travis-ci.org/ryannhg/elm-spa.svg?branch=master)](https://travis-ci.org/ryannhg/elm-spa)
+![Build](https://github.com/ryannhg/elm-spa-secrets/workflows/Build/badge.svg?branch=master)
 
 
 ## installation
