@@ -6,14 +6,16 @@ import Path exposing (Path)
 create : Path -> String
 create path =
     """
-module Pages.{{name}} exposing (Flags, Model, Msg, page)
+module Pages.{{name}} exposing (Params, Model, Msg, page)
 
 import Html
-import Page exposing (Document, Page)
+import Spa.Document exposing (Document)
+import Spa.Page as Page exposing (Page)
+import Spa.Url as Url exposing (Url)
 
 
-type alias Flags =
-    {{flags}}
+type alias Params =
+    {{params}}
 
 
 type alias Model =
@@ -24,7 +26,7 @@ type Msg
     = NoOp
 
 
-page : Page Flags Model Msg
+page : Page Params Model Msg
 page =
     Page.element
         { init = init
@@ -34,8 +36,8 @@ page =
         }
 
 
-init : Flags -> ( Model, Cmd Msg )
-init flags =
+init : Params -> ( Model, Cmd Msg )
+init params =
     ( {}, Cmd.none )
 
 
@@ -58,5 +60,5 @@ view model =
     }
 """
         |> String.replace "{{name}}" (Path.toModulePath path)
-        |> String.replace "{{flags}}" (Path.toFlags path)
+        |> String.replace "{{params}}" (Path.toParams path)
         |> String.trim

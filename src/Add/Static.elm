@@ -9,11 +9,12 @@ create path =
 module Pages.{{name}} exposing (Flags, Model, Msg, page)
 
 import Html
-import Page exposing (Document, Page)
+import Spa.Document exposing (Document)
+import Spa.Page as Page exposing (Page)
 
 
-type alias Flags =
-    {{flags}}
+type alias Params =
+    {{params}}
 
 
 type alias Model =
@@ -38,5 +39,5 @@ view =
     }
 """
         |> String.replace "{{name}}" (Path.toModulePath path)
-        |> String.replace "{{flags}}" (Path.toFlags path)
+        |> String.replace "{{params}}" (Path.toParams path)
         |> String.trim

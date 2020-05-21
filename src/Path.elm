@@ -6,11 +6,11 @@ module Path exposing
     , optionalParams
     , routingOrder
     , toFilepath
-    , toFlags
     , toList
     , toModulePath
     , toParamInputs
     , toParamList
+    , toParams
     , toParser
     , toTypeName
     , toVariableName
@@ -81,8 +81,8 @@ optionalParams =
         (\( left, right ) -> ( lowercaseFirstLetter left, right ))
 
 
-toFlags : Path -> String
-toFlags path =
+toParams : Path -> String
+toParams path =
     let
         params =
             optionalParams path

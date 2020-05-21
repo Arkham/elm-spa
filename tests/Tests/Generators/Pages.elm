@@ -115,7 +115,7 @@ type Model
                         paths.single
                             |> Pages.pagesInit
                             |> Expect.equal (String.trim """
-init : Route -> Global.Model -> ( Model, Cmd Msg, Cmd Global.Msg )
+init : Route -> Global.Model -> Url -> ( Model, Cmd Msg )
 init route =
     case route of
         Route.Top ->
@@ -126,7 +126,7 @@ init route =
                         paths.multiple
                             |> Pages.pagesInit
                             |> Expect.equal (String.trim """
-init : Route -> Global.Model -> ( Model, Cmd Msg, Cmd Global.Msg )
+init : Route -> Global.Model -> Url -> ( Model, Cmd Msg )
 init route =
     case route of
         Route.Top ->
@@ -155,7 +155,7 @@ init route =
                         paths.single
                             |> Pages.pagesUpdate
                             |> Expect.equal (String.trim """
-update : Msg -> Model -> Global.Model -> ( Model, Cmd Msg, Cmd Global.Msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update bigMsg bigModel =
     case ( bigMsg, bigModel ) of
         ( Top__Msg msg, Top__Model model ) ->
@@ -166,7 +166,7 @@ update bigMsg bigModel =
                         paths.multiple
                             |> Pages.pagesUpdate
                             |> Expect.equal (String.trim """
-update : Msg -> Model -> Global.Model -> ( Model, Cmd Msg, Cmd Global.Msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update bigMsg bigModel =
     case ( bigMsg, bigModel ) of
         ( Top__Msg msg, Top__Model model ) ->
@@ -188,7 +188,7 @@ update bigMsg bigModel =
             pages.authors__author_string__posts__postId_int.update msg model
         
         _ ->
-            always ( bigModel, Cmd.none, Cmd.none )
+            ( bigModel, Cmd.none )
             """)
                 ]
             , describe "pagesBundle" <|
@@ -197,7 +197,7 @@ update bigMsg bigModel =
                         paths.single
                             |> Pages.pagesBundle
                             |> Expect.equal (String.trim """
-bundle : Model -> Global.Model -> Bundle Msg
+bundle : Model -> Bundle
 bundle bigModel =
     case bigModel of
         Top__Model model ->
@@ -208,7 +208,7 @@ bundle bigModel =
                         paths.multiple
                             |> Pages.pagesBundle
                             |> Expect.equal (String.trim """
-bundle : Model -> Global.Model -> Bundle Msg
+bundle : Model -> Bundle
 bundle bigModel =
     case bigModel of
         Top__Model model ->

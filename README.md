@@ -32,16 +32,16 @@ elm-spa init <directory>
 ## elm-spa add
 
 ```
-elm-spa add <static|sandbox|element|component> <name>
+elm-spa add <static|sandbox|element|full> <name>
 
-  Create a new page of type <static|sandbox|element|component>
+  Create a new page of type <static|sandbox|element|full>
   with the module name <name>.
 
   examples:
   elm-spa add static Top
   elm-spa add sandbox Posts.Top
   elm-spa add element Posts.Id_Int
-  elm-spa add component SignIn
+  elm-spa add full SignIn
 ```
 
 ## elm-spa build

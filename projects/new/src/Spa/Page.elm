@@ -92,25 +92,26 @@ full page =
 -- UPGRADING
 
 
-type alias Upgraded pageFlags pageModel pageMsg model msg =
-    { init : pageFlags -> Global.Model -> Url.Url -> ( model, Cmd msg )
+type alias Bundle model msg =
+    { view : Document msg
+    , subscriptions : Sub msg
+    , save : Global.Model -> Global.Model
+    , load : Global.Model -> model
+    }
+
+
+type alias Upgraded pageParams pageModel pageMsg model msg =
+    { init : pageParams -> Global.Model -> Url.Url -> ( model, Cmd msg )
     , update : pageMsg -> pageModel -> ( model, Cmd msg )
-    , bundle :
-        pageModel
-        ->
-            { view : Document msg
-            , subscriptions : Sub msg
-            , save : Global.Model -> Global.Model
-            , load : Global.Model -> model
-            }
+    , bundle : pageModel -> Bundle model msg
     }
 
 
 upgrade :
     (pageModel -> model)
     -> (pageMsg -> msg)
-    -> Page pageFlags pageModel pageMsg
-    -> Upgraded pageFlags pageModel pageMsg model msg
+    -> Page pageParams pageModel pageMsg
+    -> Upgraded pageParams pageModel pageMsg model msg
 upgrade toModel toMsg page =
     { init = \params global url -> page.init global (Spa.Url.create params url) |> Tuple.mapBoth toModel (Cmd.map toMsg)
     , update = \msg model -> page.update msg model |> Tuple.mapBoth toModel (Cmd.map toMsg)

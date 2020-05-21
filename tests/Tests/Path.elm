@@ -196,19 +196,19 @@ suite =
                     \_ ->
                         "Top.elm"
                             |> Path.fromFilepath
-                            |> Path.toFlags
+                            |> Path.toParams
                             |> Expect.equal "()"
                 , test "works with one dynamic param" <|
                     \_ ->
                         "Posts/Id_Int.elm"
                             |> Path.fromFilepath
-                            |> Path.toFlags
+                            |> Path.toParams
                             |> Expect.equal "{ id : Int }"
                 , test "works with multiple dynamic params" <|
                     \_ ->
                         "Authors/Author_String/Posts/PostId_Int.elm"
                             |> Path.fromFilepath
-                            |> Path.toFlags
+                            |> Path.toParams
                             |> Expect.equal "{ author : String, postId : Int }"
                 ]
             ]

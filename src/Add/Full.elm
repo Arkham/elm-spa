@@ -1,4 +1,4 @@
-module Add.Component exposing (create)
+module Add.Full exposing (create)
 
 import Path exposing (Path)
 
@@ -6,15 +6,16 @@ import Path exposing (Path)
 create : Path -> String
 create path =
     """
-module Pages.{{name}} exposing (Flags, Model, Msg, page)
+module Pages.{{name}} exposing (Params, Model, Msg, page)
 
 import Global
 import Html
-import Page exposing (Document, Page)
+import Spa.Document exposing (Document)
+import Spa.Page as Page exposing (Page)
+import Spa.Url as Url exposing (Url)
 
-
-type alias Flags =
-    {{flags}}
+type alias Params =
+    {{params}}
 
 
 type alias Model =
@@ -25,9 +26,9 @@ type Msg
     = NoOp
 
 
-page : Page Flags Model Msg
+page : Page Params Model Msg
 page =
-    Page.component
+    Page.full
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -35,29 +36,29 @@ page =
         }
 
 
-init : Global.Model -> Flags -> ( Model, Cmd Msg, Cmd Global.Msg )
-init global flags =
+init : Global.Model -> Url Params -> ( Model, Cmd Msg )
+init global { params } =
     ( {}, Cmd.none, Cmd.none )
 
 
-update : Global.Model -> Msg -> Model -> ( Model, Cmd Msg, Cmd Global.Msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update global msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none, Cmd.none )
 
 
-subscriptions : Global.Model -> Model -> Sub Msg
+subscriptions : Model -> Sub Msg
 subscriptions global model =
     Sub.none
 
 
-view : Global.Model -> Model -> Document Msg
+view : Model -> Document Msg
 view global model =
     { title = "{{name}}"
     , body = [ Html.text "{{name}}" ]
     }
 """
         |> String.replace "{{name}}" (Path.toModulePath path)
-        |> String.replace "{{flags}}" (Path.toFlags path)
+        |> String.replace "{{params}}" (Path.toParams path)
         |> String.trim

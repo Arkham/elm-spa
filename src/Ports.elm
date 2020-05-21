@@ -1,7 +1,7 @@
 port module Ports exposing (add, build, uhhh)
 
-import Add.Component
 import Add.Element
+import Add.Full
 import Add.Sandbox
 import Add.Static
 import Generators.Pages as Pages
@@ -47,9 +47,9 @@ add { name, pageType } =
                 |> Add.Element.create
                 |> sendItBro
 
-        "component" ->
+        "full" ->
             path
-                |> Add.Component.create
+                |> Add.Full.create
                 |> sendItBro
 
         _ ->
@@ -59,10 +59,10 @@ add { name, pageType } =
 build : List Path -> Cmd msg
 build paths =
     buildPort
-        [ { filepath = "Generated/Route.elm"
+        [ { filepath = "Spa/Generated/Route.elm"
           , content = Route.generate paths
           }
-        , { filepath = "Generated/Pages.elm"
+        , { filepath = "Spa/Generated/Pages.elm"
           , content = Pages.generate paths
           }
         ]

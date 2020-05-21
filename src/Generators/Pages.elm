@@ -16,20 +16,23 @@ import Utils.Generate as Utils
 generate : List Path -> String
 generate paths =
     String.trim """
-module Generated.Pages exposing
+module Spa.Generated.Pages exposing
     ( Model
     , Msg
     , init
+    , load
+    , save
     , subscriptions
     , update
     , view
     )
 
-import Generated.Route as Route exposing (Route)
 import Global
-import Page exposing (Bundle, Document)
 {{pagesImports}}
-
+import Spa.Document exposing (Document)
+import Spa.Generated.Route as Route exposing (Route)
+import Spa.Page as Page
+import Url exposing (Url)
 
 
 -- TYPES
@@ -45,11 +48,12 @@ import Page exposing (Bundle, Document)
 -- PAGES
 
 
-type alias Upgraded flags model msg =
-    { init : flags -> Global.Model -> ( Model, Cmd Msg, Cmd Global.Msg )
-    , update : msg -> model -> Global.Model -> ( Model, Cmd Msg, Cmd Global.Msg )
-    , bundle : model -> Global.Model -> Bundle Msg
-    }
+type alias Upgraded params model msg =
+    Page.Upgraded params model msg Model Msg
+
+
+type alias Bundle =
+    Page.Bundle Model Msg
 
 
 
@@ -80,14 +84,24 @@ pages =
 {{pagesBundle}}
 
 
-view : Model -> Global.Model -> Document Msg
-view model =
-    bundle model >> .view
+view : Model -> Document Msg
+view =
+    bundle >> .view
 
 
-subscriptions : Model -> Global.Model -> Sub Msg
-subscriptions model =
-    bundle model >> .subscriptions
+subscriptions : Model -> Sub Msg
+subscriptions =
+    bundle >> .subscriptions
+
+
+save : Model -> Global.Model -> Global.Model
+save =
+    bundle >> .save
+
+
+load : Model -> Global.Model -> Model
+load =
+    bundle >> .load
 
 """
         |> String.replace "{{pagesImports}}" (pagesImports paths)
@@ -183,7 +197,7 @@ pagesInit : List Path -> String
 pagesInit paths =
     Utils.function
         { name = "init"
-        , annotation = [ "Route", "Global.Model", "( Model, Cmd Msg, Cmd Global.Msg )" ]
+        , annotation = [ "Route", "Global.Model", "Url", "( Model, Cmd Msg )" ]
         , inputs = [ "route" ]
         , body =
             Utils.caseExpression
@@ -219,7 +233,7 @@ pagesUpdate : List Path -> String
 pagesUpdate paths =
     Utils.function
         { name = "update"
-        , annotation = [ "Msg", "Model", "Global.Model", "( Model, Cmd Msg, Cmd Global.Msg )" ]
+        , annotation = [ "Msg", "Model", "( Model, Cmd Msg )" ]
         , inputs = [ "bigMsg bigModel" ]
         , body =
             Utils.caseExpression
@@ -245,7 +259,7 @@ pagesUpdate paths =
                                     cases
 
                                 else
-                                    cases ++ [ ( "_", "always ( bigModel, Cmd.none, Cmd.none )" ) ]
+                                    cases ++ [ ( "_", "( bigModel, Cmd.none )" ) ]
                            )
                 }
         }
@@ -255,7 +269,7 @@ pagesBundle : List Path -> String
 pagesBundle paths =
     Utils.function
         { name = "bundle"
-        , annotation = [ "Model", "Global.Model", "Bundle Msg" ]
+        , annotation = [ "Model", "Bundle" ]
         , inputs = [ "bigModel" ]
         , body =
             Utils.caseExpression

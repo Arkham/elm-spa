@@ -50,7 +50,7 @@ const toFilepath = name => path.join(folders.pages('.'), `${name.split('.').join
 const flags = { command: '', name: '', pageType: '', filepaths: [] }
 
 const isValidPageType = type =>
-  [ 'static', 'sandbox', 'element', 'component' ].some(x => x === type)
+  [ 'static', 'sandbox', 'element', 'full' ].some(x => x === type)
 
 const isValidModuleName = (name = '') => {
   const isAlphaOnly = word => word.match(/[A-Z|a-z]+/)[0] === word
@@ -85,16 +85,16 @@ const help = {
 `,
 
   add: `
-  ${bold('elm-spa add')} <static|sandbox|element|component> <name>
+  ${bold('elm-spa add')} <static|sandbox|element|full> <name>
 
-    Create a new page of type <static|sandbox|element|component>
+    Create a new page of type <static|sandbox|element|full>
     with the module name <name>.
 
     ${bold('examples:')}
     elm-spa add static Top
     elm-spa add sandbox Posts.Top
     elm-spa add element Posts.Dynamic
-    elm-spa add component SignIn
+    elm-spa add full SignIn
 `,
 
   build: `

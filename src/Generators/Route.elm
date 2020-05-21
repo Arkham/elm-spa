@@ -12,10 +12,10 @@ import Utils.Generate as Utils
 generate : List Path -> String
 generate paths =
     String.trim """
-module Generated.Route exposing
+module Spa.Generated.Route exposing
     ( Route(..)
     , fromUrl
-    , toHref
+    , toString
     )
 
 import Url exposing (Url)
@@ -36,8 +36,8 @@ routes =
 {{routeParsers}}
 
 
-toHref : Route -> String
-toHref route =
+toString : Route -> String
+toString route =
     let
         segments : List String
         segments =
