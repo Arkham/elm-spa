@@ -3,16 +3,8 @@
 
 ## local development
 
-__First time setup__ (includes initial install and build):
-
 ```
 npm start
-```
-
-__Anytime after that__ (won't exit on failed build):
-
-```
-npm run dev
 ```
 
 
