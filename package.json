@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "elm make src/Main.elm --optimize --output dist/elm.worker.js",
-    "ci": "npm run test && npm run test:cli",
+    "test:ci": "npm run test && npm run test:cli",
     "test": "elm-test",
     "test:watch": "elm-test --watch",
     "test:cli": "(npm run build && cd tests && npm run test:cli:init && npm run test:cli:add && npm run test:cli:build && npm run test:cli:cleanup)",
