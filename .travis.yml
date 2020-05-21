@@ -1,2 +1,4 @@
-language: elm
-script: elm-format --validate src tests && elm-test
+language: node_js
+node_js:
+  - lts/*
+script: npm run test:travis-ci

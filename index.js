@@ -53,11 +53,11 @@ const isValidPageType = type =>
   [ 'static', 'sandbox', 'element', 'full' ].some(x => x === type)
 
 const isValidModuleName = (name = '') => {
-  const isAlphaOnly = word => word.match(/[A-Z|a-z]+/)[0] === word
+  const isAlphaOrUnderscoreOnly = word => word.match(/[A-Z|a-z|_]+/)[0] === word
   const isCapitalized = word => word[0].toUpperCase() === word[0]
   return name &&
     name.length &&
-    name.split('.').every(word => isAlphaOnly(word) && isCapitalized(word))
+    name.split('.').every(word => isAlphaOrUnderscoreOnly(word) && isCapitalized(word))
 }
 
 // Help commands
@@ -93,8 +93,8 @@ const help = {
     ${bold('examples:')}
     elm-spa add static Top
     elm-spa add sandbox Posts.Top
-    elm-spa add element Posts.Dynamic
-    elm-spa add full SignIn
+    elm-spa add element Posts.Id_Int
+    elm-spa add full Authors.Name_String.Posts.Post_Int
 `,
 
   build: `
@@ -175,7 +175,6 @@ const commands = {
 
 const main = ([ command, ...args ] = []) =>
   (commands[command] || commands['help'])(args)
-    // .then(_ => args.data.slice)
     .then(console.info)
     .catch(reason => {
       console.info(`\n${bold('Congratulations!')} - you've found a bug!

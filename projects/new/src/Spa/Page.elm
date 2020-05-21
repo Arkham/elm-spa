@@ -1,14 +1,14 @@
 module Spa.Page exposing
     ( Page
     , static, sandbox, element, full
-    , Upgraded, upgrade
+    , Upgraded, Bundle, upgrade
     )
 
 {-|
 
 @docs Page
 @docs static, sandbox, element, full
-@docs Upgraded, upgrade
+@docs Upgraded, Bundle, upgrade
 
 -}
 
@@ -92,18 +92,18 @@ full page =
 -- UPGRADING
 
 
+type alias Upgraded pageParams pageModel pageMsg model msg =
+    { init : pageParams -> Global.Model -> Url.Url -> ( model, Cmd msg )
+    , update : pageMsg -> pageModel -> ( model, Cmd msg )
+    , bundle : pageModel -> Bundle model msg
+    }
+
+
 type alias Bundle model msg =
     { view : Document msg
     , subscriptions : Sub msg
     , save : Global.Model -> Global.Model
     , load : Global.Model -> model
-    }
-
-
-type alias Upgraded pageParams pageModel pageMsg model msg =
-    { init : pageParams -> Global.Model -> Url.Url -> ( model, Cmd msg )
-    , update : pageMsg -> pageModel -> ( model, Cmd msg )
-    , bundle : pageModel -> Bundle model msg
     }
 
 

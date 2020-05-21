@@ -113,9 +113,9 @@ type Route
                     [ "posts" ]
                 
                 Posts__Id_Int { id } ->
-                    [ "posts", id ]
+                    [ "posts", String.fromInt id ]
                 
                 Authors__Author_String__Posts__PostId_Int { author, postId } ->
-                    [ "authors", author, "posts", postId ]"""
+                    [ "authors", author, "posts", String.fromInt postId ]"""
             ]
         ]

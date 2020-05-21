@@ -163,7 +163,7 @@ pagesUpgradedTypes paths =
                 ( Path.toVariableName path
                 , "Upgraded "
                     ++ name
-                    ++ ".Flags "
+                    ++ ".Params "
                     ++ name
                     ++ ".Model "
                     ++ name

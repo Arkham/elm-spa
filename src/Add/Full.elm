@@ -33,28 +33,40 @@ page =
         , update = update
         , subscriptions = subscriptions
         , view = view
+        , save = save
+        , load = load
         }
 
 
 init : Global.Model -> Url Params -> ( Model, Cmd Msg )
 init global { params } =
-    ( {}, Cmd.none, Cmd.none )
+    ( {}, Cmd.none )
+
+
+load : Global.Model -> Model -> Model
+load global model =
+    model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update global msg model =
+update msg model =
     case msg of
         NoOp ->
-            ( model, Cmd.none, Cmd.none )
+            ( model, Cmd.none )
+
+
+save : Model -> Global.Model -> Global.Model
+save model global =
+    global
 
 
 subscriptions : Model -> Sub Msg
-subscriptions global model =
+subscriptions model =
     Sub.none
 
 
 view : Model -> Document Msg
-view global model =
+view model =
     { title = "{{name}}"
     , body = [ Html.text "{{name}}" ]
     }

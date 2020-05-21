@@ -243,8 +243,12 @@ toParamList (Internals list) =
         helper : String -> List String -> List String
         helper piece names =
             case getDynamicParameter piece of
-                Just ( left, _ ) ->
-                    names ++ [ lowercaseFirstLetter left ]
+                Just ( left, right ) ->
+                    if right == "Int" then
+                        names ++ [ "String.fromInt " ++ lowercaseFirstLetter left ]
+
+                    else
+                        names ++ [ lowercaseFirstLetter left ]
 
                 Nothing ->
                     names ++ [ "\"" ++ sluggify piece ++ "\"" ]

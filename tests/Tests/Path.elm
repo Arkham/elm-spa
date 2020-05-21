@@ -191,7 +191,7 @@ suite =
   |> Parser.map (\\author postId -> { author = author, postId = postId })
   |> Parser.map Authors__Author_String__Posts__PostId_Int 
 """)
-            , describe "toFlags"
+            , describe "toParams"
                 [ test "works with no dynamic params" <|
                     \_ ->
                         "Top.elm"

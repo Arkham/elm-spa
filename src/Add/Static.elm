@@ -6,7 +6,7 @@ import Path exposing (Path)
 create : Path -> String
 create path =
     """
-module Pages.{{name}} exposing (Flags, Model, Msg, page)
+module Pages.{{name}} exposing (Params, Model, Msg, page)
 
 import Html
 import Spa.Document exposing (Document)
@@ -25,7 +25,7 @@ type alias Msg =
     Never
 
 
-page : Page Flags Model Msg
+page : Page Params Model Msg
 page =
     Page.static
         { view = view

@@ -21,9 +21,9 @@ main =
         }
 
 
-notFoundRoute : Route
-notFoundRoute =
-    Route.NotFound ()
+fromUrl : Url -> Route
+fromUrl =
+    Route.fromUrl >> Maybe.withDefault Route.NotFound
 
 
 
@@ -45,7 +45,7 @@ init flags url key =
             Global.init flags key
 
         ( page, pageCmd ) =
-            Pages.init (Route.fromUrl notFoundRoute url) global url
+            Pages.init (fromUrl url) global url
     in
     ( Model url key global page
     , Cmd.map Pages pageCmd
@@ -79,7 +79,7 @@ update msg model =
         UrlChanged url ->
             let
                 ( page, cmd ) =
-                    Pages.init (Route.fromUrl notFoundRoute url) model.global url
+                    Pages.init (fromUrl url) model.global url
 
                 global =
                     Pages.save page model.global

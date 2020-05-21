@@ -36,8 +36,8 @@ page =
         }
 
 
-init : Params -> ( Model, Cmd Msg )
-init params =
+init : Url Params -> ( Model, Cmd Msg )
+init { params } =
     ( {}, Cmd.none )
 
 

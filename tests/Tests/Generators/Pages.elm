@@ -78,17 +78,17 @@ type Model
                     \_ ->
                         paths.single
                             |> Pages.pagesUpgradedTypes
-                            |> Expect.equal "    { top : Upgraded Pages.Top.Flags Pages.Top.Model Pages.Top.Msg }"
+                            |> Expect.equal "    { top : Upgraded Pages.Top.Params Pages.Top.Model Pages.Top.Msg }"
                 , test "works with multiple paths" <|
                     \_ ->
                         paths.multiple
                             |> Pages.pagesUpgradedTypes
-                            |> Expect.equal """    { top : Upgraded Pages.Top.Flags Pages.Top.Model Pages.Top.Msg
-    , about : Upgraded Pages.About.Flags Pages.About.Model Pages.About.Msg
-    , notFound : Upgraded Pages.NotFound.Flags Pages.NotFound.Model Pages.NotFound.Msg
-    , posts__top : Upgraded Pages.Posts.Top.Flags Pages.Posts.Top.Model Pages.Posts.Top.Msg
-    , posts__id_int : Upgraded Pages.Posts.Id_Int.Flags Pages.Posts.Id_Int.Model Pages.Posts.Id_Int.Msg
-    , authors__author_string__posts__postId_int : Upgraded Pages.Authors.Author_String.Posts.PostId_Int.Flags Pages.Authors.Author_String.Posts.PostId_Int.Model Pages.Authors.Author_String.Posts.PostId_Int.Msg
+                            |> Expect.equal """    { top : Upgraded Pages.Top.Params Pages.Top.Model Pages.Top.Msg
+    , about : Upgraded Pages.About.Params Pages.About.Model Pages.About.Msg
+    , notFound : Upgraded Pages.NotFound.Params Pages.NotFound.Model Pages.NotFound.Msg
+    , posts__top : Upgraded Pages.Posts.Top.Params Pages.Posts.Top.Model Pages.Posts.Top.Msg
+    , posts__id_int : Upgraded Pages.Posts.Id_Int.Params Pages.Posts.Id_Int.Model Pages.Posts.Id_Int.Msg
+    , authors__author_string__posts__postId_int : Upgraded Pages.Authors.Author_String.Posts.PostId_Int.Params Pages.Authors.Author_String.Posts.PostId_Int.Model Pages.Authors.Author_String.Posts.PostId_Int.Msg
     }"""
                 ]
             , describe "pagesUpgradedValues"

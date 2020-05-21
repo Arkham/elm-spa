@@ -59,8 +59,8 @@ view { page, global, toMsg } =
     , body =
         [ div [ class "column container padding-small spacing-small fill-y" ]
             [ header [ class "row spacing-small spread" ]
-                [ a [ class "link", href (Route.toString (Route.Top ())) ] [ text "Home" ]
-                , a [ class "link", href (Route.toString (Route.NotFound ())) ] [ text "Nowhere" ]
+                [ a [ class "link", href (Route.toString Route.Top) ] [ text "Home" ]
+                , a [ class "link", href (Route.toString Route.NotFound) ] [ text "Nowhere" ]
                 ]
             , Html.main_ [ class "flex" ] page.body
             , footer [ class "footer" ] [ text "Built with elm-spa" ]
