@@ -3,7 +3,7 @@
 ![Build](https://github.com/ryannhg/elm-spa-secrets/workflows/Build/badge.svg?branch=master)
 
 
-## installation
+## getting started
 
 ```
 npm install -g elm-spa@latest
