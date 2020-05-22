@@ -42,28 +42,6 @@ customType options =
                 }
 
 
-module_ :
-    { name : String
-    , exposing_ : List String
-    }
-    -> String
-module_ options =
-    case options.exposing_ of
-        [] ->
-            "module " ++ options.name
-
-        first :: [] ->
-            "module " ++ options.name ++ " exposing " ++ "(" ++ first ++ ")"
-
-        first :: rest ->
-            multilineIndentedThing
-                { header = "module " ++ options.name
-                , items = { first = first, rest = rest }
-                , prefixes = { first = "( ", rest = ", " }
-                , suffix = [ ")" ]
-                }
-
-
 singleLineRecordType : List ( String, String ) -> String
 singleLineRecordType =
     singleLineRecord " : "

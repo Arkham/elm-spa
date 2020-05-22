@@ -6,7 +6,7 @@
 ## installation
 
 ```
-npm install -g elm-spa
+npm install -g elm-spa@latest
 ```
 
 ## available commands
@@ -76,7 +76,7 @@ src/
    ├─ About.elm
    ├─ Posts/
    |   ├─ Top.elm
-   |   └─ Post_Int.elm
+   |   └─ Id_Int.elm
    └─ Authors/
        └─ Author_String/
            └─ Posts/
@@ -124,12 +124,11 @@ type alias Params =
 ```elm
 module Pages.Authors.Author_String.Posts.PostId_Int exposing (..)
 
-type alias Flags =
+type alias Params =
     { author : String
     , postId : Int
     }
 ```
 
-These `Params` are __automatically__ passed into the `init` function, along with
-other information like the query parameters and complete raw `Url` value.
+These `Params` are __automatically__ passed into the `init` function, along with other information like the query parameters and original `Url` value.
 

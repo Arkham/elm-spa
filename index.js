@@ -125,7 +125,7 @@ const commands = {
       ? Promise.resolve()
           .then(_ => {
             const dest = path.join(process.cwd(), folder)
-            cp(path.join(__dirname, 'projects', 'new'), dest)
+            cp(path.join(__dirname, 'examples', 'new'), dest)
             try { fs.renameSync(path.join(dest, '.npmignore'), path.join(dest, '.gitignore')) } catch (_) {}
           })
           .then(_ => `\ncreated a new project in ${path.join(process.cwd(), folder)}\n`)

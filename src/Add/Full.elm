@@ -9,7 +9,7 @@ create path =
 module Pages.{{name}} exposing (Params, Model, Msg, page)
 
 import Global
-import Html
+import Html exposing (..)
 import Spa.Document exposing (Document)
 import Spa.Page as Page exposing (Page)
 import Spa.Url as Url exposing (Url)
@@ -68,7 +68,7 @@ subscriptions model =
 view : Model -> Document Msg
 view model =
     { title = "{{name}}"
-    , body = [ Html.text "{{name}}" ]
+    , body = [ text "{{name}}" ]
     }
 """
         |> String.replace "{{name}}" (Path.toModulePath path)

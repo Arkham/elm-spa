@@ -44,8 +44,11 @@ init flags url key =
         global =
             Global.init flags key
 
+        route =
+            fromUrl url
+
         ( page, pageCmd ) =
-            Pages.init (fromUrl url) global url
+            Pages.init route global url
     in
     ( Model url key global page
     , Cmd.map Pages pageCmd
@@ -78,8 +81,11 @@ update msg model =
 
         UrlChanged url ->
             let
+                route =
+                    fromUrl url
+
                 ( page, cmd ) =
-                    Pages.init (fromUrl url) model.global url
+                    Pages.init route model.global url
 
                 global =
                     Pages.save page model.global

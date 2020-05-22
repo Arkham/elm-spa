@@ -9,9 +9,8 @@ module Global exposing
     )
 
 import Browser.Navigation as Nav
-import Html exposing (a, div, footer, header, text)
+import Html exposing (..)
 import Html.Attributes exposing (class, href)
-import Ports
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
 
@@ -57,13 +56,13 @@ view :
 view { page, global, toMsg } =
     { title = page.title
     , body =
-        [ div [ class "column container padding-small spacing-small fill-y" ]
-            [ header [ class "row spacing-small spread" ]
+        [ div [ class "column spacing-medium padding-medium fill container" ]
+            [ header [ class "row spacing-small" ]
                 [ a [ class "link", href (Route.toString Route.Top) ] [ text "Home" ]
-                , a [ class "link", href (Route.toString Route.NotFound) ] [ text "Nowhere" ]
+                , a [ class "link", href (Route.toString Route.NotFound) ] [ text "Not found" ]
                 ]
-            , Html.main_ [ class "flex" ] page.body
-            , footer [ class "footer" ] [ text "Built with elm-spa" ]
+            , div [ class "flex" ] page.body
+            , footer [] [ text "built with elm-spa" ]
             ]
         ]
     }

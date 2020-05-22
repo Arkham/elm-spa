@@ -1,8 +1,8 @@
-module Pages.NotFound exposing (Model, Msg, Params, page)
+module Pages.Top exposing (Model, Msg, Params, page, view)
 
-import Html exposing (h1, text)
+import Html exposing (..)
 import Html.Attributes exposing (class)
-import Spa.Document as Document exposing (Document)
+import Spa.Document exposing (Document)
 import Spa.Page as Page exposing (Page)
 
 
@@ -27,8 +27,8 @@ type alias Msg =
 
 view : Document Msg
 view =
-    { title = "404"
+    { title = "Homepage"
     , body =
-        [ h1 [ class "font-h2" ] [ text "Page not found" ]
+        [ h1 [ class "font-h2" ] [ text "Homepage" ]
         ]
     }
