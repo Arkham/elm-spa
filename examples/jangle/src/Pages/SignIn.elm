@@ -15,11 +15,6 @@ type alias Params =
     ()
 
 
-clientId : String
-clientId =
-    "20c33fe428b932816bb2"
-
-
 page : Page Params Model Msg
 page =
     Page.full
@@ -37,7 +32,8 @@ page =
 
 
 type alias Model =
-    { code : Maybe String
+    { githubClientId : String
+    , code : Maybe String
     , token : Maybe (Result Http.Error String)
     }
 
@@ -46,12 +42,18 @@ init : Global.Model -> Url Params -> ( Model, Cmd Msg )
 init global { query } =
     case Dict.get "code" query of
         Just code ->
-            ( { code = Just code, token = Nothing }
+            ( { githubClientId = global.githubClientId
+              , code = Just code
+              , token = Nothing
+              }
             , requestAuthToken code
             )
 
         Nothing ->
-            ( { code = Nothing, token = Nothing }
+            ( { githubClientId = global.githubClientId
+              , code = Nothing
+              , token = Nothing
+              }
             , Cmd.none
             )
 
@@ -121,7 +123,7 @@ view model =
                             ]
 
                         Nothing ->
-                            [ a [ class "button", href ("https://github.com/login/oauth/authorize?client_id=" ++ clientId) ]
+                            [ a [ class "button", href ("https://github.com/login/oauth/authorize?client_id=" ++ model.githubClientId) ]
                                 [ text "Sign in with GitHub" ]
                             ]
                 ]

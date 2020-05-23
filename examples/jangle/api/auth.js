@@ -1,14 +1,27 @@
 const axios = require('axios')
 
-const config = {
-  clientId: '20c33fe428b932816bb2',
-  clientSecret: process.env.CLIENT_SECRET
+let env = {}
+try {
+  env = require('./.env')
+} catch (_) {}
+
+const configs = {
+  production: {
+    clientId: process.env.CLIENT_ID,
+    clientSecret : process.env.CLIENT_SECRET
+  },
+  dev: {
+    clientId: '20c33fe428b932816bb2',
+    clientSecret: env.clientSecret || console.error('\nERROR: Missing env.clientSecret\n')
+  }
 }
 
 exports.handler = function (event, context, callback) {
-  // your server-side functionality
+  const config = process.env.NODE_ENV === 'production'
+    ? configs.production
+    : configs.dev
+
   const { code } = event.queryStringParameters || {}
-  console.log('code', code)
 
   const sendToken = response => {
     if (response.data && typeof response.data.access_token === 'string') {
