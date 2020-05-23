@@ -1,10 +1,11 @@
 const axios = require('axios')
+const getConfig = require('../config.js')
 
 exports.handler = function (event, _context, callback) {
-  const config = require('../config.js')({
+  const { code } = event.queryStringParameters || {}
+  const config = getConfig({
     isLocalDevelopment: event.headers.host === 'localhost:8000'
   })
-  const { code } = event.queryStringParameters || {}
 
   const sendToken = response => {
     if (response.data && typeof response.data.access_token === 'string') {
