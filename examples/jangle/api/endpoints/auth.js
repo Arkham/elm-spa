@@ -2,7 +2,7 @@ const axios = require('axios')
 const secrets = require('secrets')
 
 exports.handler = function (event, _context, callback) {
-  const isLocalDevelopment = (event.headers.host === 'localhost:8000')
+  const isLocalDevelopment = event.headers.host === 'localhost:8000'
 
   const config = isLocalDevelopment
     ? { clientId: '20c33fe428b932816bb2', clientSecret: secrets.clientSecret }
