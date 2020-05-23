@@ -1,7 +1,7 @@
 const axios = require('axios')
 
-exports.handler = function (event, context, callback) {
-  const config = require('./config.js')({
+exports.handler = function (event, _context, callback) {
+  const config = require('../config.js')({
     isLocalDevelopment: event.headers.host === 'localhost:8000'
   })
   const { code } = event.queryStringParameters || {}
