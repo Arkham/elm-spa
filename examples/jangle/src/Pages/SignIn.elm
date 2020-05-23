@@ -98,7 +98,7 @@ subscriptions model =
 
 view : Model -> Document Msg
 view model =
-    { title = "SignIn"
+    { title = "Sign In | Jangle"
     , body =
         [ div [ class "column fill center" ]
             [ div [ class "column bg--white padding-medium shadow spacing-small max-width--20 rounded-tiny fill-x center-x" ]

@@ -26,7 +26,7 @@ type alias Msg =
 
 view : Document Msg
 view =
-    { title = "404"
+    { title = "404 | Jangle"
     , body =
         [ text "Page not found"
         ]
