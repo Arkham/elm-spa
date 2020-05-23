@@ -7,7 +7,6 @@ const flags = {
   dev: { githubClientId: '20c33fe428b932816bb2' }
 }
 
-
 // Start our Elm application
 var app = Elm.Main.init({
   flags: isLocalDevelopment
