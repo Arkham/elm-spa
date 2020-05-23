@@ -1,29 +1,18 @@
-const isProduction = typeof process.env.CLIENT_ID === 'string'
-const isLocalDevelopment = !isProduction
-
-// Fetch local dev secrets
-let env = {}
-
-if (isLocalDevelopment) {
-  try {
-    env = require('./.env.js')
-  } catch (_) {
-    console.warn('\nPlease create an `./api/.env.js` file to work with Github API.')
+module.exports = ({ isLocalDevelopment = false } = {}) => {
+  if (isLocalDevelopment) {
+    // attempt to get local dev secrets
+    let env = {}
+    try { env = require('./.env.js') } catch (_) {
+      console.warn('\nPlease check ./api/README.md to work with the Github API.\n')
+    }
+    return {
+      clientId: '20c33fe428b932816bb2',
+      clientSecret: env.clientSecret
+    }
+  } else {
+    return {
+      clientId: process.env.CLIENT_ID,
+      clientSecret : process.env.CLIENT_SECRET
+    }
   }
 }
-
-// Split config into two
-const configs = {
-  production: {
-    clientId: process.env.CLIENT_ID,
-    clientSecret : process.env.CLIENT_SECRET
-  },
-  dev: {
-    clientId: '20c33fe428b932816bb2',
-    clientSecret: env.clientSecret
-  }
-}
-
-module.exports = (isProduction)
-  ? configs.production
-  : configs.dev
