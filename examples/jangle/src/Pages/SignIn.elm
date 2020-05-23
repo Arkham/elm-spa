@@ -1,9 +1,11 @@
 module Pages.SignIn exposing (Model, Msg, Params, page)
 
-import Dict exposing (Dict)
+import Dict
 import Global
 import Html exposing (..)
 import Html.Attributes exposing (class, disabled, href)
+import Http
+import Json.Decode as D
 import Spa.Document exposing (Document)
 import Spa.Page as Page exposing (Page)
 import Spa.Url exposing (Url)
@@ -13,13 +15,9 @@ type alias Params =
     ()
 
 
-type alias Model =
-    { code : Maybe String
-    }
-
-
-type Msg
-    = NoOp
+clientId : String
+clientId =
+    "20c33fe428b932816bb2"
 
 
 page : Page Params Model Msg
@@ -34,12 +32,36 @@ page =
         }
 
 
+
+-- INIT
+
+
+type alias Model =
+    { code : Maybe String
+    , token : Maybe (Result Http.Error String)
+    }
+
+
 init : Global.Model -> Url Params -> ( Model, Cmd Msg )
 init global { query } =
-    ( { code = Dict.get "code" query
-      }
-    , Cmd.none
-    )
+    case Dict.get "code" query of
+        Just code ->
+            ( { code = Just code, token = Nothing }
+            , requestAuthToken code
+            )
+
+        Nothing ->
+            ( { code = Nothing, token = Nothing }
+            , Cmd.none
+            )
+
+
+requestAuthToken : String -> Cmd Msg
+requestAuthToken code =
+    Http.get
+        { url = "/api/auth?code=" ++ code
+        , expect = Http.expectJson GotAuthToken D.string
+        }
 
 
 load : Global.Model -> Model -> Model
@@ -47,11 +69,19 @@ load global model =
     model
 
 
+
+-- UPDATE
+
+
+type Msg
+    = GotAuthToken (Result Http.Error String)
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            ( model, Cmd.none )
+        GotAuthToken result ->
+            ( { model | token = Just result }, Cmd.none )
 
 
 save : Model -> Global.Model -> Global.Model
@@ -77,11 +107,21 @@ view model =
                 , div [ class "row" ] <|
                     case model.code of
                         Just code ->
-                            [ button [ class "button", disabled True ] [ text "Signing you in..." ]
+                            [ button [ class "button", disabled True ]
+                                [ case model.token of
+                                    Nothing ->
+                                        text "Signing you in..."
+
+                                    Just (Ok _) ->
+                                        text "Sign in successful!"
+
+                                    Just (Err _) ->
+                                        text "Sign in failed."
+                                ]
                             ]
 
                         Nothing ->
-                            [ a [ class "button", href "https://github.com/login/oauth/authorize?client_id=20c33fe428b932816bb2" ]
+                            [ a [ class "button", href ("https://github.com/login/oauth/authorize?client_id=" ++ clientId) ]
                                 [ text "Sign in with GitHub" ]
                             ]
                 ]

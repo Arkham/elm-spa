@@ -6,3 +6,5 @@ src/Spa/Generated
 
 # MacOS weird stuff
 .DS_Store
+# Local Netlify folder
+.netlify
