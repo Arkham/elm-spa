@@ -1,4 +1,4 @@
-const isProduction = process.env.NODE_ENV === 'production'
+const isProduction = typeof process.env.CLIENT_ID === 'string'
 const isLocalDevelopment = !isProduction
 
 // Fetch local dev secrets
