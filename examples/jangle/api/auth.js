@@ -1,26 +1,7 @@
 const axios = require('axios')
-
-let env = {}
-try {
-  env = require('./.env')
-} catch (_) {}
-
-const configs = {
-  production: {
-    clientId: process.env.CLIENT_ID,
-    clientSecret : process.env.CLIENT_SECRET
-  },
-  dev: {
-    clientId: '20c33fe428b932816bb2',
-    clientSecret: env.clientSecret || console.error('\nERROR: Missing env.clientSecret\n')
-  }
-}
+const config = require('./config.js')
 
 exports.handler = function (event, context, callback) {
-  const config = process.env.NODE_ENV === 'production'
-    ? configs.production
-    : configs.dev
-
   const { code } = event.queryStringParameters || {}
 
   const sendToken = response => {
