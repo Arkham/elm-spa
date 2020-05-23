@@ -1,10 +1,11 @@
-# API
+# API Secrets
+> a package for local development config
 
 ## Actually logging in to Github
 
 I needed to use GitHub's OAuth API to work with GitHub, so I have an auth endpoint here. The API requires a client secret– which should __NOT__ be in source control!
 
-For that reason, please create a file in this directory called `.env.js` like this:
+For that reason, please create a file in this directory called `index.js` like this:
 
 ```js
 module.exports = {
@@ -26,6 +27,6 @@ You can get your own Client ID and Client Secret, when you create an OAuth appli
 The Client ID is _not_ a secret, but those are hardcoded in __two__ places:
 
 1. `public/main.js` – for use in the frontend Elm app
-2. `api/config.js` - for use in backend Netlify functions
+2. `api/auth.js` - for use in backend Netlify functions
 
 It would be ideal to have it in one place, but the build process is simpler if I just write these docs instead.
