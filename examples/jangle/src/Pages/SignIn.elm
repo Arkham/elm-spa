@@ -61,7 +61,7 @@ init global { query } =
 requestAuthToken : String -> Cmd Msg
 requestAuthToken code =
     Http.get
-        { url = "/api/auth?code=" ++ code
+        { url = "/api/github-auth?code=" ++ code
         , expect = Http.expectJson GotAuthToken D.string
         }
 
