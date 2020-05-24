@@ -1,18 +1,38 @@
 module Pages.SignIn exposing (Model, Msg, Params, page)
 
+import Browser.Navigation as Nav
 import Dict
 import Global
 import Html exposing (..)
 import Html.Attributes exposing (class, disabled, href)
 import Http
 import Json.Decode as D
+import Ports
 import Spa.Document exposing (Document)
+import Spa.Generated.Route as Route
 import Spa.Page as Page exposing (Page)
 import Spa.Url exposing (Url)
 
 
 type alias Params =
     ()
+
+
+type Data a
+    = NotAsked
+    | Loading
+    | Success a
+    | Failure String
+
+
+dataToMaybe : Data a -> Maybe a
+dataToMaybe data =
+    case data of
+        Success value ->
+            Just value
+
+        _ ->
+            Nothing
 
 
 page : Page Params Model Msg
@@ -33,29 +53,36 @@ page =
 
 type alias Model =
     { githubClientId : String
-    , code : Maybe String
-    , token : Maybe (Result Http.Error String)
+    , token : Data String
+    , key : Nav.Key
     }
 
 
 init : Global.Model -> Url Params -> ( Model, Cmd Msg )
 init global { query } =
-    case Dict.get "code" query of
-        Just code ->
-            ( { githubClientId = global.githubClientId
-              , code = Just code
-              , token = Nothing
-              }
-            , requestAuthToken code
+    case global.token of
+        Just _ ->
+            ( Model global.githubClientId Loading global.key
+            , Nav.pushUrl global.key (Route.toString Route.Dashboard)
             )
 
         Nothing ->
-            ( { githubClientId = global.githubClientId
-              , code = Nothing
-              , token = Nothing
-              }
-            , Cmd.none
-            )
+            case Dict.get "code" query of
+                Just code ->
+                    ( { githubClientId = global.githubClientId
+                      , token = Loading
+                      , key = global.key
+                      }
+                    , requestAuthToken code
+                    )
+
+                Nothing ->
+                    ( { githubClientId = global.githubClientId
+                      , token = NotAsked
+                      , key = global.key
+                      }
+                    , Cmd.none
+                    )
 
 
 requestAuthToken : String -> Cmd Msg
@@ -67,7 +94,7 @@ requestAuthToken code =
 
 
 load : Global.Model -> Model -> Model
-load _ model =
+load global model =
     model
 
 
@@ -82,13 +109,23 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotAuthToken result ->
-            ( { model | token = Just result }, Cmd.none )
+        GotAuthToken (Ok token) ->
+            ( { model | token = Success token }
+            , Cmd.batch
+                [ Ports.storeToken token
+                , Nav.pushUrl model.key (Route.toString Route.Dashboard)
+                ]
+            )
+
+        GotAuthToken (Err _) ->
+            ( { model | token = Failure "Failed to sign in." }
+            , Cmd.none
+            )
 
 
 save : Model -> Global.Model -> Global.Model
-save _ global =
-    global
+save model global =
+    { global | token = dataToMaybe model.token }
 
 
 subscriptions : Model -> Sub Msg
@@ -107,24 +144,24 @@ view model =
                     , h2 [ class "font-body" ] [ text "a cms for humans" ]
                     ]
                 , div [ class "row" ] <|
-                    case model.code of
-                        Just _ ->
-                            [ button [ class "button", disabled True ]
-                                [ case model.token of
-                                    Nothing ->
-                                        text "Signing you in..."
-
-                                    Just (Ok _) ->
-                                        text "Sign in successful!"
-
-                                    Just (Err _) ->
-                                        text "Sign in failed."
-                                ]
-                            ]
-
-                        Nothing ->
+                    case model.token of
+                        NotAsked ->
                             [ a [ class "button", href ("https://github.com/login/oauth/authorize?client_id=" ++ model.githubClientId) ]
                                 [ text "Sign in with GitHub" ]
+                            ]
+
+                        Loading ->
+                            [ text "Signing in..." ]
+
+                        Success _ ->
+                            [ text "Sign in successful!" ]
+
+                        Failure reason ->
+                            [ div [ class "column center-x" ]
+                                [ text reason
+                                , a [ class "link", href ("https://github.com/login/oauth/authorize?client_id=" ++ model.githubClientId) ]
+                                    [ text "Try again?" ]
+                                ]
                             ]
                 ]
             ]

@@ -16,12 +16,14 @@ import Spa.Generated.Route as Route
 
 type alias Flags =
     { githubClientId : String
+    , token : Maybe String
     }
 
 
 type alias Model =
     { key : Nav.Key
     , githubClientId : String
+    , token : Maybe String
     }
 
 
@@ -30,6 +32,7 @@ init flags key =
     Model
         key
         flags.githubClientId
+        flags.token
 
 
 type Msg
