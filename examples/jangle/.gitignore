@@ -8,4 +8,4 @@ src/Spa/Generated
 .DS_Store
 
 # Ignore local dev secrets
-secrets.js
+api/secrets/index.js
