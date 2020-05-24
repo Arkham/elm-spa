@@ -64,7 +64,7 @@ init global { query } =
     case global.token of
         Just _ ->
             ( Model global.githubClientId Loading global.key
-            , Nav.pushUrl global.key (Route.toString Route.Dashboard)
+            , Nav.pushUrl global.key (Route.toString Route.Projects)
             )
 
         Nothing ->
@@ -114,7 +114,7 @@ update msg model =
             ( { model | token = Success token }
             , Cmd.batch
                 [ Ports.storeToken token
-                , Nav.pushUrl model.key (Route.toString Route.Dashboard)
+                , Nav.pushUrl model.key (Route.toString Route.Projects)
                 ]
             )
 
@@ -152,10 +152,10 @@ view model =
                             ]
 
                         Loading ->
-                            [ button [ class "button button--secondary", disabled True ] [ text "Signing in..." ] ]
+                            [ button [ class "button button--white", disabled True ] [ text "Signing in..." ] ]
 
                         Success _ ->
-                            [ button [ class "button button--secondary", disabled True ] [ text "Success!" ] ]
+                            [ button [ class "button button--white", disabled True ] [ text "Success!" ] ]
 
                         Failure reason ->
                             [ div [ class "column center-x" ]

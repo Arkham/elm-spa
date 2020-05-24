@@ -83,9 +83,16 @@ update msg model =
             )
 
         UrlChanged url ->
-            ( { model | isTransitioning = True }
-            , Utils.Cmd.delay 300 (FadeInPage url)
-            )
+            if url == model.url then
+                ( model, Cmd.none )
+
+            else if url.path == model.url.path then
+                ( model, Utils.Cmd.delay 0 (FadeInPage url) )
+
+            else
+                ( { model | isTransitioning = True }
+                , Utils.Cmd.delay 300 (FadeInPage url)
+                )
 
         FadeInPage url ->
             let

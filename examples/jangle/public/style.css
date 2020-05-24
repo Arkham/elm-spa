@@ -13,9 +13,18 @@ body { font-family: 'Nunito', sans-serif; }
   font-weight: 800;
 }
 
+.color--white { color: white; }
+.color--shell { color: #f8f4f4; }
+.color--orange { color: #ce6946; }
+
 .bg--white { background: white; }
+.bg--shell { background: #f8f4f4; }
+.bg--orange { background: #ce6946; }
 
 .shadow { box-shadow: 0 0.5em 2em rgba(0, 0, 0, 0.25); }
+
+.width--half { width: 50%; }
+.width--sidebar { width: 12rem; }
 
 .max-width--20 { max-width: 20rem; }
 
@@ -30,7 +39,7 @@ body { font-family: 'Nunito', sans-serif; }
 }
 .button:hover { opacity: 0.75; }
 .button[disabled] { opacity: 0.5; }
-.button--secondary { color: #ce6946; background: linear-gradient(#ffffff, #f0f0f0); }
+.button--white { color: #ce6946; background: linear-gradient(#ffffff, #f0f0f0); }
 
 .page { transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out; }
 .page--invisible { opacity: 0; visibility: hidden; }

@@ -37,7 +37,7 @@ init : Global.Model -> Url Params -> ( Model, Cmd Msg )
 init global _ =
     case global.token of
         Just _ ->
-            ( {}, Nav.pushUrl global.key (Route.toString Route.Dashboard) )
+            ( {}, Nav.pushUrl global.key (Route.toString Route.Projects) )
 
         Nothing ->
             ( {}, Nav.pushUrl global.key (Route.toString Route.SignIn) )

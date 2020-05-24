@@ -1,10 +1,10 @@
-module Pages.Dashboard exposing (Model, Msg, Params, page)
+module Pages.Projects exposing (Model, Msg, Params, page)
 
 import Api.Token exposing (Token)
 import Browser.Navigation as Nav
 import Global
 import Html exposing (..)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, href)
 import Html.Events as Events
 import Ports
 import Spa.Document exposing (Document)
@@ -92,13 +92,28 @@ view : ProtectedModel -> Document Msg
 view model =
     { title = "Jangle"
     , body =
-        [ div [ class "column fill center" ]
-            [ div [ class "column bg--white padding-medium shadow spacing-small max-width--20 rounded-tiny fill-x center-x" ]
-                [ h1 [ class "font-h1 text-center" ] [ text "Dashboard" ]
-                , div [ class "row" ] <|
-                    [ button [ class "button", Events.onClick SignOut ] [ text "Sign out" ]
+        [ div [ class "visible-mobile column fill" ]
+            [ header [ class "row padding-small relative bg--orange color--white" ]
+                [ button [ class "button button--white" ] [ text "Menu" ]
+                , h3 [ class "absolute center" ] [ a [ class "font-h3", href (Route.toString Route.Projects) ] [ text "Jangle" ] ]
+                ]
+            ]
+        , div [ class "hidden-mobile fill relative" ]
+            [ div [ class "absolute width--half align-left align-top align-bottom bg--orange" ] []
+            , div [ class "relative bg--shell row fill-y container align-top" ]
+                [ aside [ class "width--sidebar bg--orange color--white column fill-y padding-medium spread center-x" ]
+                    [ a [ class "font-h3", href (Route.toString Route.Projects) ] [ text "Jangle" ]
+                    , button [ class "button button--white" ] [ text "Sign out" ]
                     ]
+                , main_ [ class "flex" ] [ viewContent ]
                 ]
             ]
         ]
     }
+
+
+viewContent : Html msg
+viewContent =
+    div [ class "column padding-medium" ]
+        [ h1 [ class "font-h3" ] [ text "Projects" ]
+        ]
