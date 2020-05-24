@@ -1,13 +1,7 @@
 const axios = require('axios')
-const secrets = require('secrets')
+const config = require('config')
 
 exports.handler = function (event, _context, callback) {
-  const isLocalDevelopment = event.headers.host === 'localhost:8000'
-
-  const config = isLocalDevelopment
-    ? { clientId: '20c33fe428b932816bb2', clientSecret: secrets.clientSecret }
-    : { clientId: process.env.CLIENT_ID, clientSecret : process.env.CLIENT_SECRET }
-
   const code = event.queryStringParameters.code
 
   const sendToken = response => {

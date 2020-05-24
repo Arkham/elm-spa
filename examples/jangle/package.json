@@ -14,7 +14,7 @@
     "build:elm-spa": "elm-spa build .",
     "dev:elm": "elm-live src/Main.elm --no-server -- --debug --output=public/dist/elm.compiled.js",
     "dev:elm-spa": "chokidar src/Pages -c \"elm-spa build .\"",
-    "dev:netlify": "(cd ../.. && netlify dev -p 8000)"
+    "dev:netlify": "(cd ../.. && netlify dev -o -p 8000)"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "axios": "0.19.2",
-    "secrets": "file:api/secrets"
+    "config": "file:api/config"
   }
 }

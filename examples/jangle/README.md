@@ -9,6 +9,8 @@ You can get this site up and running with one command:
 npm start
 ```
 
+__Important Note:__ Sign in won't work until you [setup the API correctly](./api/README.md) 
+
 ### other commands to know
 
 There are a handful of commands in the [package.json](./package.json).
