@@ -18,7 +18,7 @@ type alias Params =
 
 page : Page Params Model Msg
 page =
-    Page.full
+    Page.protectedFull
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -36,7 +36,9 @@ type alias Model =
 
 init : Global.Model -> Url Params -> ( Model, Cmd Msg )
 init global _ =
-    ( { key = global.key, token = global.token }, Cmd.none )
+    ( { key = global.key, token = global.token }
+    , Cmd.none
+    )
 
 
 load : Global.Model -> Model -> Model

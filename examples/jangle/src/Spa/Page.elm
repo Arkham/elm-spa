@@ -1,6 +1,7 @@
 module Spa.Page exposing
     ( Page
     , static, sandbox, element, full
+    , protectedFull
     , Upgraded, Bundle, upgrade
     )
 
@@ -8,12 +9,15 @@ module Spa.Page exposing
 
 @docs Page
 @docs static, sandbox, element, full
+@docs protectedFull
 @docs Upgraded, Bundle, upgrade
 
 -}
 
+import Browser.Navigation as Nav
 import Global
 import Spa.Document as Document exposing (Document)
+import Spa.Generated.Route as Route
 import Spa.Url exposing (Url)
 import Url
 
@@ -86,6 +90,41 @@ full :
     -> Page params model msg
 full page =
     page
+
+
+
+-- PROTECTED, redirect to sign in if not signed in
+
+
+protectedFull :
+    { init : Global.Model -> Url params -> ( model, Cmd msg )
+    , update : msg -> model -> ( model, Cmd msg )
+    , view : model -> Document msg
+    , subscriptions : model -> Sub msg
+    , save : model -> Global.Model -> Global.Model
+    , load : Global.Model -> model -> model
+    }
+    -> Page params model msg
+protectedFull =
+    protected << full
+
+
+protected : Page params model msg -> Page params model msg
+protected page =
+    { page
+        | init =
+            \global url ->
+                case global.token of
+                    Just token ->
+                        page.init global url
+
+                    Nothing ->
+                        let
+                            ( model, _ ) =
+                                page.init global url
+                        in
+                        ( model, Nav.pushUrl global.key (Route.toString Route.SignIn) )
+    }
 
 
 
