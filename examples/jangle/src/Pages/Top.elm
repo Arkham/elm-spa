@@ -68,5 +68,5 @@ subscriptions model =
 view : Model -> Document Msg
 view model =
     { title = "Top"
-    , body = [ text "Top" ]
+    , body = []
     }
