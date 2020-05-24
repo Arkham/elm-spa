@@ -1,5 +1,6 @@
 module Pages.SignIn exposing (Model, Msg, Params, page)
 
+import Api.Data as Data exposing (Data)
 import Api.Token
 import Browser.Navigation as Nav
 import Dict
@@ -17,23 +18,6 @@ import Spa.Url exposing (Url)
 
 type alias Params =
     ()
-
-
-type Data a
-    = NotAsked
-    | Loading
-    | Success a
-    | Failure String
-
-
-dataToMaybe : Data a -> Maybe a
-dataToMaybe data =
-    case data of
-        Success value ->
-            Just value
-
-        _ ->
-            Nothing
 
 
 page : Page Params Model Msg
@@ -63,7 +47,7 @@ init : Global.Model -> Url Params -> ( Model, Cmd Msg )
 init global { query } =
     case global.token of
         Just _ ->
-            ( Model global.githubClientId Loading global.key
+            ( Model global.githubClientId Data.Loading global.key
             , Nav.pushUrl global.key (Route.toString Route.Projects)
             )
 
@@ -71,7 +55,7 @@ init global { query } =
             case Dict.get "code" query of
                 Just code ->
                     ( { githubClientId = global.githubClientId
-                      , token = Loading
+                      , token = Data.Loading
                       , key = global.key
                       }
                     , requestAuthToken code
@@ -79,7 +63,7 @@ init global { query } =
 
                 Nothing ->
                     ( { githubClientId = global.githubClientId
-                      , token = NotAsked
+                      , token = Data.NotAsked
                       , key = global.key
                       }
                     , Cmd.none
@@ -111,7 +95,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         GotAuthToken (Ok token) ->
-            ( { model | token = Success token }
+            ( { model | token = Data.Success token }
             , Cmd.batch
                 [ Ports.storeToken token
                 , Nav.pushUrl model.key (Route.toString Route.Projects)
@@ -119,14 +103,14 @@ update msg model =
             )
 
         GotAuthToken (Err _) ->
-            ( { model | token = Failure "Failed to sign in." }
+            ( { model | token = Data.Failure "Failed to sign in." }
             , Cmd.none
             )
 
 
 save : Model -> Global.Model -> Global.Model
 save model global =
-    { global | token = dataToMaybe model.token |> Maybe.map Api.Token.fromString }
+    { global | token = Data.toMaybe model.token |> Maybe.map Api.Token.fromString }
 
 
 subscriptions : Model -> Sub Msg
@@ -146,18 +130,18 @@ view model =
                     ]
                 , div [ class "row" ] <|
                     case model.token of
-                        NotAsked ->
+                        Data.NotAsked ->
                             [ a [ class "button", href ("https://github.com/login/oauth/authorize?client_id=" ++ model.githubClientId) ]
                                 [ text "Sign in with GitHub" ]
                             ]
 
-                        Loading ->
+                        Data.Loading ->
                             [ button [ class "button button--white", disabled True ] [ text "Signing in..." ] ]
 
-                        Success _ ->
+                        Data.Success _ ->
                             [ button [ class "button button--white", disabled True ] [ text "Success!" ] ]
 
-                        Failure reason ->
+                        Data.Failure reason ->
                             [ div [ class "column center-x" ]
                                 [ text reason
                                 , a [ class "link", href ("https://github.com/login/oauth/authorize?client_id=" ++ model.githubClientId) ]

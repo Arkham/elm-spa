@@ -3,6 +3,7 @@
 html { background: #f8f4f4; color: #333; font-size: 18px; }
 
 body { font-family: 'Nunito', sans-serif; }
+img { width: 100%; }
 
 .font-h1, .font-h2, .font-h3, .font-h4,
 .font-h5, .font-h6, .font-body {
@@ -25,6 +26,8 @@ body { font-family: 'Nunito', sans-serif; }
 
 .width--half { width: 50%; }
 .width--sidebar { width: 12rem; }
+
+.size--avatar { min-width: 2rem; min-height: 2rem; max-width: 2rem; max-height: 2rem; }
 
 .max-width--20 { max-width: 20rem; }
 
