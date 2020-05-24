@@ -20,6 +20,7 @@ body { font-family: 'Nunito', sans-serif; }
 .max-width--20 { max-width: 20rem; }
 
 .button {
+  cursor: pointer;
   color: white;
   background: linear-gradient(coral, #ce6946);
   border-radius: 0.25em;
@@ -28,3 +29,6 @@ body { font-family: 'Nunito', sans-serif; }
 }
 .button:hover { opacity: 0.75; }
 .button[disabled] { opacity: 0.5; }
+
+.page { transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out; }
+.page--invisible { opacity: 0; visibility: hidden; }

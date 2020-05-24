@@ -7,6 +7,7 @@ import Spa.Document as Document exposing (Document)
 import Spa.Generated.Pages as Pages
 import Spa.Generated.Route as Route exposing (Route)
 import Url exposing (Url)
+import Utils.Cmd
 
 
 main : Program Flags Model Msg
@@ -33,6 +34,7 @@ fromUrl =
 type alias Model =
     { url : Url
     , key : Nav.Key
+    , isTransitioning : Bool
     , global : Global.Model
     , page : Pages.Model
     }
@@ -50,7 +52,7 @@ init flags url key =
         ( page, pageCmd ) =
             Pages.init route global url
     in
-    ( Model url key global page
+    ( Model url key False global page
     , Cmd.map Pages pageCmd
     )
 
@@ -62,6 +64,7 @@ init flags url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url
+    | FadeInPage Url
     | Global Global.Msg
     | Pages Pages.Msg
 
@@ -80,6 +83,11 @@ update msg model =
             )
 
         UrlChanged url ->
+            ( { model | isTransitioning = True }
+            , Utils.Cmd.delay 300 (FadeInPage url)
+            )
+
+        FadeInPage url ->
             let
                 route =
                     fromUrl url
@@ -90,7 +98,7 @@ update msg model =
                 global =
                     Pages.save page model.global
             in
-            ( { model | url = url, page = page, global = global }
+            ( { model | url = url, page = page, global = global, isTransitioning = False }
             , Cmd.map Pages cmd
             )
 
@@ -125,6 +133,7 @@ view model =
         { page = Pages.view model.page |> Document.map Pages
         , global = model.global
         , toMsg = Global
+        , isTransitioning = model.isTransitioning
         }
 
 

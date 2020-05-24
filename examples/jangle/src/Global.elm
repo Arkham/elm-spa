@@ -10,6 +10,7 @@ module Global exposing
 
 import Browser.Navigation as Nav
 import Html exposing (..)
+import Html.Attributes exposing (class, classList)
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
 
@@ -57,7 +58,16 @@ view :
     { page : Document msg
     , global : Model
     , toMsg : Msg -> msg
+    , isTransitioning : Bool
     }
     -> Document msg
-view { page } =
-    page
+view { page, isTransitioning } =
+    { title = page.title
+    , body =
+        [ div
+            [ class "column fill page"
+            , classList [ ( "page--invisible", isTransitioning ) ]
+            ]
+            page.body
+        ]
+    }
