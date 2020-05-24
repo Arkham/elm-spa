@@ -1,6 +1,6 @@
 /* Add your styles here */
 
-html { background: #f8f4f4; color: #333; font-size: 18px; }
+html { background: #f8f4f4; color: #333; }
 
 body { font-family: 'Nunito', sans-serif; }
 img { width: 100%; }
@@ -46,3 +46,8 @@ img { width: 100%; }
 
 .page { transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out; }
 .page--invisible { opacity: 0; visibility: hidden; }
+
+/* responsive font scaling */
+html { font-size: 16px; }
+@media screen and (min-width: 641px) { html { font-size: 18px; } }
+@media screen and (min-width: 1281px) { html { font-size: 20px; } }

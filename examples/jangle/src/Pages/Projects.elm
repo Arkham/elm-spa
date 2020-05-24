@@ -107,24 +107,26 @@ view model =
     { title = "Jangle"
     , body =
         [ div [ class "visible-mobile column fill" ]
-            [ header [ class "row padding-small relative bg--orange color--white" ]
-                [ button [ class "button button--white" ] [ text "Menu" ]
-                , h3 [ class "absolute center" ] [ a [ class "font-h3", href (Route.toString Route.Projects) ] [ text "Jangle" ] ]
-                ]
+            [ header [ class "row padding-medium relative bg--orange color--white spread center-y" ] viewMenuOptions
             , main_ [ class "flex" ] [ viewContent model ]
             ]
         , div [ class "hidden-mobile fill relative" ]
             [ div [ class "absolute width--half align-left align-top align-bottom bg--orange" ] []
             , div [ class "relative bg--shell row fill-y container align-top" ]
                 [ aside [ class "width--sidebar bg--orange color--white column fill-y padding-medium spread center-x" ]
-                    [ a [ class "font-h3", href (Route.toString Route.Projects) ] [ text "Jangle" ]
-                    , button [ Events.onClick ClickedSignOut, class "button button--white" ] [ text "Sign out" ]
-                    ]
+                    viewMenuOptions
                 , main_ [ class "flex" ] [ viewContent model ]
                 ]
             ]
         ]
     }
+
+
+viewMenuOptions : List (Html Msg)
+viewMenuOptions =
+    [ a [ class "font-h3", href (Route.toString Route.Projects) ] [ text "Jangle" ]
+    , button [ Events.onClick ClickedSignOut, class "button button--white" ] [ text "Sign out" ]
+    ]
 
 
 viewContent : { model | user : Maybe User } -> Html msg
