@@ -8,6 +8,7 @@ module Global exposing
     , view
     )
 
+import Api.Token exposing (Token)
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (class, classList)
@@ -24,7 +25,7 @@ type alias Flags =
 type alias Model =
     { key : Nav.Key
     , githubClientId : String
-    , token : Maybe String
+    , token : Maybe Token
     }
 
 
@@ -33,7 +34,7 @@ init flags key =
     Model
         key
         flags.githubClientId
-        flags.token
+        (flags.token |> Maybe.map Api.Token.fromString)
 
 
 type Msg

@@ -1,5 +1,6 @@
 module Pages.SignIn exposing (Model, Msg, Params, page)
 
+import Api.Token
 import Browser.Navigation as Nav
 import Dict
 import Global
@@ -125,7 +126,7 @@ update msg model =
 
 save : Model -> Global.Model -> Global.Model
 save model global =
-    { global | token = dataToMaybe model.token }
+    { global | token = dataToMaybe model.token |> Maybe.map Api.Token.fromString }
 
 
 subscriptions : Model -> Sub Msg

@@ -14,6 +14,7 @@ module Spa.Page exposing
 
 -}
 
+import Api.Token exposing (Token)
 import Browser.Navigation as Nav
 import Global
 import Spa.Document as Document exposing (Document)
@@ -88,8 +89,8 @@ full :
     , load : Global.Model -> model -> model
     }
     -> Page params model msg
-full page =
-    page
+full =
+    identity
 
 
 
@@ -97,33 +98,52 @@ full page =
 
 
 protectedFull :
-    { init : Global.Model -> Url params -> ( model, Cmd msg )
+    { init : Token -> Global.Model -> Url params -> ( model, Cmd msg )
     , update : msg -> model -> ( model, Cmd msg )
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
     , save : model -> Global.Model -> Global.Model
     , load : Global.Model -> model -> model
     }
-    -> Page params model msg
+    -> Page params (Maybe model) msg
 protectedFull =
-    protected << full
+    protected >> full
 
 
-protected : Page params model msg -> Page params model msg
+protected :
+    { init : Token -> Global.Model -> Url params -> ( model, Cmd msg )
+    , update : msg -> model -> ( model, Cmd msg )
+    , view : model -> Document msg
+    , subscriptions : model -> Sub msg
+    , save : model -> Global.Model -> Global.Model
+    , load : Global.Model -> model -> model
+    }
+    -> Page params (Maybe model) msg
 protected page =
-    { page
-        | init =
-            \global url ->
-                case global.token of
-                    Just token ->
-                        page.init global url
+    let
+        init : Global.Model -> Url params -> ( Maybe model, Cmd msg )
+        init global url =
+            case global.token of
+                Just token ->
+                    page.init token global url |> Tuple.mapFirst Just
 
-                    Nothing ->
-                        let
-                            ( model, _ ) =
-                                page.init global url
-                        in
-                        ( model, Nav.pushUrl global.key (Route.toString Route.SignIn) )
+                Nothing ->
+                    ( Nothing
+                    , Nav.pushUrl global.key (Route.toString Route.SignIn)
+                    )
+
+        protect : (model -> value) -> value -> Maybe model -> value
+        protect fromModel fallback maybeModel =
+            maybeModel
+                |> Maybe.map fromModel
+                |> Maybe.withDefault fallback
+    in
+    { init = init
+    , update = \msg model_ -> protect (\model -> page.update msg model |> Tuple.mapFirst Just) ( Nothing, Cmd.none ) model_
+    , view = protect page.view { title = "", body = [] }
+    , subscriptions = protect page.subscriptions Sub.none
+    , save = \model_ global -> protect (\model -> page.save model global) global model_
+    , load = \global model_ -> protect (\model -> page.load global model |> Just) Nothing model_
     }
 
 

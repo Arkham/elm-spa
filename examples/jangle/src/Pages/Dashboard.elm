@@ -1,5 +1,6 @@
 module Pages.Dashboard exposing (Model, Msg, Params, page)
 
+import Api.Token exposing (Token)
 import Browser.Navigation as Nav
 import Global
 import Html exposing (..)
@@ -16,6 +17,10 @@ type alias Params =
     ()
 
 
+type alias Model =
+    Maybe ProtectedModel
+
+
 page : Page Params Model Msg
 page =
     Page.protectedFull
@@ -28,21 +33,25 @@ page =
         }
 
 
-type alias Model =
+type alias ProtectedModel =
     { key : Nav.Key
-    , token : Maybe String
+    , token : Token
+    , signOutRequested : Bool
     }
 
 
-init : Global.Model -> Url Params -> ( Model, Cmd Msg )
-init global _ =
-    ( { key = global.key, token = global.token }
+init : Token -> Global.Model -> Url Params -> ( ProtectedModel, Cmd Msg )
+init token global _ =
+    ( ProtectedModel
+        global.key
+        token
+        False
     , Cmd.none
     )
 
 
-load : Global.Model -> Model -> Model
-load global model =
+load : Global.Model -> ProtectedModel -> ProtectedModel
+load _ model =
     model
 
 
@@ -50,11 +59,11 @@ type Msg
     = SignOut
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> ProtectedModel -> ( ProtectedModel, Cmd Msg )
 update msg model =
     case msg of
         SignOut ->
-            ( { model | token = Nothing }
+            ( { model | signOutRequested = True }
             , Cmd.batch
                 [ Ports.clearToken ()
                 , Nav.pushUrl model.key (Route.toString Route.SignIn)
@@ -62,17 +71,24 @@ update msg model =
             )
 
 
-save : Model -> Global.Model -> Global.Model
+save : ProtectedModel -> Global.Model -> Global.Model
 save model global =
-    { global | token = model.token }
+    { global
+        | token =
+            if model.signOutRequested then
+                Nothing
+
+            else
+                Just model.token
+    }
 
 
-subscriptions : Model -> Sub Msg
+subscriptions : ProtectedModel -> Sub Msg
 subscriptions model =
     Sub.none
 
 
-view : Model -> Document Msg
+view : ProtectedModel -> Document Msg
 view model =
     { title = "Jangle"
     , body =
