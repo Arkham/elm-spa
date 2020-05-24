@@ -67,7 +67,7 @@ requestAuthToken code =
 
 
 load : Global.Model -> Model -> Model
-load global model =
+load _ model =
     model
 
 
@@ -87,12 +87,12 @@ update msg model =
 
 
 save : Model -> Global.Model -> Global.Model
-save model global =
+save _ global =
     global
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 
@@ -108,7 +108,7 @@ view model =
                     ]
                 , div [ class "row" ] <|
                     case model.code of
-                        Just code ->
+                        Just _ ->
                             [ button [ class "button", disabled True ]
                                 [ case model.token of
                                     Nothing ->

@@ -10,7 +10,6 @@ module Global exposing
 
 import Browser.Navigation as Nav
 import Html exposing (..)
-import Html.Attributes exposing (class, href)
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
 
@@ -47,7 +46,7 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 
@@ -57,5 +56,5 @@ view :
     , toMsg : Msg -> msg
     }
     -> Document msg
-view { page, global, toMsg } =
+view { page } =
     page
