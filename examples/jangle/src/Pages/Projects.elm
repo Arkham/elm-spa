@@ -107,15 +107,14 @@ view model =
     { title = "Jangle"
     , body =
         [ div [ class "visible-mobile column fill" ]
-            [ header [ class "row padding-medium relative bg--orange color--white spread center-y" ] viewMenuOptions
-            , main_ [ class "flex" ] [ viewContent model ]
+            [ header [ class "row padding-small relative bg--orange color--white spread center-y" ] viewMenuOptions
+            , main_ [ class "flex padding-small" ] [ viewContent model ]
             ]
         , div [ class "hidden-mobile fill relative" ]
             [ div [ class "absolute width--half align-left align-top align-bottom bg--orange" ] []
             , div [ class "relative bg--shell row fill-y container align-top" ]
-                [ aside [ class "width--sidebar bg--orange color--white column fill-y padding-medium spread center-x" ]
-                    viewMenuOptions
-                , main_ [ class "flex" ] [ viewContent model ]
+                [ aside [ class "width--sidebar bg--orange color--white column fill-y padding-medium spread center-x" ] viewMenuOptions
+                , main_ [ class "flex padding-medium" ] [ viewContent model ]
                 ]
             ]
         ]
@@ -131,15 +130,14 @@ viewMenuOptions =
 
 viewContent : { model | user : Maybe User } -> Html msg
 viewContent model =
-    div [ class "column padding-medium" ]
+    div [ class "column" ]
         [ div [ class "row spacing-tiny wrap spread center-y" ]
             [ h1 [ class "font-h3" ] [ text "Projects" ]
             , Utils.Maybe.view model.user <|
                 \user ->
                     div [ class "row spacing-tiny center-y" ]
                         [ div [ class "row rounded-circle bg-orange size--avatar" ]
-                            [ img [ src user.avatarUrl, alt user.name ] []
-                            ]
+                            [ img [ src user.avatarUrl, alt user.name ] [] ]
                         , span [] [ text user.name ]
                         ]
             ]
