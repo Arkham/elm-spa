@@ -1,10 +1,5 @@
 const axios = require('axios')
-const secrets = require('secrets')
-
-const config = {
-  clientId: process.env.CLIENT_ID || secrets.clientId,
-  clientSecret : process.env.CLIENT_SECRET || secrets.clientSecret
-}
+const config = require('secrets')
 
 exports.handler = function (event, _context, callback) {
   const code = event.queryStringParameters.code
