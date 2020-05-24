@@ -151,10 +151,10 @@ view model =
                             ]
 
                         Loading ->
-                            [ text "Signing in..." ]
+                            [ button [ class "button button--secondary", disabled True ] [ text "Signing in..." ] ]
 
                         Success _ ->
-                            [ text "Sign in successful!" ]
+                            [ button [ class "button button--secondary", disabled True ] [ text "Success!" ] ]
 
                         Failure reason ->
                             [ div [ class "column center-x" ]

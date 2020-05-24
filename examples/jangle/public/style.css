@@ -15,7 +15,7 @@ body { font-family: 'Nunito', sans-serif; }
 
 .bg--white { background: white; }
 
-.shadow { box-shadow: 0 0.5em 2em rgba(0,0,0,0.25); }
+.shadow { box-shadow: 0 0.5em 2em rgba(0, 0, 0, 0.25); }
 
 .max-width--20 { max-width: 20rem; }
 
@@ -25,10 +25,12 @@ body { font-family: 'Nunito', sans-serif; }
   background: linear-gradient(coral, #ce6946);
   border-radius: 0.25em;
   padding: 0.6em 1.2em;
+  box-shadow: 0 0.25em 1em rgba(0, 0, 0, 0.25);
   transition: opacity 200ms ease-in-out;
 }
 .button:hover { opacity: 0.75; }
 .button[disabled] { opacity: 0.5; }
+.button--secondary { color: #ce6946; background: linear-gradient(#ffffff, #f0f0f0); }
 
 .page { transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out; }
 .page--invisible { opacity: 0; visibility: hidden; }
