@@ -6,7 +6,9 @@ import Global exposing (Flags)
 import Spa.Document as Document exposing (Document)
 import Spa.Generated.Pages as Pages
 import Spa.Generated.Route as Route exposing (Route)
+import Spa.Transition
 import Url exposing (Url)
+import Utils.Cmd
 
 
 main : Program Flags Model Msg
@@ -35,6 +37,7 @@ type alias Model =
     , key : Nav.Key
     , global : Global.Model
     , page : Pages.Model
+    , isTransitioning : { layout : Bool, page : Bool }
     }
 
 
@@ -50,8 +53,11 @@ init flags url key =
         ( page, pageCmd ) =
             Pages.init route global url
     in
-    ( Model url key global page
-    , Cmd.map Pages pageCmd
+    ( Model url key global page { layout = True, page = True }
+    , Cmd.batch
+        [ Cmd.map Pages pageCmd
+        , Utils.Cmd.delay Spa.Transition.delays.layout (FadeIn url)
+        ]
     )
 
 
@@ -64,6 +70,7 @@ type Msg
     | UrlChanged Url
     | Global Global.Msg
     | Pages Pages.Msg
+    | FadeIn Url
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -80,19 +87,19 @@ update msg model =
             )
 
         UrlChanged url ->
-            let
-                route =
-                    fromUrl url
+            if url == model.url then
+                ( model, Cmd.none )
 
-                ( page, cmd ) =
-                    Pages.init route model.global url
+            else if url.path == model.url.path then
+                loadPage url model
 
-                global =
-                    Pages.save page model.global
-            in
-            ( { model | url = url, page = page, global = global }
-            , Cmd.map Pages cmd
-            )
+            else
+                ( { model | isTransitioning = { layout = False, page = True } }
+                , Utils.Cmd.delay Spa.Transition.delays.page (FadeIn url)
+                )
+
+        FadeIn url ->
+            loadPage url model
 
         Global globalMsg ->
             let
@@ -119,12 +126,35 @@ update msg model =
             )
 
 
+loadPage : Url -> Model -> ( Model, Cmd Msg )
+loadPage url model =
+    let
+        route =
+            fromUrl url
+
+        ( page, cmd ) =
+            Pages.init route model.global url
+
+        global =
+            Pages.save page model.global
+    in
+    ( { model
+        | url = url
+        , page = page
+        , global = global
+        , isTransitioning = { layout = False, page = False }
+      }
+    , Cmd.map Pages cmd
+    )
+
+
 view : Model -> Document Msg
 view model =
     Global.view
         { page = Pages.view model.page |> Document.map Pages
         , global = model.global
         , toMsg = Global
+        , isTransitioning = model.isTransitioning
         }
 
 

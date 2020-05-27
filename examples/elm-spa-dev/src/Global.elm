@@ -10,9 +10,10 @@ module Global exposing
 
 import Browser.Navigation as Nav
 import Html exposing (..)
-import Html.Attributes exposing (class, href)
+import Html.Attributes exposing (class, classList, href, style)
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
+import Spa.Transition
 
 
 type alias Flags =
@@ -51,12 +52,17 @@ view :
     { page : Document msg
     , global : Model
     , toMsg : Msg -> msg
+    , isTransitioning : { layout : Bool, page : Bool }
     }
     -> Document msg
-view { page, global, toMsg } =
+view { page, isTransitioning } =
     { title = page.title
     , body =
-        [ div [ class "column container px-small spacing-small fill-y" ]
+        [ div
+            [ class "column container px-small spacing-small fill-y"
+            , style "transition" Spa.Transition.properties.layout
+            , classList [ ( "invisible", isTransitioning.layout ) ]
+            ]
             [ header [ class "py-medium row spacing-small spread" ]
                 [ a [ class "font-h3 text-header hoverable", href "/" ]
                     [ text "elm-spa" ]
@@ -69,7 +75,12 @@ view { page, global, toMsg } =
                         [ text "examples" ]
                     ]
                 ]
-            , main_ [ class "flex" ] page.body
+            , main_
+                [ class "flex"
+                , style "transition" Spa.Transition.properties.page
+                , classList [ ( "invisible", isTransitioning.page ) ]
+                ]
+                page.body
             , footer [ class "footer py-medium text-center color--faint" ]
                 [ text "[ built with elm-spa ]" ]
             ]

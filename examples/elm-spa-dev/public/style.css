@@ -39,3 +39,5 @@ html, body {
 .size--120 { min-width: 120px; min-height: 120px; max-width: 120px; max-height: 120px; }
 
 .color--faint { color: rgba(0, 0, 0, 0.6);}
+
+.invisible { opacity: 0; }
