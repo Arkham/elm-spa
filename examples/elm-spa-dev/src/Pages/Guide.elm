@@ -1,8 +1,8 @@
-module Pages.Docs.Topic_String exposing (Model, Msg, Params, page)
+module Pages.Guide exposing (Model, Msg, Params, page)
 
 import Components.Sidebar as Sidebar
 import Html exposing (..)
-import Html.Attributes exposing (class, href)
+import Html.Attributes exposing (class)
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route exposing (Route)
 import Spa.Page as Page exposing (Page)
@@ -10,12 +10,11 @@ import Spa.Url as Url exposing (Url)
 
 
 type alias Params =
-    { topic : String }
+    ()
 
 
 type alias Model =
-    { title : String
-    , route : Route
+    { route : Route
     }
 
 
@@ -34,9 +33,8 @@ page =
 
 
 init : Url Params -> ( Model, Cmd Msg )
-init { rawUrl, params } =
+init { rawUrl } =
     ( { route = Route.fromUrl rawUrl |> Maybe.withDefault Route.NotFound
-      , title = params.topic
       }
     , Cmd.none
     )
@@ -56,18 +54,11 @@ subscriptions model =
 
 view : Model -> Document Msg
 view model =
-    { title = prettifySlug model.title ++ " | docs | elm-spa"
+    { title = "guide | elm-spa"
     , body =
         [ div [ class "flex column spacing-medium" ]
-            [ h1 [ class "font-h2" ] [ text (prettifySlug model.title) ]
+            [ h1 [ class "font-h2" ] [ text "guide" ]
             , div [ class "content readable" ] [ text "TODO: Markdown docs" ]
             ]
         ]
     }
-
-
-prettifySlug : String -> String
-prettifySlug slug =
-    slug
-        |> String.replace "-" " "
-        |> String.replace "elm spa" "elm-spa"

@@ -58,7 +58,7 @@ view :
     , route : Route
     }
     -> Document msg
-view { page, isTransitioning, route, shouldShowSidebar } =
+view ({ page, isTransitioning } as options) =
     { title = page.title
     , body =
         [ div
@@ -66,36 +66,66 @@ view { page, isTransitioning, route, shouldShowSidebar } =
             , style "transition" Spa.Transition.properties.layout
             , classList [ ( "invisible", isTransitioning.layout ) ]
             ]
-            [ header [ class "py-medium row spacing-small spread" ]
-                [ a [ class "font-h3 text-header hoverable", href "/" ]
-                    [ text "elm-spa" ]
-                , div [ class "row spacing-small text--bigger" ]
-                    [ a [ class "link", href (Route.toString Route.Docs) ] [ text "docs" ]
-                    , a [ class "link", href (Route.toString Route.NotFound) ] [ text "guide" ]
-                    , a [ class "link", href (Route.toString Route.NotFound) ] [ text "examples" ]
-                    ]
-                ]
+            [ viewNavbar
             , div [ class "flex row spacing-small align-top relative" ]
-                [ main_
-                    [ class "flex"
-                    , style "transition" Spa.Transition.properties.page
-                    , classList [ ( "invisible", isTransitioning.page ) ]
-                    ]
-                    page.body
-                , if shouldShowSidebar then
-                    div [ class "width--sidebar invisible" ] []
-
-                  else
-                    text ""
-                , aside
-                    [ class "absolute align-right align-top"
-                    , style "transition" Spa.Transition.properties.page
-                    , classList [ ( "invisible", not shouldShowSidebar ) ]
-                    ]
-                    [ Components.Sidebar.view route ]
+                [ viewPage options
+                , viewSidebar options
                 ]
-            , footer [ class "footer py-medium text-center color--faint" ]
-                [ text "[ built with elm-spa ]" ]
+            , viewFooter
             ]
         ]
     }
+
+
+viewNavbar : Html msg
+viewNavbar =
+    header [ class "py-medium row spacing-small spread center-y" ]
+        [ a [ class "font-h3 text-header hoverable", href "/" ]
+            [ text "elm-spa" ]
+        , div [ class "row spacing-small text--bigger" ]
+            [ a [ class "link", href (Route.toString Route.Docs) ] [ text "docs" ]
+            , a [ class "link", href (Route.toString Route.Guide) ] [ text "guide" ]
+            , a [ class "link", href (Route.toString Route.NotFound) ] [ text "examples" ]
+            ]
+        ]
+
+
+viewPage :
+    { options
+        | page : Document msg
+        , isTransitioning : { layout : Bool, page : Bool }
+    }
+    -> Html msg
+viewPage { page, isTransitioning } =
+    main_
+        [ class "flex"
+        , style "transition" Spa.Transition.properties.page
+        , classList [ ( "invisible", isTransitioning.page ) ]
+        ]
+        page.body
+
+
+viewSidebar : { options | shouldShowSidebar : Bool, route : Route } -> Html msg
+viewSidebar { shouldShowSidebar, route } =
+    aside [ class "hidden-mobile" ]
+        [ if shouldShowSidebar then
+            div [ class "invisible" ] [ Components.Sidebar.view route ]
+
+          else
+            text ""
+        , div
+            [ class "absolute align-right align-top"
+            , style "transition" Spa.Transition.properties.page
+            , classList [ ( "invisible", not shouldShowSidebar ) ]
+            ]
+            [ Components.Sidebar.view route ]
+        ]
+
+
+viewFooter : Html msg
+viewFooter =
+    footer [ class "footer pt-large pb-medium text-center color--faint" ]
+        [ text "[ Built with "
+        , a [ class "text-underline hoverable", Html.Attributes.target "_blank", href "https://elm-lang.org" ] [ text "Elm" ]
+        , text " ]"
+        ]

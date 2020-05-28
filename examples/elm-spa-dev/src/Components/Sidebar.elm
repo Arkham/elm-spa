@@ -28,7 +28,7 @@ view currentRoute =
     let
         viewSection : Section -> Html msg
         viewSection section =
-            Html.section [ class "column spacing-small align-left sticky" ]
+            Html.section [ class "column spacing-small align-left" ]
                 [ h3 [ class "font-h4" ] [ text section.title ]
                 , div [ class "column spacing-tiny align-left pl-tiny" ]
                     (List.map viewLink section.links)
@@ -37,13 +37,13 @@ view currentRoute =
         viewLink : Link -> Html msg
         viewLink link =
             if link.route == currentRoute then
-                span [ class "", disabled True ] [ text link.label ]
+                span [ class "link disabled" ] [ text link.label ]
 
             else
                 a [ class "link", href (Route.toString link.route) ]
                     [ text link.label ]
     in
-    aside [ class "hidden-mobile width--sidebar column spacing-small align-left" ]
+    div [ class "hidden-mobile width--sidebar column spacing-small align-left" ]
         (List.map viewSection sections)
 
 
@@ -56,7 +56,7 @@ sections =
 
         guide : String -> Route
         guide topic =
-            Route.Docs__Topic_String { topic = topic }
+            Route.Guide__Topic_String { topic = topic }
     in
     [ { title = "docs"
       , links =

@@ -36,12 +36,17 @@ html, body {
   opacity: 0.6;
 }
 
+.link.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .size--120 { min-width: 6rem; min-height: 6rem; max-width: 6rem; max-height: 6rem; }
 .width--sidebar { min-width: 13.5rem; max-width: 13.5rem; }
 
 .color--faint { color: rgba(0, 0, 0, 0.6);}
 
-.invisible { opacity: 0; }
+.invisible { opacity: 0; visibility: hidden; }
 .sticky { position: sticky; }
 
 /* responsive font scaling */

@@ -20,4 +20,4 @@ properties =
 
 property : Int -> String
 property delay =
-    "opacity " ++ String.fromInt delay ++ "ms ease-in-out"
+    "opacity " ++ String.fromInt delay ++ "ms ease-in-out, visibility " ++ String.fromInt delay ++ "ms ease-in-out"

@@ -1,4 +1,4 @@
-module Pages.Docs.Topic_String exposing (Model, Msg, Params, page)
+module Pages.Guide.Topic_String exposing (Model, Msg, Params, page)
 
 import Components.Sidebar as Sidebar
 import Html exposing (..)
@@ -56,7 +56,7 @@ subscriptions model =
 
 view : Model -> Document Msg
 view model =
-    { title = prettifySlug model.title ++ " | docs | elm-spa"
+    { title = prettifySlug model.title ++ " | guide | elm-spa"
     , body =
         [ div [ class "flex column spacing-medium" ]
             [ h1 [ class "font-h2" ] [ text (prettifySlug model.title) ]
