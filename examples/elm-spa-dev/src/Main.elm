@@ -38,6 +38,7 @@ type alias Model =
     , global : Global.Model
     , page : Pages.Model
     , isTransitioning : { layout : Bool, page : Bool }
+    , nextUrl : Url
     }
 
 
@@ -53,7 +54,7 @@ init flags url key =
         ( page, pageCmd ) =
             Pages.init route global url
     in
-    ( Model url key global page { layout = True, page = True }
+    ( Model url key global page { layout = True, page = True } url
     , Cmd.batch
         [ Cmd.map Pages pageCmd
         , Utils.Cmd.delay Spa.Transition.delays.layout (FadeIn url)
@@ -94,7 +95,7 @@ update msg model =
                 loadPage url model
 
             else
-                ( { model | isTransitioning = { layout = False, page = True } }
+                ( { model | isTransitioning = { layout = False, page = True }, nextUrl = url }
                 , Utils.Cmd.delay Spa.Transition.delays.page (FadeIn url)
                 )
 
@@ -140,6 +141,7 @@ loadPage url model =
     in
     ( { model
         | url = url
+        , nextUrl = url
         , page = page
         , global = global
         , isTransitioning = { layout = False, page = False }
@@ -155,7 +157,14 @@ view model =
         , global = model.global
         , toMsg = Global
         , isTransitioning = model.isTransitioning
+        , route = fromUrl model.url
+        , shouldShowSidebar = isSidebarPage model.url && isSidebarPage model.nextUrl
         }
+
+
+isSidebarPage : Url -> Bool
+isSidebarPage { path } =
+    String.startsWith "/docs" path || String.startsWith "/guide" path
 
 
 subscriptions : Model -> Sub Msg

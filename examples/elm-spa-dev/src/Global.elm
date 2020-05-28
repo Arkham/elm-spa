@@ -9,10 +9,11 @@ module Global exposing
     )
 
 import Browser.Navigation as Nav
+import Components.Sidebar
 import Html exposing (..)
 import Html.Attributes exposing (class, classList, href, style)
 import Spa.Document exposing (Document)
-import Spa.Generated.Route as Route
+import Spa.Generated.Route as Route exposing (Route)
 import Spa.Transition
 
 
@@ -53,9 +54,11 @@ view :
     , global : Model
     , toMsg : Msg -> msg
     , isTransitioning : { layout : Bool, page : Bool }
+    , shouldShowSidebar : Bool
+    , route : Route
     }
     -> Document msg
-view { page, isTransitioning } =
+view { page, isTransitioning, route, shouldShowSidebar } =
     { title = page.title
     , body =
         [ div
@@ -66,21 +69,31 @@ view { page, isTransitioning } =
             [ header [ class "py-medium row spacing-small spread" ]
                 [ a [ class "font-h3 text-header hoverable", href "/" ]
                     [ text "elm-spa" ]
-                , div [ class "row spacing-small" ]
-                    [ a [ class "link text--bigger", href "/not-found" ]
-                        [ text "docs" ]
-                    , a [ class "link text--bigger", href "/not-found" ]
-                        [ text "guide" ]
-                    , a [ class "link text--bigger", href "/not-found" ]
-                        [ text "examples" ]
+                , div [ class "row spacing-small text--bigger" ]
+                    [ a [ class "link", href (Route.toString Route.Docs) ] [ text "docs" ]
+                    , a [ class "link", href (Route.toString Route.NotFound) ] [ text "guide" ]
+                    , a [ class "link", href (Route.toString Route.NotFound) ] [ text "examples" ]
                     ]
                 ]
-            , main_
-                [ class "flex"
-                , style "transition" Spa.Transition.properties.page
-                , classList [ ( "invisible", isTransitioning.page ) ]
+            , div [ class "flex row spacing-small align-top relative" ]
+                [ main_
+                    [ class "flex"
+                    , style "transition" Spa.Transition.properties.page
+                    , classList [ ( "invisible", isTransitioning.page ) ]
+                    ]
+                    page.body
+                , if shouldShowSidebar then
+                    div [ class "width--sidebar invisible" ] []
+
+                  else
+                    text ""
+                , aside
+                    [ class "absolute align-right align-top"
+                    , style "transition" Spa.Transition.properties.page
+                    , classList [ ( "invisible", not shouldShowSidebar ) ]
+                    ]
+                    [ Components.Sidebar.view route ]
                 ]
-                page.body
             , footer [ class "footer py-medium text-center color--faint" ]
                 [ text "[ built with elm-spa ]" ]
             ]

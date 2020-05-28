@@ -39,5 +39,5 @@ hero =
     div [ class "column spacing-tiny py-large center-x text-center" ]
         [ img [ alt "elm-spa logo", class "size--120", src "/images/logo.svg" ] []
         , h1 [ class "font-h1" ] [ text "elm-spa" ]
-        , p [ class "font-h4 color--faint" ] [ text "single page apps made easy." ]
+        , p [ class "font-h5 color--faint" ] [ text "single page apps made easy." ]
         ]
