@@ -68,8 +68,8 @@ sections =
     , { title = "guide"
       , links =
             [ { label = "installation", route = guide "installation" }
-            , { label = "creating a project", route = guide "init" }
-            , { label = "adding pages", route = guide "add" }
+            , { label = "creating a project", route = guide "creating-a-project" }
+            , { label = "adding pages", route = guide "adding-pages" }
             ]
       }
     ]
