@@ -7,7 +7,7 @@ module Components.Sidebar exposing (view)
 -}
 
 import Html exposing (..)
-import Html.Attributes exposing (class, disabled, href)
+import Html.Attributes exposing (class, href)
 import Spa.Generated.Route as Route exposing (Route)
 
 
@@ -60,9 +60,9 @@ sections =
     in
     [ { title = "docs"
       , links =
-            [ { label = "init", route = docs "elm-spa-init" }
-            , { label = "add", route = docs "elm-spa-add" }
-            , { label = "build", route = docs "elm-spa-build" }
+            [ { label = "elm-spa init", route = docs "elm-spa-init" }
+            , { label = "elm-spa add", route = docs "elm-spa-add" }
+            , { label = "elm-spa build", route = docs "elm-spa-build" }
             ]
       }
     , { title = "guide"
