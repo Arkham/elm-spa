@@ -64,7 +64,13 @@ view model =
     { title = prettifySlug model.title ++ " | docs | elm-spa"
     , body =
         [ Api.Data.view
-            (Markdown.toHtml [ class "markdown readable column spacing-small" ])
+            (Markdown.toHtmlWith
+                { githubFlavored = Just { tables = True, breaks = True }
+                , defaultHighlighting = Nothing
+                , sanitize = False
+                , smartypants = False
+                }
+                [ class "markdown readable column spacing-small" ])
             model.content
         ]
     }
