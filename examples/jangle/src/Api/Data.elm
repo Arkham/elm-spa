@@ -1,6 +1,8 @@
 module Api.Data exposing
     ( Data(..)
     , fromHttpResult
+    , isResolved
+    , isUnresolved
     , toMaybe
     , view
     )
@@ -79,3 +81,24 @@ view data views =
 
         Success value ->
             views.success value
+
+
+isResolved : Data value -> Bool
+isResolved data =
+    case data of
+        NotAsked ->
+            False
+
+        Loading ->
+            False
+
+        Success _ ->
+            True
+
+        Failure _ ->
+            True
+
+
+isUnresolved : Data value -> Bool
+isUnresolved =
+    not << isResolved

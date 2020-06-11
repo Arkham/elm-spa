@@ -32,6 +32,7 @@ img { width: 100%; }
 .bg--white { background: white; }
 .bg--shell { background: #f8f4f4; }
 .bg--orange { background: #ce6946; }
+.bg--dark-orange { background: #a1482b;}
 
 .shadow { box-shadow: 0 0.5em 2em rgba(0, 0, 0, 0.25); }
 .shadow--shell { box-shadow: 0 1rem 2rem rgb(248, 244, 244); }

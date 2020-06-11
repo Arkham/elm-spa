@@ -144,6 +144,7 @@ view model =
         , global = model.global
         , toMsg = Global
         , isTransitioning = model.isTransitioning
+        , route = fromUrl model.url
         }
 
 

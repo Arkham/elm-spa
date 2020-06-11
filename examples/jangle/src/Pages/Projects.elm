@@ -6,7 +6,7 @@ import Api.User as User exposing (User)
 import Browser.Navigation as Nav
 import Global
 import Html exposing (..)
-import Html.Attributes as Attr exposing (class, href)
+import Html.Attributes as Attr exposing (class, classList, href)
 import Html.Events as Events
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
@@ -109,10 +109,13 @@ view model =
                         }
                     ]
                 ]
-            , div [ class "column spacing-medium scrollable" ]
+            , div
+                [ class "column spacing-medium scrollable page"
+                , classList [ ( "page--invisible", Api.Data.isUnresolved model.projects ) ]
+                ]
                 [ Api.Data.view model.projects
                     { notAsked = text ""
-                    , loading = span [ class "px-medium color--faint" ] [ text "Loading projects..." ]
+                    , loading = span [ class "px-medium color--faint" ] [ text "" ]
                     , failure = \reason -> span [ class "error px-medium" ] [ text reason ]
                     , success = viewProjects
                     }

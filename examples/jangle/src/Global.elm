@@ -17,7 +17,7 @@ import Html exposing (..)
 import Html.Attributes exposing (class, classList)
 import Ports
 import Spa.Document exposing (Document)
-import Spa.Generated.Route as Route
+import Spa.Generated.Route as Route exposing (Route)
 
 
 type alias Flags =
@@ -86,13 +86,14 @@ subscriptions _ =
 
 
 view :
-    { page : Document msg
+    { route : Route
+    , page : Document msg
     , global : Model
     , toMsg : Msg -> msg
     , isTransitioning : Bool
     }
     -> Document msg
-view { page, global, toMsg, isTransitioning } =
+view { route, page, global, toMsg, isTransitioning } =
     { title = page.title
     , body =
         Api.Data.view global.user
@@ -111,6 +112,7 @@ view { page, global, toMsg, isTransitioning } =
                                 page.body
                             ]
                         , onSignOutClicked = toMsg ClickedSignOut
+                        , currentRoute = route
                         }
             }
     }

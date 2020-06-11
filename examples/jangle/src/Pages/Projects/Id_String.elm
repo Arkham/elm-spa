@@ -32,13 +32,9 @@ view { params } =
     { title = params.id ++ " | Jangle"
     , body =
         [ div [ class "column overflow-hidden" ]
-            [ viewMainContent params
+            [ div [ class "row wrap padding-medium spacing-tiny spread center-y bg--shell" ]
+                [ h1 [ class "font-h3" ] [ text params.id ]
+                ]
             ]
         ]
     }
-
-
-viewMainContent model =
-    div [ class "row wrap padding-medium spacing-tiny spread center-y bg--shell" ]
-        [ h1 [ class "font-h3" ] [ text model.id ]
-        ]

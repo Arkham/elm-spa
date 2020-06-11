@@ -26,7 +26,7 @@ get options =
         , query = """
             query { 
                 viewer {
-                    repositories(first: 100, affiliations: [OWNER], orderBy: { field: UPDATED_AT, direction: DESC }) {
+                    repositories(first: 10, affiliations: [OWNER], orderBy: { field: UPDATED_AT, direction: DESC }) {
                         nodes {
                             name,
                             description
