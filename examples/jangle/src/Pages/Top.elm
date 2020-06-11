@@ -1,5 +1,6 @@
 module Pages.Top exposing (Model, Msg, Params, page)
 
+import Api.Data
 import Browser.Navigation as Nav
 import Global
 import Html exposing (..)
@@ -35,7 +36,7 @@ page =
 
 init : Global.Model -> Url Params -> ( Model, Cmd Msg )
 init global _ =
-    case global.token of
+    case Api.Data.toMaybe global.user of
         Just _ ->
             ( {}, Nav.pushUrl global.key (Route.toString Route.Projects) )
 

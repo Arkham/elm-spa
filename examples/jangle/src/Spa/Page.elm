@@ -1,7 +1,7 @@
 module Spa.Page exposing
     ( Page
     , static, sandbox, element, full
-    , protectedFull
+    , protectedStatic, protectedFull
     , Upgraded, Bundle, upgrade
     )
 
@@ -9,12 +9,13 @@ module Spa.Page exposing
 
 @docs Page
 @docs static, sandbox, element, full
-@docs protectedFull
+@docs protectedStatic, protectedFull
 @docs Upgraded, Bundle, upgrade
 
 -}
 
-import Api.Token exposing (Token)
+import Api.Data
+import Api.User exposing (User)
 import Browser.Navigation as Nav
 import Global
 import Spa.Document as Document exposing (Document)
@@ -34,13 +35,13 @@ type alias Page params model msg =
 
 
 static :
-    { view : Document msg
+    { view : Url params -> Document msg
     }
-    -> Page params () msg
+    -> Page params (Url params) msg
 static page =
-    { init = \_ _ -> ( (), Cmd.none )
-    , update = \_ _ -> ( (), Cmd.none )
-    , view = \_ -> page.view
+    { init = \_ url -> ( url, Cmd.none )
+    , update = \_ model -> ( model, Cmd.none )
+    , view = page.view
     , subscriptions = \_ -> Sub.none
     , save = always identity
     , load = always identity
@@ -97,8 +98,23 @@ full =
 -- PROTECTED, redirect to sign in if not signed in
 
 
+protectedStatic :
+    { view : User -> Url params -> Document msg
+    }
+    -> Page params (Maybe { user : User, url : Url params }) msg
+protectedStatic page =
+    protected
+        { init = \user _ url -> ( { url = url, user = user }, Cmd.none )
+        , update = \_ model -> ( model, Cmd.none )
+        , subscriptions = always Sub.none
+        , view = \{ user, url } -> page.view user url
+        , save = always identity
+        , load = always identity
+        }
+
+
 protectedFull :
-    { init : Token -> Global.Model -> Url params -> ( model, Cmd msg )
+    { init : User -> Global.Model -> Url params -> ( model, Cmd msg )
     , update : msg -> model -> ( model, Cmd msg )
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
@@ -111,7 +127,7 @@ protectedFull =
 
 
 protected :
-    { init : Token -> Global.Model -> Url params -> ( model, Cmd msg )
+    { init : User -> Global.Model -> Url params -> ( model, Cmd msg )
     , update : msg -> model -> ( model, Cmd msg )
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
@@ -123,9 +139,9 @@ protected page =
     let
         init : Global.Model -> Url params -> ( Maybe model, Cmd msg )
         init global url =
-            case global.token of
-                Just token ->
-                    page.init token global url |> Tuple.mapFirst Just
+            case Api.Data.toMaybe global.user of
+                Just user ->
+                    page.init user global url |> Tuple.mapFirst Just
 
                 Nothing ->
                     ( Nothing

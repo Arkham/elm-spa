@@ -1,7 +1,8 @@
 module Pages.SignIn exposing (Model, Msg, Params, page)
 
-import Api.Data as Data exposing (Data)
-import Api.Token
+import Api.Data exposing (Data(..))
+import Api.Token exposing (Token)
+import Api.User exposing (User)
 import Browser.Navigation as Nav
 import Dict
 import Global
@@ -38,16 +39,17 @@ page =
 
 type alias Model =
     { githubClientId : String
-    , token : Data String
+    , token : Data Token
+    , user : Data User
     , key : Nav.Key
     }
 
 
 init : Global.Model -> Url Params -> ( Model, Cmd Msg )
 init global { query } =
-    case global.token of
-        Just _ ->
-            ( Model global.githubClientId Data.Loading global.key
+    case Api.Data.toMaybe global.user of
+        Just user ->
+            ( Model global.githubClientId Loading (Success user) global.key
             , Nav.pushUrl global.key (Route.toString Route.Projects)
             )
 
@@ -55,7 +57,8 @@ init global { query } =
             case Dict.get "code" query of
                 Just code ->
                     ( { githubClientId = global.githubClientId
-                      , token = Data.Loading
+                      , token = Loading
+                      , user = NotAsked
                       , key = global.key
                       }
                     , requestAuthToken code
@@ -63,7 +66,8 @@ init global { query } =
 
                 Nothing ->
                     ( { githubClientId = global.githubClientId
-                      , token = Data.NotAsked
+                      , token = NotAsked
+                      , user = NotAsked
                       , key = global.key
                       }
                     , Cmd.none
@@ -89,28 +93,37 @@ load global model =
 
 type Msg
     = GotAuthToken (Result Http.Error String)
+    | GotUser (Data User)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         GotAuthToken (Ok token) ->
-            ( { model | token = Data.Success token }
+            ( { model | token = Success (Api.Token.fromString token) }
             , Cmd.batch
                 [ Ports.storeToken token
-                , Nav.pushUrl model.key (Route.toString Route.Projects)
+                , Api.User.current
+                    { token = Api.Token.fromString token
+                    , toMsg = GotUser
+                    }
                 ]
             )
 
         GotAuthToken (Err _) ->
-            ( { model | token = Data.Failure "Failed to sign in." }
+            ( { model | token = Failure "Failed to sign in." }
             , Cmd.none
+            )
+
+        GotUser user ->
+            ( { model | user = user }
+            , Nav.pushUrl model.key (Route.toString Route.Projects)
             )
 
 
 save : Model -> Global.Model -> Global.Model
 save model global =
-    { global | token = Data.toMaybe model.token |> Maybe.map Api.Token.fromString }
+    { global | user = model.user }
 
 
 subscriptions : Model -> Sub Msg
@@ -130,18 +143,18 @@ view model =
                     ]
                 , div [ class "row" ] <|
                     case model.token of
-                        Data.NotAsked ->
+                        NotAsked ->
                             [ a [ class "button", href ("https://github.com/login/oauth/authorize?client_id=" ++ model.githubClientId) ]
                                 [ text "Sign in with GitHub" ]
                             ]
 
-                        Data.Loading ->
+                        Loading ->
                             [ button [ class "button button--white", disabled True ] [ text "Signing in..." ] ]
 
-                        Data.Success _ ->
+                        Success _ ->
                             [ button [ class "button button--white", disabled True ] [ text "Success!" ] ]
 
-                        Data.Failure reason ->
+                        Failure reason ->
                             [ div [ class "column center-x" ]
                                 [ text reason
                                 , a [ class "link", href ("https://github.com/login/oauth/authorize?client_id=" ++ model.githubClientId) ]

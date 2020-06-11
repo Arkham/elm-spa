@@ -1,8 +1,13 @@
-/* Add your styles here */
+/* responsive font scaling */
+html { font-size: 18px; }
+@media screen and (min-width: 641px) { html { font-size: 20px; } }
+@media screen and (min-width: 1281px) { html { font-size: 20px; } }
 
 html { background: #f8f4f4; color: #333; }
-
 body { font-family: 'Nunito', sans-serif; }
+
+input { min-width: 0; border-radius: 0; }
+
 img { width: 100%; }
 
 .font-h1, .font-h2, .font-h3, .font-h4,
@@ -14,9 +19,12 @@ img { width: 100%; }
   font-weight: 800;
 }
 
+.text--small { font-size: 0.75rem; }
+
 .color--white { color: white; }
 .color--shell { color: #f8f4f4; }
 .color--orange { color: #ce6946; }
+.color--faint { opacity: 0.65; }
 
 .bg--white { background: white; }
 .bg--shell { background: #f8f4f4; }
@@ -24,30 +32,46 @@ img { width: 100%; }
 
 .shadow { box-shadow: 0 0.5em 2em rgba(0, 0, 0, 0.25); }
 
+.sticky { position: sticky; top: 0; left: 0; right: 0; }
+
 .width--half { width: 50%; }
 .width--sidebar { width: 12rem; }
+.offset--sidebar { margin-left: 12rem; }
 
-.size--avatar { min-width: 2rem; min-height: 2rem; max-width: 2rem; max-height: 2rem; }
+.size--avatar { min-width: 1.5em; min-height: 1.5em; max-width: 1.5em; max-height: 1.5em; }
 
 .max-width--20 { max-width: 20rem; }
+.max-width--10 { max-width: 10rem; }
 
+.ellipsis { max-width: 100%; text-overflow: ellipsis; white-space: nowrap; }
+
+.overflow-hidden { overflow-x: hidden }
+.hidden-scrollbar { transform: translateX(15px); padding-left: calc(2rem - 15px) }
+
+.tr { display: table-row; }
+.tr:nth-child(2n + 1) { background: #eee; }
+
+/* buttons */
 .button {
   cursor: pointer;
   color: white;
   background: linear-gradient(coral, #ce6946);
-  border-radius: 0.25em;
   padding: 0.6em 1.2em;
   box-shadow: 0 0.25em 1em rgba(0, 0, 0, 0.25);
   transition: opacity 200ms ease-in-out;
 }
+
+.button--icon { padding: 0.6em; }
+
 .button:hover { opacity: 0.75; }
 .button[disabled] { opacity: 0.5; }
+
 .button--white { color: #ce6946; background: linear-gradient(#ffffff, #f0f0f0); }
 
 .page { transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out; }
 .page--invisible { opacity: 0; visibility: hidden; }
 
-/* responsive font scaling */
-html { font-size: 18px; }
-@media screen and (min-width: 641px) { html { font-size: 20px; } }
-@media screen and (min-width: 1281px) { html { font-size: 20px; } }
+.borderless { border: 0; }
+
+.hoverable { transition: color 200ms ease-in-out; }
+.hoverable:hover { color: dodgerblue; }

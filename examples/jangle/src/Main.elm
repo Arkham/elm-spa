@@ -43,7 +43,7 @@ type alias Model =
 init : Flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
     let
-        global =
+        ( global, globalCmd ) =
             Global.init flags key
 
         route =
@@ -53,7 +53,10 @@ init flags url key =
             Pages.init route global url
     in
     ( Model url key False global page
-    , Cmd.map Pages pageCmd
+    , Cmd.batch
+        [ Cmd.map Pages pageCmd
+        , Cmd.map Global globalCmd
+        ]
     )
 
 

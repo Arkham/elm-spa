@@ -8,10 +8,14 @@ module Global exposing
     , view
     )
 
+import Api.Data exposing (Data(..))
 import Api.Token exposing (Token)
+import Api.User exposing (User)
 import Browser.Navigation as Nav
+import Components.Layout
 import Html exposing (..)
 import Html.Attributes exposing (class, classList)
+import Ports
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
 
@@ -25,28 +29,54 @@ type alias Flags =
 type alias Model =
     { key : Nav.Key
     , githubClientId : String
-    , token : Maybe Token
+    , user : Data User
     }
 
 
-init : Flags -> Nav.Key -> Model
+init : Flags -> Nav.Key -> ( Model, Cmd Msg )
 init flags key =
-    Model
-        key
+    let
+        possibleToken =
+            flags.token |> Maybe.map Api.Token.fromString
+
+        user =
+            if possibleToken == Nothing then
+                NotAsked
+
+            else
+                Loading
+    in
+    ( Model key
         flags.githubClientId
-        (flags.token |> Maybe.map Api.Token.fromString)
+        user
+    , case possibleToken of
+        Just token ->
+            Api.User.current { token = token, toMsg = GotUser }
+
+        Nothing ->
+            Cmd.none
+    )
 
 
 type Msg
-    = NoOp
+    = GotUser (Data User)
+    | ClickedSignOut
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
-            ( model
+        GotUser user ->
+            ( { model | user = user }
             , Cmd.none
+            )
+
+        ClickedSignOut ->
+            ( { model | user = NotAsked }
+            , Cmd.batch
+                [ Ports.clearToken ()
+                , Nav.pushUrl model.key (Route.toString Route.SignIn)
+                ]
             )
 
 
@@ -62,13 +92,25 @@ view :
     , isTransitioning : Bool
     }
     -> Document msg
-view { page, isTransitioning } =
+view { page, global, toMsg, isTransitioning } =
     { title = page.title
     , body =
-        [ div
-            [ class "column fill page"
-            , classList [ ( "page--invisible", isTransitioning ) ]
-            ]
-            page.body
-        ]
+        Api.Data.view global.user
+            { notAsked = page.body
+            , loading = []
+            , failure = text >> List.singleton
+            , success =
+                \user ->
+                    Components.Layout.view
+                        { model = { user = user }
+                        , page =
+                            [ div
+                                [ class "column fill page"
+                                , classList [ ( "page--invisible", isTransitioning ) ]
+                                ]
+                                page.body
+                            ]
+                        , onSignOutClicked = toMsg ClickedSignOut
+                        }
+            }
     }

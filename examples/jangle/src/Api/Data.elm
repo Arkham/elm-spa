@@ -2,6 +2,7 @@ module Api.Data exposing
     ( Data(..)
     , fromHttpResult
     , toMaybe
+    , view
     )
 
 import Http
@@ -54,3 +55,27 @@ fromHttpResult result =
 
         Err (Http.BadBody reason) ->
             Failure reason
+
+
+view :
+    Data value
+    ->
+        { notAsked : result
+        , loading : result
+        , failure : String -> result
+        , success : value -> result
+        }
+    -> result
+view data views =
+    case data of
+        NotAsked ->
+            views.notAsked
+
+        Loading ->
+            views.loading
+
+        Failure reason ->
+            views.failure reason
+
+        Success value ->
+            views.success value

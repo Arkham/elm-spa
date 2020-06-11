@@ -1,19 +1,18 @@
 module Pages.Projects exposing (Model, Msg, Params, page)
 
 import Api.Data exposing (Data)
-import Api.Token exposing (Token)
+import Api.Project exposing (Project)
 import Api.User as User exposing (User)
 import Browser.Navigation as Nav
 import Global
 import Html exposing (..)
-import Html.Attributes exposing (alt, class, href, src)
+import Html.Attributes as Attr exposing (class, href)
 import Html.Events as Events
-import Ports
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
 import Spa.Page as Page exposing (Page)
 import Spa.Url as Url exposing (Url)
-import Utils.Maybe
+import Utils.Time
 
 
 type alias Params =
@@ -31,74 +30,66 @@ page =
         , update = update
         , subscriptions = subscriptions
         , view = view
-        , save = save
-        , load = load
+        , save = always identity
+        , load = always identity
         }
 
 
 type alias ProtectedModel =
     { key : Nav.Key
-    , token : Token
+    , user : User
     , signOutRequested : Bool
-    , user : Maybe User
+    , query : String
+    , projects : Data (List Project)
     }
 
 
-init : Token -> Global.Model -> Url Params -> ( ProtectedModel, Cmd Msg )
-init token global _ =
+init : User -> Global.Model -> Url Params -> ( ProtectedModel, Cmd Msg )
+init user global _ =
     ( ProtectedModel
         global.key
-        token
+        user
         False
-        Nothing
-    , User.current
-        { token = token
-        , toMsg = GotUser
+        ""
+        Api.Data.Loading
+    , Api.Project.get
+        { token = user.token
+        , toMsg = GotProjects
         }
     )
 
 
-load : Global.Model -> ProtectedModel -> ProtectedModel
-load _ model =
-    model
-
-
 type Msg
-    = GotUser (Data User)
-    | ClickedSignOut
+    = GotProjects (Data (List Project))
+    | UpdatedSearchInput String
+    | SubmittedSearch
+    | ClickedRow Project
 
 
 update : Msg -> ProtectedModel -> ( ProtectedModel, Cmd Msg )
 update msg model =
     case msg of
-        GotUser user ->
-            ( { model | user = Api.Data.toMaybe user }
+        GotProjects projects ->
+            ( { model | projects = projects }
             , Cmd.none
             )
 
-        ClickedSignOut ->
-            ( { model | signOutRequested = True }
-            , Cmd.batch
-                [ Ports.clearToken ()
-                , Nav.pushUrl model.key (Route.toString Route.SignIn)
-                ]
+        UpdatedSearchInput query ->
+            ( { model | query = query }
+            , Cmd.none
             )
 
+        SubmittedSearch ->
+            ( { model | query = "" }
+            , Cmd.none
+            )
 
-save : ProtectedModel -> Global.Model -> Global.Model
-save model global =
-    { global
-        | token =
-            if model.signOutRequested then
-                Nothing
-
-            else
-                Just model.token
-    }
+        ClickedRow _ ->
+            ( model, Cmd.none )
 
 
 subscriptions : ProtectedModel -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 
@@ -106,39 +97,79 @@ view : ProtectedModel -> Document Msg
 view model =
     { title = "Jangle"
     , body =
-        [ div [ class "visible-mobile column fill" ]
-            [ header [ class "row padding-small relative bg--orange color--white spread center-y" ] viewMenuOptions
-            , main_ [ class "flex padding-small" ] [ viewContent model ]
-            ]
-        , div [ class "hidden-mobile fill relative" ]
-            [ div [ class "absolute width--half align-left align-top align-bottom bg--orange" ] []
-            , div [ class "relative bg--shell row fill-y container align-top" ]
-                [ aside [ class "width--sidebar bg--orange color--white column fill-y padding-medium spread center-x" ] viewMenuOptions
-                , main_ [ class "flex padding-medium" ] [ viewContent model ]
+        [ div [ class "column" ]
+            [ div [ class "row padding-medium spacing-tiny spread center-y bg--shell" ]
+                [ h1 [ class "font-h3" ] [ text "Projects" ]
+                , viewSearchbar
+                    { value = model.query
+                    , placeholder = "Find a project..."
+                    , onInput = UpdatedSearchInput
+                    , onSubmit = SubmittedSearch
+                    }
+                ]
+            , div [ class "column spacing-medium" ]
+                [ Api.Data.view model.projects
+                    { notAsked = text ""
+                    , loading = span [ class "px-medium color--faint" ] [ text "Loading projects..." ]
+                    , failure = \reason -> span [ class "error px-medium" ] [ text reason ]
+                    , success = viewProjects
+                    }
                 ]
             ]
         ]
     }
 
 
-viewMenuOptions : List (Html Msg)
-viewMenuOptions =
-    [ a [ class "font-h3", href (Route.toString Route.Projects) ] [ text "Jangle" ]
-    , button [ Events.onClick ClickedSignOut, class "button button--white" ] [ text "Sign out" ]
-    ]
-
-
-viewContent : { model | user : Maybe User } -> Html msg
-viewContent model =
-    div [ class "column" ]
-        [ div [ class "row spacing-tiny wrap spread center-y" ]
-            [ h1 [ class "font-h3" ] [ text "Projects" ]
-            , Utils.Maybe.view model.user <|
-                \user ->
-                    div [ class "row spacing-tiny center-y" ]
-                        [ div [ class "row rounded-circle bg-orange size--avatar" ]
-                            [ img [ src user.avatarUrl, alt user.name ] [] ]
-                        , span [] [ text user.name ]
-                        ]
+viewProjects : List Project -> Html Msg
+viewProjects projects =
+    viewTable
+        { columns =
+            [ { header = th [ class "pl-medium" ] [ text "Name" ]
+              , viewItem = \item -> td [ class "ellipsis pl-medium" ] [ text item.name ]
+              }
+            , { header = th [] [ text "Description" ]
+              , viewItem = \item -> td [ class "py-small color--faint" ] [ text item.description ]
+              }
+            , { header = th [] [ text "Last Update" ]
+              , viewItem = \item -> td [] [ text (Utils.Time.format item.updatedAt) ]
+              }
             ]
+        , items = projects
+        , viewRow = \item -> a [ class "tr ", href (Route.toString <| Route.Projects__Id_String { id = item.name }) ]
+        }
+
+
+viewTable :
+    { columns : List { header : Html msg, viewItem : item -> Html msg }
+    , items : List item
+    , viewRow : item -> List (Html msg) -> Html msg
+    }
+    -> Html msg
+viewTable options =
+    table [ class "borderless" ]
+        [ thead [] [ tr [] <| List.map .header options.columns ]
+        , tbody [] <|
+            List.map
+                (\item -> options.viewRow item (List.map (\column -> column.viewItem item) options.columns))
+                options.items
+        ]
+
+
+viewSearchbar :
+    { value : String
+    , placeholder : String
+    , onInput : String -> msg
+    , onSubmit : msg
+    }
+    -> Html msg
+viewSearchbar options =
+    Html.form [ Events.onSubmit options.onSubmit, class "row stretch text--small" ]
+        [ input
+            [ class "max-width--10 rounded-none"
+            , Attr.placeholder options.placeholder
+            , Attr.value options.value
+            , Events.onInput options.onInput
+            ]
+            [ text "Search bar" ]
+        , button [ class "button rounded-none" ] [ text "search" ]
         ]
