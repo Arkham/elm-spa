@@ -1,10 +1,13 @@
 /* responsive font scaling */
 html { font-size: 18px; }
-@media screen and (min-width: 641px) { html { font-size: 20px; } }
-@media screen and (min-width: 1281px) { html { font-size: 20px; } }
+@media screen and (min-width: 641px) { html { font-size: 16px; } }
+@media screen and (min-width: 1281px) { html { font-size: 18px; } }
 
 html { background: #f8f4f4; color: #333; }
 body { font-family: 'Nunito', sans-serif; }
+
+table { max-width: 100%;}
+td { white-space: nowrap; line-height: 1.2; }
 
 input { min-width: 0; border-radius: 0; }
 
@@ -18,7 +21,7 @@ img { width: 100%; }
 .font-h1, .font-h2, .font-h3, .font-h4, .text-header {
   font-weight: 800;
 }
-
+.text-wrap { white-space: normal; }
 .text--small { font-size: 0.75rem; }
 
 .color--white { color: white; }
@@ -31,12 +34,15 @@ img { width: 100%; }
 .bg--orange { background: #ce6946; }
 
 .shadow { box-shadow: 0 0.5em 2em rgba(0, 0, 0, 0.25); }
+.shadow--shell { box-shadow: 0 1rem 2rem rgb(248, 244, 244); }
 
-.sticky { position: sticky; top: 0; left: 0; right: 0; }
+.sticky { position: sticky; z-index: 1; top: 0; left: 0; right: 0; }
+
+.z-2 { z-index: 2; }
 
 .width--half { width: 50%; }
-.width--sidebar { width: 12rem; }
-.offset--sidebar { margin-left: 12rem; }
+.width--sidebar { width: 14rem; }
+.offset--sidebar { margin-left: 14rem; }
 
 .size--avatar { min-width: 1.5em; min-height: 1.5em; max-width: 1.5em; max-height: 1.5em; }
 
@@ -45,8 +51,7 @@ img { width: 100%; }
 
 .ellipsis { max-width: 100%; text-overflow: ellipsis; white-space: nowrap; }
 
-.overflow-hidden { overflow-x: hidden }
-.hidden-scrollbar { transform: translateX(15px); padding-left: calc(2rem - 15px) }
+.overflow-hidden { overflow: hidden; }
 
 .tr { display: table-row; }
 .tr:nth-child(2n + 1) { background: #eee; }

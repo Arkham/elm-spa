@@ -97,17 +97,19 @@ view : ProtectedModel -> Document Msg
 view model =
     { title = "Jangle"
     , body =
-        [ div [ class "column" ]
-            [ div [ class "row padding-medium spacing-tiny spread center-y bg--shell" ]
-                [ h1 [ class "font-h3" ] [ text "Projects" ]
-                , viewSearchbar
-                    { value = model.query
-                    , placeholder = "Find a project..."
-                    , onInput = UpdatedSearchInput
-                    , onSubmit = SubmittedSearch
-                    }
+        [ div [ class "column spacing-medium" ]
+            [ div [ class "column overflow-hidden bg--shell shadow--shell sticky" ]
+                [ div [ class "row wrap padding-medium spacing-tiny spread center-y" ]
+                    [ h1 [ class "font-h3" ] [ text "Projects" ]
+                    , viewSearchbar
+                        { value = model.query
+                        , placeholder = "Find a project..."
+                        , onInput = UpdatedSearchInput
+                        , onSubmit = SubmittedSearch
+                        }
+                    ]
                 ]
-            , div [ class "column spacing-medium" ]
+            , div [ class "column spacing-medium scrollable" ]
                 [ Api.Data.view model.projects
                     { notAsked = text ""
                     , loading = span [ class "px-medium color--faint" ] [ text "Loading projects..." ]
@@ -125,17 +127,17 @@ viewProjects projects =
     viewTable
         { columns =
             [ { header = th [ class "pl-medium" ] [ text "Name" ]
-              , viewItem = \item -> td [ class "ellipsis pl-medium" ] [ text item.name ]
+              , viewItem = \item -> td [ class "py-small pl-medium" ] [ strong [] [ text item.name ] ]
+              }
+            , { header = th [] [ text "Updated On" ]
+              , viewItem = \item -> td [] [ text (Utils.Time.format item.updatedAt) ]
               }
             , { header = th [] [ text "Description" ]
-              , viewItem = \item -> td [ class "py-small color--faint" ] [ text item.description ]
-              }
-            , { header = th [] [ text "Last Update" ]
-              , viewItem = \item -> td [] [ text (Utils.Time.format item.updatedAt) ]
+              , viewItem = \item -> td [ class "color--faint" ] [ text item.description ]
               }
             ]
         , items = projects
-        , viewRow = \item -> a [ class "tr ", href (Route.toString <| Route.Projects__Id_String { id = item.name }) ]
+        , viewRow = \item -> a [ class "tr hoverable", href (Route.toString <| Route.Projects__Id_String { id = item.name }) ]
         }
 
 

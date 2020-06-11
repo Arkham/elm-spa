@@ -31,18 +31,14 @@ view : Url Params -> Document Msg
 view { params } =
     { title = params.id ++ " | Jangle"
     , body =
-        [ viewMainContent params
+        [ div [ class "column overflow-hidden" ]
+            [ viewMainContent params
+            ]
         ]
-
-    -- Components.Layout.view
-    --     { viewMainContent = viewMainContent params
-    --     , model = { user = user }
-    --     , onSignOutClicked = ()
-    --     }
     }
 
 
 viewMainContent model =
-    div [ class "row padding-medium spacing-tiny spread center-y bg--shell" ]
+    div [ class "row wrap padding-medium spacing-tiny spread center-y bg--shell" ]
         [ h1 [ class "font-h3" ] [ text model.id ]
         ]

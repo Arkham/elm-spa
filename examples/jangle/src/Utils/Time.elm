@@ -9,8 +9,9 @@ format =
     DateFormat.format
         [ DateFormat.monthNameFull
         , DateFormat.text " "
-        , DateFormat.dayOfMonthSuffix
-        , DateFormat.text ", "
+
+        -- , DateFormat.dayOfMonthSuffix
+        -- , DateFormat.text ", "
         , DateFormat.yearNumber
         ]
         Time.utc

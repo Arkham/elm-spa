@@ -38,8 +38,8 @@ viewDesktop : Options model msg -> Html msg
 viewDesktop { onSignOutClicked, model, page } =
     div [ class "hidden-mobile fill relative" ]
         [ div [ class "relative bg--shell row fill-y align-top" ]
-            [ div [ class "fixed width--sidebar align-top align-left fill-y bg--orange color--white" ] [ viewSidebar onSignOutClicked model ]
-            , main_ [ class "offset--sidebar column flex scrollable" ] page
+            [ div [ class "fixed z-2 width--sidebar align-top align-left fill-y bg--orange color--white" ] [ viewSidebar onSignOutClicked model ]
+            , main_ [ class "offset--sidebar column flex" ] page
             ]
         ]
 
@@ -56,7 +56,7 @@ viewSidebar onSignOutClicked model =
 
 viewMobileNavbar : msg -> { model | user : User } -> Html msg
 viewMobileNavbar onSignOutClicked model =
-    header [ class "row padding-small relative bg--orange color--white spread center-y" ]
+    header [ class "row padding-small relative z-2 bg--orange color--white spread center-y" ]
         [ a [ class "font-h3", href (Route.toString Route.Projects) ] [ text "Jangle" ]
         , div [ class "column center-x spacing-tiny" ]
             [ viewUser onSignOutClicked model.user
