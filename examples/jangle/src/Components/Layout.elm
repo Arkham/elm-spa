@@ -39,7 +39,7 @@ viewMobile { onSignOutClicked, model, page } =
 viewDesktop : Options model msg -> Html msg
 viewDesktop { currentRoute, onSignOutClicked, model, page } =
     div [ class "hidden-mobile fill relative" ]
-        [ div [ class "relative bg--shell row fill-y align-top" ]
+        [ div [ class "relative bg--shell row fill-y align-top stretch" ]
             [ div [ class "fixed z-2 width--sidebar align-top align-left fill-y bg--orange color--white" ] [ viewSidebar currentRoute onSignOutClicked model ]
             , main_ [ class "offset--sidebar column flex" ] page
             ]
