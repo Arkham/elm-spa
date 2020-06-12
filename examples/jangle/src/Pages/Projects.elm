@@ -20,7 +20,7 @@ type alias Params =
 
 
 type alias Model =
-    Maybe ProtectedModel
+    Page.Protected Params ProtectedModel
 
 
 page : Page Params Model Msg
@@ -140,7 +140,7 @@ viewProjects projects =
               }
             ]
         , items = projects
-        , viewRow = \item -> a [ class "tr hoverable", href (Route.toString <| Route.Projects__Id_String { id = item.name }) ]
+        , viewRow = \item -> a [ class "tr highlightable", href (Route.toString <| Route.Projects__Id_String { id = item.name }) ]
         }
 
 

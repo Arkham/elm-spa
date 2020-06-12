@@ -82,10 +82,15 @@ img { width: 100%; }
 
 .borderless { border: 0; }
 
-.hoverable { transition: color 200ms ease-in-out; }
-.hoverable:hover { color: dodgerblue; }
+/* Hover effects */
+.highlightable { cursor: pointer; transition: color 200ms ease-in-out; }
+.highlightable:hover { color: dodgerblue; }
 
-.fas {
+.hoverable { cursor: pointer; transition: opacity 200ms ease-in-out; }
+.hoverable:hover { opacity: 0.5; }
+
+/* Normalize icon size */
+.fas, .fab {
   min-width: 1em;
   min-height: 1em;
   display: inline-flex;

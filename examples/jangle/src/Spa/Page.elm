@@ -1,6 +1,7 @@
 module Spa.Page exposing
     ( Page
     , static, sandbox, element, full
+    , Protected
     , protectedStatic, protectedFull
     , Upgraded, Bundle, upgrade
     )
@@ -9,12 +10,13 @@ module Spa.Page exposing
 
 @docs Page
 @docs static, sandbox, element, full
+@docs Protected
 @docs protectedStatic, protectedFull
 @docs Upgraded, Bundle, upgrade
 
 -}
 
-import Api.Data
+import Api.Data exposing (Data(..))
 import Api.User exposing (User)
 import Browser.Navigation as Nav
 import Global
@@ -98,10 +100,15 @@ full =
 -- PROTECTED, redirect to sign in if not signed in
 
 
+type Protected params model
+    = Protected model
+    | Unprotected (Url params)
+
+
 protectedStatic :
     { view : User -> Url params -> Document msg
     }
-    -> Page params (Maybe { user : User, url : Url params }) msg
+    -> Page params (Protected params { user : User, url : Url params }) msg
 protectedStatic page =
     protected
         { init = \user _ url -> ( { url = url, user = user }, Cmd.none )
@@ -121,7 +128,7 @@ protectedFull :
     , save : model -> Global.Model -> Global.Model
     , load : Global.Model -> model -> model
     }
-    -> Page params (Maybe model) msg
+    -> Page params (Protected params model) msg
 protectedFull =
     protected >> full
 
@@ -134,32 +141,52 @@ protected :
     , save : model -> Global.Model -> Global.Model
     , load : Global.Model -> model -> model
     }
-    -> Page params (Maybe model) msg
+    -> Page params (Protected params model) msg
 protected page =
     let
-        init : Global.Model -> Url params -> ( Maybe model, Cmd msg )
+        init : Global.Model -> Url params -> ( Protected params model, Cmd msg )
         init global url =
-            case Api.Data.toMaybe global.user of
-                Just user ->
-                    page.init user global url |> Tuple.mapFirst Just
-
-                Nothing ->
-                    ( Nothing
+            case global.user of
+                NotAsked ->
+                    ( Unprotected url
                     , Nav.pushUrl global.key (Route.toString Route.SignIn)
                     )
 
-        protect : (model -> value) -> value -> Maybe model -> value
-        protect fromModel fallback maybeModel =
-            maybeModel
-                |> Maybe.map fromModel
-                |> Maybe.withDefault fallback
+                Loading ->
+                    ( Unprotected url
+                    , Cmd.none
+                    )
+
+                Success user ->
+                    page.init user global url |> Tuple.mapFirst Protected
+
+                Failure _ ->
+                    ( Unprotected url
+                    , Nav.pushUrl global.key (Route.toString Route.SignIn)
+                    )
+
+        protect : (model -> value) -> value -> Protected params model -> value
+        protect fromModel fallback protectedModel =
+            case protectedModel of
+                Protected model ->
+                    fromModel model
+
+                Unprotected _ ->
+                    fallback
     in
     { init = init
-    , update = \msg model_ -> protect (\model -> page.update msg model |> Tuple.mapFirst Just) ( Nothing, Cmd.none ) model_
+    , update = \msg model_ -> protect (\model -> page.update msg model |> Tuple.mapFirst Protected) ( model_, Cmd.none ) model_
     , view = protect page.view { title = "", body = [] }
     , subscriptions = protect page.subscriptions Sub.none
     , save = \model_ global -> protect (\model -> page.save model global) global model_
-    , load = \global model_ -> protect (\model -> page.load global model |> Just) Nothing model_
+    , load =
+        \global model_ ->
+            case model_ of
+                Protected model ->
+                    page.load global model |> Protected
+
+                Unprotected url ->
+                    init global url |> Tuple.first
     }
 
 

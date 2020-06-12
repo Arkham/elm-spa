@@ -1,9 +1,7 @@
 module Pages.NotFound exposing (Model, Msg, Params, page)
 
-import Api.Token exposing (Token)
 import Api.User exposing (User)
 import Browser.Navigation as Nav
-import Global
 import Html exposing (..)
 import Html.Attributes exposing (class, href)
 import Html.Events as Events
@@ -18,7 +16,7 @@ type alias Params =
 
 
 type alias Model =
-    Maybe { user : User, url : Url Params }
+    Page.Protected Params { user : User, url : Url Params }
 
 
 type alias Msg =
@@ -33,7 +31,7 @@ page =
 
 
 view : User -> Url Params -> Document Msg
-view user url =
+view _ _ =
     { title = "Jangle"
     , body =
         [ div [ class "column fill center" ]
