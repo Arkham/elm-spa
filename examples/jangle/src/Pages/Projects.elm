@@ -168,7 +168,7 @@ viewSearchbar :
     }
     -> Html msg
 viewSearchbar options =
-    Html.form [ Events.onSubmit options.onSubmit, class "row stretch text--small" ]
+    Html.form [ Events.onSubmit options.onSubmit, class "row stretch border--light" ]
         [ input
             [ class "max-width--10 rounded-none"
             , Attr.placeholder options.placeholder
@@ -176,5 +176,5 @@ viewSearchbar options =
             , Events.onInput options.onInput
             ]
             [ text "Search bar" ]
-        , button [ class "button rounded-none" ] [ text "search" ]
+        , button [ class "button button--icon button--white rounded-none shadow--none" ] [ span [ class "fas fa-search" ] [] ]
         ]
