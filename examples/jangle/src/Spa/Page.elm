@@ -1,8 +1,6 @@
 module Spa.Page exposing
     ( Page
     , static, sandbox, element, full
-    , Protected
-    , protectedStatic, protectedFull
     , Upgraded, Bundle, upgrade
     )
 
@@ -10,18 +8,12 @@ module Spa.Page exposing
 
 @docs Page
 @docs static, sandbox, element, full
-@docs Protected
-@docs protectedStatic, protectedFull
 @docs Upgraded, Bundle, upgrade
 
 -}
 
-import Api.Data exposing (Data(..))
-import Api.User exposing (User)
-import Browser.Navigation as Nav
 import Global
 import Spa.Document as Document exposing (Document)
-import Spa.Generated.Route as Route
 import Spa.Url exposing (Url)
 import Url
 
@@ -32,7 +24,7 @@ type alias Page params model msg =
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
     , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> model
+    , load : Global.Model -> model -> ( model, Cmd msg )
     }
 
 
@@ -46,7 +38,7 @@ static page =
     , view = page.view
     , subscriptions = \_ -> Sub.none
     , save = always identity
-    , load = always identity
+    , load = always (identity >> ignoreEffect)
     }
 
 
@@ -62,7 +54,7 @@ sandbox page =
     , view = page.view
     , subscriptions = \_ -> Sub.none
     , save = always identity
-    , load = always identity
+    , load = always (identity >> ignoreEffect)
     }
 
 
@@ -79,7 +71,7 @@ element page =
     , view = page.view
     , subscriptions = page.subscriptions
     , save = always identity
-    , load = always identity
+    , load = always (identity >> ignoreEffect)
     }
 
 
@@ -92,102 +84,19 @@ full :
     , load : Global.Model -> model -> model
     }
     -> Page params model msg
-full =
-    identity
-
-
-
--- PROTECTED, redirect to sign in if not signed in
-
-
-type Protected params model
-    = Protected model
-    | Unprotected (Url params)
-
-
-protectedStatic :
-    { view : User -> Url params -> Document msg
+full page =
+    { init = page.init
+    , update = page.update
+    , view = page.view
+    , subscriptions = page.subscriptions
+    , save = page.save
+    , load = \global model -> page.load global model |> ignoreEffect
     }
-    -> Page params (Protected params { user : User, url : Url params }) msg
-protectedStatic page =
-    protected
-        { init = \user _ url -> ( { url = url, user = user }, Cmd.none )
-        , update = \_ model -> ( model, Cmd.none )
-        , subscriptions = always Sub.none
-        , view = \{ user, url } -> page.view user url
-        , save = always identity
-        , load = always identity
-        }
 
 
-protectedFull :
-    { init : User -> Global.Model -> Url params -> ( model, Cmd msg )
-    , update : msg -> model -> ( model, Cmd msg )
-    , view : model -> Document msg
-    , subscriptions : model -> Sub msg
-    , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> model
-    }
-    -> Page params (Protected params model) msg
-protectedFull =
-    protected >> full
-
-
-protected :
-    { init : User -> Global.Model -> Url params -> ( model, Cmd msg )
-    , update : msg -> model -> ( model, Cmd msg )
-    , view : model -> Document msg
-    , subscriptions : model -> Sub msg
-    , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> model
-    }
-    -> Page params (Protected params model) msg
-protected page =
-    let
-        init : Global.Model -> Url params -> ( Protected params model, Cmd msg )
-        init global url =
-            case global.user of
-                NotAsked ->
-                    ( Unprotected url
-                    , Nav.pushUrl global.key (Route.toString Route.SignIn)
-                    )
-
-                Loading ->
-                    ( Unprotected url
-                    , Cmd.none
-                    )
-
-                Success user ->
-                    page.init user global url |> Tuple.mapFirst Protected
-
-                Failure _ ->
-                    ( Unprotected url
-                    , Nav.pushUrl global.key (Route.toString Route.SignIn)
-                    )
-
-        protect : (model -> value) -> value -> Protected params model -> value
-        protect fromModel fallback protectedModel =
-            case protectedModel of
-                Protected model ->
-                    fromModel model
-
-                Unprotected _ ->
-                    fallback
-    in
-    { init = init
-    , update = \msg model_ -> protect (\model -> page.update msg model |> Tuple.mapFirst Protected) ( model_, Cmd.none ) model_
-    , view = protect page.view { title = "", body = [] }
-    , subscriptions = protect page.subscriptions Sub.none
-    , save = \model_ global -> protect (\model -> page.save model global) global model_
-    , load =
-        \global model_ ->
-            case model_ of
-                Protected model ->
-                    page.load global model |> Protected
-
-                Unprotected url ->
-                    init global url |> Tuple.first
-    }
+ignoreEffect : model -> ( model, Cmd msg )
+ignoreEffect model =
+    ( model, Cmd.none )
 
 
 
@@ -205,7 +114,7 @@ type alias Bundle model msg =
     { view : Document msg
     , subscriptions : Sub msg
     , save : Global.Model -> Global.Model
-    , load : Global.Model -> model
+    , load : Global.Model -> ( model, Cmd msg )
     }
 
 
@@ -222,6 +131,6 @@ upgrade toModel toMsg page =
             { view = page.view model |> Document.map toMsg
             , subscriptions = page.subscriptions model |> Sub.map toMsg
             , save = page.save model
-            , load = \global -> toModel (page.load global model)
+            , load = \global -> page.load global model |> Tuple.mapBoth toModel (Cmd.map toMsg)
             }
     }

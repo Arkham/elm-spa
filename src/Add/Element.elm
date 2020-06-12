@@ -18,27 +18,35 @@ type alias Params =
     {{params}}
 
 
-type alias Model =
-    {}
-
-
-type Msg
-    = NoOp
-
-
 page : Page Params Model Msg
 page =
     Page.element
         { init = init
         , update = update
-        , subscriptions = subscriptions
         , view = view
+        , subscriptions = subscriptions
         }
+
+
+
+-- INIT
+
+
+type alias Model =
+    {}
 
 
 init : Url Params -> ( Model, Cmd Msg )
 init { params } =
     ( {}, Cmd.none )
+
+
+
+-- UPDATE
+
+
+type Msg
+    = NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -51,6 +59,10 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
+
+
+
+-- VIEW
 
 
 view : Model -> Document Msg

@@ -18,14 +18,6 @@ type alias Params =
     {{params}}
 
 
-type alias Model =
-    {}
-
-
-type Msg
-    = NoOp
-
-
 page : Page Params Model Msg
 page =
     Page.full
@@ -38,14 +30,25 @@ page =
         }
 
 
+
+-- INIT
+
+
+type alias Model =
+    {}
+
+
 init : Global.Model -> Url Params -> ( Model, Cmd Msg )
 init global { params } =
     ( {}, Cmd.none )
 
 
-load : Global.Model -> Model -> Model
-load global model =
-    model
+
+-- UPDATE
+
+
+type Msg
+    = NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -60,9 +63,18 @@ save model global =
     global
 
 
+load : Global.Model -> Model -> ( Model, Cmd Msg )
+load global model =
+    ( model, Cmd.none )
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
+
+
+
+-- VIEW
 
 
 view : Model -> Document Msg

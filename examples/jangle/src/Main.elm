@@ -106,7 +106,7 @@ update msg model =
                     Pages.init route model.global url
 
                 global =
-                    Pages.save page model.global
+                    (Pages.bundle >> .save) page model.global
             in
             ( { model | url = url, page = page, global = global, isTransitioning = False }
             , Cmd.map Pages cmd
@@ -114,14 +114,17 @@ update msg model =
 
         Global globalMsg ->
             let
-                ( global, cmd ) =
+                ( global, globalCmd ) =
                     Global.update globalMsg model.global
 
-                page =
-                    Pages.load model.page global
+                ( page, pageCmd ) =
+                    (Pages.bundle >> .load) model.page global
             in
             ( { model | page = page, global = global }
-            , Cmd.map Global cmd
+            , Cmd.batch
+                [ Cmd.map Pages pageCmd
+                , Cmd.map Global globalCmd
+                ]
             )
 
         Pages pageMsg ->
@@ -130,7 +133,7 @@ update msg model =
                     Pages.update pageMsg model.page
 
                 global =
-                    Pages.save page model.global
+                    (Pages.bundle >> .save) page model.global
             in
             ( { model | page = page, global = global }
             , Cmd.map Pages cmd
@@ -140,7 +143,7 @@ update msg model =
 view : Model -> Document Msg
 view model =
     Global.view
-        { page = Pages.view model.page |> Document.map Pages
+        { page = (Pages.bundle >> .view) model.page |> Document.map Pages
         , global = model.global
         , toMsg = Global
         , isTransitioning = model.isTransitioning
@@ -150,5 +153,5 @@ view model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Pages.subscriptions model.page
+    (Pages.bundle >> .subscriptions) model.page
         |> Sub.map Pages

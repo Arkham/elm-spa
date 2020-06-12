@@ -17,14 +17,6 @@ type alias Params =
     {{params}}
 
 
-type alias Model =
-    {}
-
-
-type Msg
-    = NoOp
-
-
 page : Page Params Model Msg
 page =
     Page.sandbox
@@ -34,9 +26,25 @@ page =
         }
 
 
+
+-- INIT
+
+
+type alias Model =
+    {}
+
+
 init : Model
 init =
     {}
+
+
+
+-- UPDATE
+
+
+type Msg
+    = NoOp
 
 
 update : Msg -> Model -> Model
@@ -44,6 +52,10 @@ update msg model =
     case msg of
         NoOp ->
             {}
+
+
+
+-- VIEW
 
 
 view : Model -> Document Msg

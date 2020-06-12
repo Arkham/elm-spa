@@ -24,9 +24,9 @@ type alias Model =
     }
 
 
-init : Flags -> Nav.Key -> Model
+init : Flags -> Nav.Key -> ( Model, Cmd Msg )
 init _ key =
-    Model key
+    ( Model key, Cmd.none )
 
 
 type Msg

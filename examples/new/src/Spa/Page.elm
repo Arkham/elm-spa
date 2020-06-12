@@ -24,21 +24,21 @@ type alias Page params model msg =
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
     , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> model
+    , load : Global.Model -> model -> ( model, Cmd msg )
     }
 
 
 static :
-    { view : Document msg
+    { view : Url params -> Document msg
     }
-    -> Page params () msg
+    -> Page params (Url params) msg
 static page =
-    { init = \_ _ -> ( (), Cmd.none )
-    , update = \_ _ -> ( (), Cmd.none )
-    , view = \_ -> page.view
+    { init = \_ url -> ( url, Cmd.none )
+    , update = \_ model -> ( model, Cmd.none )
+    , view = page.view
     , subscriptions = \_ -> Sub.none
     , save = always identity
-    , load = always identity
+    , load = always (identity >> ignoreEffect)
     }
 
 
@@ -54,7 +54,7 @@ sandbox page =
     , view = page.view
     , subscriptions = \_ -> Sub.none
     , save = always identity
-    , load = always identity
+    , load = always (identity >> ignoreEffect)
     }
 
 
@@ -71,7 +71,7 @@ element page =
     , view = page.view
     , subscriptions = page.subscriptions
     , save = always identity
-    , load = always identity
+    , load = always (identity >> ignoreEffect)
     }
 
 
@@ -81,11 +81,22 @@ full :
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
     , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> model
+    , load : Global.Model -> model -> ( model, Cmd msg )
     }
     -> Page params model msg
 full page =
-    page
+    { init = page.init
+    , update = page.update
+    , view = page.view
+    , subscriptions = page.subscriptions
+    , save = page.save
+    , load = page.load
+    }
+
+
+ignoreEffect : model -> ( model, Cmd msg )
+ignoreEffect model =
+    ( model, Cmd.none )
 
 
 
@@ -103,7 +114,7 @@ type alias Bundle model msg =
     { view : Document msg
     , subscriptions : Sub msg
     , save : Global.Model -> Global.Model
-    , load : Global.Model -> model
+    , load : Global.Model -> ( model, Cmd msg )
     }
 
 
@@ -120,6 +131,6 @@ upgrade toModel toMsg page =
             { view = page.view model |> Document.map toMsg
             , subscriptions = page.subscriptions model |> Sub.map toMsg
             , save = page.save model
-            , load = \global -> toModel (page.load global model)
+            , load = \global -> page.load global model |> Tuple.mapBoth toModel (Cmd.map toMsg)
             }
     }

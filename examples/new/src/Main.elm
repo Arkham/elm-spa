@@ -41,17 +41,20 @@ type alias Model =
 init : Flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
     let
-        global =
-            Global.init flags key
-
         route =
             fromUrl url
+
+        ( global, globalCmd ) =
+            Global.init flags key
 
         ( page, pageCmd ) =
             Pages.init route global url
     in
     ( Model url key global page
-    , Cmd.map Pages pageCmd
+    , Cmd.batch
+        [ Cmd.map Global globalCmd
+        , Cmd.map Pages pageCmd
+        ]
     )
 
 
@@ -96,14 +99,17 @@ update msg model =
 
         Global globalMsg ->
             let
-                ( global, cmd ) =
+                ( global, globalCmd ) =
                     Global.update globalMsg model.global
 
-                page =
+                ( page, pageCmd ) =
                     Pages.load model.page global
             in
             ( { model | page = page, global = global }
-            , Cmd.map Global cmd
+            , Cmd.batch
+                [ Cmd.map Global globalCmd
+                , Cmd.map Pages pageCmd
+                ]
             )
 
         Pages pageMsg ->

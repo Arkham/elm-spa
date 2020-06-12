@@ -1,8 +1,21 @@
-module Pages.NotFound exposing (Model, Msg, Params, page, view)
+module Pages.NotFound exposing (Params, Model, Msg, page)
 
 import Html exposing (..)
 import Spa.Document exposing (Document)
 import Spa.Page as Page exposing (Page)
+import Spa.Url exposing (Url)
+
+
+type alias Params =
+    ()
+
+
+type alias Model =
+    Url Params
+
+
+type alias Msg =
+    Never
 
 
 page : Page Params Model Msg
@@ -12,20 +25,12 @@ page =
         }
 
 
-type alias Params =
-    ()
+
+-- VIEW
 
 
-type alias Model =
-    ()
-
-
-type alias Msg =
-    Never
-
-
-view : Document Msg
-view =
+view : Url Params -> Document Msg
+view { params } =
     { title = "404"
     , body =
         [ text "Page not found"

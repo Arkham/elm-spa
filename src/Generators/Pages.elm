@@ -99,7 +99,7 @@ save =
     bundle >> .save
 
 
-load : Model -> Global.Model -> Model
+load : Model -> Global.Model -> ( Model, Cmd Msg )
 load =
     bundle >> .load
 

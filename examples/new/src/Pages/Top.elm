@@ -1,9 +1,21 @@
-module Pages.Top exposing (Model, Msg, Params, page, view)
+module Pages.Top exposing (Params, Model, Msg, page)
 
 import Html exposing (..)
-import Html.Attributes exposing (class)
 import Spa.Document exposing (Document)
 import Spa.Page as Page exposing (Page)
+import Spa.Url exposing (Url)
+
+
+type alias Params =
+    ()
+
+
+type alias Model =
+    Url Params
+
+
+type alias Msg =
+    Never
 
 
 page : Page Params Model Msg
@@ -13,22 +25,12 @@ page =
         }
 
 
-type alias Params =
-    ()
+
+-- VIEW
 
 
-type alias Model =
-    ()
-
-
-type alias Msg =
-    Never
-
-
-view : Document Msg
-view =
+view : Url Params -> Document Msg
+view { params } =
     { title = "Homepage"
-    , body =
-        [ h1 [ class "font-h2" ] [ text "Homepage" ]
-        ]
+    , body = [ text "Homepage" ]
     }
