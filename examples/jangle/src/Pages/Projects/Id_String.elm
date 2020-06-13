@@ -4,7 +4,7 @@ import Api.Data exposing (Data(..))
 import Api.Project
 import Api.User exposing (User)
 import Html exposing (..)
-import Html.Attributes exposing (class, href, target)
+import Html.Attributes as Attr exposing (class, href, target)
 import Spa.Document exposing (Document)
 import Spa.Page as Page exposing (Page)
 import Spa.Url exposing (Url)
@@ -91,7 +91,11 @@ view model =
                     >> List.singleton
                     >> code []
                     >> List.singleton
-                    >> pre [ class "padding-medium" ]
+                    >> pre
+                        [ class "padding-medium"
+                        , Attr.style "white-space" "pre-wrap"
+                        , Attr.style "line-height" "1.2"
+                        ]
             }
         ]
     }
