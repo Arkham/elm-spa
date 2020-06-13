@@ -44,9 +44,9 @@ init global _ =
             ( {}, Nav.pushUrl global.key (Route.toString Route.SignIn) )
 
 
-load : Global.Model -> Model -> Model
+load : Global.Model -> Model -> ( Model, Cmd Msg )
 load global model =
-    model
+    ( model, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

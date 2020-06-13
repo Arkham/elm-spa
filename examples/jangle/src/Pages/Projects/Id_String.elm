@@ -4,7 +4,7 @@ import Api.Data exposing (Data(..))
 import Api.Project
 import Api.User exposing (User)
 import Html exposing (..)
-import Html.Attributes exposing (class, href)
+import Html.Attributes exposing (class, href, target)
 import Spa.Document exposing (Document)
 import Spa.Page as Page exposing (Page)
 import Spa.Url exposing (Url)
@@ -56,10 +56,6 @@ init user url =
 
 update : Msg -> ProtectedModel -> ( ProtectedModel, Cmd Msg )
 update msg model =
-    let
-        _ =
-            Debug.log "hello from update"
-    in
     case msg of
         GotReadme readme ->
             ( { model | readme = readme }
@@ -83,14 +79,19 @@ view model =
         [ div [ class "column overflow-hidden" ]
             [ div [ class "row wrap padding-medium spacing-small center-y bg--shell" ]
                 [ h1 [ class "font-h3" ] [ text model.url.params.id ]
-                , a [ class "font-h3 hoverable", href repoUrl ] [ span [ class "fab fa-github-square" ] [] ]
+                , a [ class "font-h3 hoverable", href repoUrl, target "_blank" ] [ span [ class "fab fa-github-square" ] [] ]
                 ]
             ]
         , Api.Data.view model.readme
             { notAsked = text ""
             , loading = text ""
             , failure = text
-            , success = text
+            , success =
+                text
+                    >> List.singleton
+                    >> code []
+                    >> List.singleton
+                    >> pre [ class "padding-medium" ]
             }
         ]
     }

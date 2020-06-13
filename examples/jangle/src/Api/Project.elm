@@ -53,11 +53,27 @@ decoder =
 
 readme : { user : User, repo : String, toMsg : Data String -> msg } -> Cmd msg
 readme options =
+    restApiGet
+        { token = options.user.token
+        , path = "/repos/" ++ options.user.login ++ "/" ++ options.repo ++ "/readme"
+        , decoder = D.field "content" Utils.Json.base64
+        , toMsg = options.toMsg
+        }
+
+
+restApiGet :
+    { token : Token
+    , path : String
+    , decoder : Decoder value
+    , toMsg : Data value -> msg
+    }
+    -> Cmd msg
+restApiGet options =
     Http.request
         { method = "GET"
-        , headers = [ Http.header "Authorization" ("Bearer " ++ Api.Token.toString options.user.token) ]
-        , url = "https://api.github.com/repos/" ++ options.user.login ++ "/" ++ options.repo ++ "/readme"
-        , expect = Http.expectString (Api.Data.fromHttpResult >> options.toMsg)
+        , headers = [ Http.header "Authorization" ("Bearer " ++ Api.Token.toString options.token) ]
+        , url = "https://api.github.com" ++ options.path
+        , expect = Http.expectJson (Api.Data.fromHttpResult >> options.toMsg) options.decoder
         , body = Http.emptyBody
         , timeout = Just (1000 * 60)
         , tracker = Nothing

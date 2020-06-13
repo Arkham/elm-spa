@@ -82,9 +82,9 @@ requestAuthToken code =
         }
 
 
-load : Global.Model -> Model -> Model
+load : Global.Model -> Model -> ( Model, Cmd Msg )
 load global model =
-    model
+    ( model, Cmd.none )
 
 
 
