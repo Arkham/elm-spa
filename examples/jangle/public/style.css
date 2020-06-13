@@ -35,7 +35,7 @@ img { width: 100%; }
 .bg--dark-orange { background: #a1482b;}
 
 .shadow { box-shadow: 0 0.5em 2em rgba(0, 0, 0, 0.25); }
-.shadow--shell { box-shadow: 0 1rem 2rem rgb(248, 244, 244); }
+.shadow--shell { box-shadow: 0 2rem 1rem #f8f4f4; }
 .shadow--none { box-shadow: none !important; }
 
 .border--light { border: solid 1px #ccc; }
