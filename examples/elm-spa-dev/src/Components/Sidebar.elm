@@ -9,6 +9,7 @@ module Components.Sidebar exposing (view)
 import Html exposing (..)
 import Html.Attributes exposing (class, href)
 import Spa.Generated.Route as Route exposing (Route)
+import Utils.String
 
 
 type alias Section =
@@ -30,46 +31,47 @@ view currentRoute =
         viewSection section =
             Html.section [ class "column spacing-small align-left" ]
                 [ h3 [ class "font-h4" ] [ text section.title ]
-                , div [ class "column spacing-tiny align-left pl-tiny" ]
+                , div [ class "column spacing-small align-left" ]
                     (List.map viewLink section.links)
                 ]
 
         viewLink : Link -> Html msg
         viewLink link =
-            if link.route == currentRoute then
-                span [ class "link disabled" ] [ text link.label ]
+            a
+                [ href (Route.toString link.route)
+                , if link.route == currentRoute then
+                    class "color--green text-underline text-bold"
 
-            else
-                a [ class "link", href (Route.toString link.route) ]
-                    [ text link.label ]
+                  else
+                    class "text-underline hoverable"
+                ]
+                [ text link.label ]
     in
-    div [ class "hidden-mobile width--sidebar column spacing-small align-left" ]
+    div [ class "hidden-mobile width--sidebar column pt-medium spacing-medium align-left" ]
         (List.map viewSection sections)
 
 
 sections : List Section
 sections =
     let
-        docs : String -> Route
-        docs topic =
-            Route.Docs__Topic_String { topic = topic }
-
-        guide : String -> Route
-        guide topic =
-            Route.Guide__Topic_String { topic = topic }
+        guide : String -> Link
+        guide label =
+            Link label <|
+                Route.Guide__Topic_String
+                    { topic = Utils.String.sluggify label
+                    }
     in
-    [ { title = "docs"
+    [ { title = "guide"
       , links =
-            [ { label = "elm-spa init", route = docs "elm-spa-init" }
-            , { label = "elm-spa add", route = docs "elm-spa-add" }
-            , { label = "elm-spa build", route = docs "elm-spa-build" }
-            ]
-      }
-    , { title = "guide"
-      , links =
-            [ { label = "installation", route = guide "installation" }
-            , { label = "creating a project", route = guide "creating-a-project" }
-            , { label = "adding pages", route = guide "adding-pages" }
+            [ Link "Introduction" Route.Guide
+            , guide "Installation"
+            , guide "Project Structure"
+            , guide "Configuration"
+            , guide "Routing"
+            , guide "Pages"
+            , guide "Global"
+            , guide "Components"
+            , guide "Using APIs"
             ]
       }
     ]

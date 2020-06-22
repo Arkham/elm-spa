@@ -107,7 +107,7 @@ update msg model =
                 ( global, cmd ) =
                     Global.update globalMsg model.global
 
-                page =
+                ( page, pageCmd ) =
                     Pages.load model.page global
             in
             ( { model | page = page, global = global }
@@ -158,7 +158,7 @@ view model =
         , toMsg = Global
         , isTransitioning = model.isTransitioning
         , route = fromUrl model.url
-        , shouldShowSidebar = isSidebarPage model.url && isSidebarPage model.nextUrl
+        , shouldShowSidebar = isSidebarPage model.url
         }
 
 

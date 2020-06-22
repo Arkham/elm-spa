@@ -62,14 +62,14 @@ view ({ page, isTransitioning } as options) =
     { title = page.title
     , body =
         [ div
-            [ class "column container px-small spacing-small fill-y"
+            [ class "column container px-medium spacing-small fill-y"
             , style "transition" Spa.Transition.properties.layout
             , classList [ ( "invisible", isTransitioning.layout ) ]
             ]
             [ viewNavbar
-            , div [ class "flex row spacing-small align-top relative" ]
-                [ viewPage options
-                , viewSidebar options
+            , div [ class "flex row align-top relative" ]
+                [ viewSidebar options
+                , viewPage options
                 ]
             , viewFooter
             ]
@@ -83,8 +83,7 @@ viewNavbar =
         [ a [ class "font-h3 text-header hoverable", href "/" ]
             [ text "elm-spa" ]
         , div [ class "row spacing-small text--bigger" ]
-            [ a [ class "link", href (Route.toString Route.Docs) ] [ text "docs" ]
-            , a [ class "link", href (Route.toString Route.Guide) ] [ text "guide" ]
+            [ a [ class "link", href (Route.toString Route.Guide) ] [ text "guide" ]
             , a [ class "link", href (Route.toString Route.NotFound) ] [ text "examples" ]
             ]
         ]
@@ -107,18 +106,14 @@ viewPage { page, isTransitioning } =
 
 viewSidebar : { options | shouldShowSidebar : Bool, route : Route } -> Html msg
 viewSidebar { shouldShowSidebar, route } =
-    aside [ class "hidden-mobile" ]
-        [ if shouldShowSidebar then
-            div [ class "invisible" ] [ Components.Sidebar.view route ]
-
-          else
-            text ""
-        , div
-            [ class "absolute align-right align-top"
-            , style "transition" Spa.Transition.properties.page
-            , classList [ ( "invisible", not shouldShowSidebar ) ]
+    aside
+        [ class "hidden-mobile fadeable"
+        , classList
+            [ ( "invisible", not shouldShowSidebar )
+            , ( "no-width", not shouldShowSidebar )
             ]
-            [ Components.Sidebar.view route ]
+        ]
+        [ Components.Sidebar.view route
         ]
 
 

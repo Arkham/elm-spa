@@ -24,7 +24,7 @@ type alias Page params model msg =
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
     , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> model
+    , load : Global.Model -> model -> ( model, Cmd msg )
     }
 
 
@@ -38,7 +38,7 @@ static page =
     , view = \_ -> page.view
     , subscriptions = \_ -> Sub.none
     , save = always identity
-    , load = always identity
+    , load = \_ model -> ( model, Cmd.none )
     }
 
 
@@ -54,7 +54,7 @@ sandbox page =
     , view = page.view
     , subscriptions = \_ -> Sub.none
     , save = always identity
-    , load = always identity
+    , load = \_ model -> ( model, Cmd.none )
     }
 
 
@@ -71,7 +71,7 @@ element page =
     , view = page.view
     , subscriptions = page.subscriptions
     , save = always identity
-    , load = always identity
+    , load = \_ model -> ( model, Cmd.none )
     }
 
 
@@ -81,7 +81,7 @@ full :
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
     , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> model
+    , load : Global.Model -> model -> ( model, Cmd msg )
     }
     -> Page params model msg
 full page =
@@ -103,7 +103,7 @@ type alias Bundle model msg =
     { view : Document msg
     , subscriptions : Sub msg
     , save : Global.Model -> Global.Model
-    , load : Global.Model -> model
+    , load : Global.Model -> ( model, Cmd msg )
     }
 
 
@@ -120,6 +120,6 @@ upgrade toModel toMsg page =
             { view = page.view model |> Document.map toMsg
             , subscriptions = page.subscriptions model |> Sub.map toMsg
             , save = page.save model
-            , load = \global -> toModel (page.load global model)
+            , load = \global -> page.load global model |> Tuple.mapBoth toModel (Cmd.map toMsg)
             }
     }
