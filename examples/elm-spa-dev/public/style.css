@@ -46,7 +46,7 @@ table { line-height: 1.2; }
 }
 
 .size--120 { min-width: 6rem; min-height: 6rem; max-width: 6rem; max-height: 6rem; }
-.width--sidebar { min-width: 13.5rem; max-width: 13.5rem; }
+.width--sidebar { min-width: 12rem; max-width: 12rem; }
 
 .color--faint { color: rgba(0, 0, 0, 0.6);}
 .color--green { color: #409844; }
