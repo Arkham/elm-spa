@@ -1,6 +1,6 @@
 {
   "name": "elm-spa",
-  "version": "5.0.0-rc6",
+  "version": "5.0.0-rc7",
   "description": "single page apps made easy",
   "main": "index.js",
   "bin": "./index.js",
