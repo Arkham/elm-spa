@@ -11,10 +11,7 @@ module Pages.{{name}} exposing (Params, Model, Msg, page)
 import Html exposing (..)
 import Spa.Document exposing (Document)
 import Spa.Page as Page exposing (Page)
-
-
-type alias Params =
-    {{params}}
+import Spa.Url as Url exposing (Url)
 
 
 page : Page Params Model Msg
@@ -30,12 +27,16 @@ page =
 -- INIT
 
 
+type alias Params =
+    {{params}}
+
+
 type alias Model =
     {}
 
 
-init : Model
-init =
+init : Url Params -> Model
+init { params } =
     {}
 
 
@@ -44,13 +45,13 @@ init =
 
 
 type Msg
-    = NoOp
+    = ReplaceMe
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        NoOp ->
+        ReplaceMe ->
             {}
 
 

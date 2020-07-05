@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
-import Global exposing (Flags)
+import Shared exposing (Flags)
 import Spa.Document as Document exposing (Document)
 import Spa.Generated.Pages as Pages
 import Spa.Generated.Route as Route exposing (Route)
@@ -35,7 +35,7 @@ fromUrl =
 type alias Model =
     { url : Url
     , key : Nav.Key
-    , global : Global.Model
+    , shared : Shared.Model
     , page : Pages.Model
     , isTransitioning : { layout : Bool, page : Bool }
     , nextUrl : Url
@@ -45,16 +45,16 @@ type alias Model =
 init : Flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
     let
-        global =
-            Global.init flags key
+        shared =
+            Shared.init flags key
 
         route =
             fromUrl url
 
         ( page, pageCmd ) =
-            Pages.init route global url
+            Pages.init route shared url
     in
-    ( Model url key global page { layout = True, page = True } url
+    ( Model url key shared page { layout = True, page = True } url
     , Cmd.batch
         [ Cmd.map Pages pageCmd
         , Utils.Cmd.delay Spa.Transition.delays.layout (FadeIn url)
@@ -69,7 +69,7 @@ init flags url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url
-    | Global Global.Msg
+    | Shared Shared.Msg
     | Pages Pages.Msg
     | FadeIn Url
 
@@ -102,16 +102,16 @@ update msg model =
         FadeIn url ->
             loadPage url model
 
-        Global globalMsg ->
+        Shared sharedMsg ->
             let
-                ( global, cmd ) =
-                    Global.update globalMsg model.global
+                ( shared, cmd ) =
+                    Shared.update sharedMsg model.shared
 
                 ( page, pageCmd ) =
-                    Pages.load model.page global
+                    Pages.load model.page shared
             in
-            ( { model | page = page, global = global }
-            , Cmd.map Global cmd
+            ( { model | page = page, shared = shared }
+            , Cmd.map Shared cmd
             )
 
         Pages pageMsg ->
@@ -119,10 +119,10 @@ update msg model =
                 ( page, cmd ) =
                     Pages.update pageMsg model.page
 
-                global =
-                    Pages.save page model.global
+                shared =
+                    Pages.save page model.shared
             in
-            ( { model | page = page, global = global }
+            ( { model | page = page, shared = shared }
             , Cmd.map Pages cmd
             )
 
@@ -134,16 +134,16 @@ loadPage url model =
             fromUrl url
 
         ( page, cmd ) =
-            Pages.init route model.global url
+            Pages.init route model.shared url
 
-        global =
-            Pages.save page model.global
+        shared =
+            Pages.save page model.shared
     in
     ( { model
         | url = url
         , nextUrl = url
         , page = page
-        , global = global
+        , shared = shared
         , isTransitioning = { layout = False, page = False }
       }
     , Cmd.map Pages cmd
@@ -152,10 +152,10 @@ loadPage url model =
 
 view : Model -> Document Msg
 view model =
-    Global.view
+    Shared.view
         { page = Pages.view model.page |> Document.map Pages
-        , global = model.global
-        , toMsg = Global
+        , shared = model.shared
+        , toMsg = Shared
         , isTransitioning = model.isTransitioning
         , route = fromUrl model.url
         , shouldShowSidebar = isSidebarPage model.url

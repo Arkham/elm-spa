@@ -17,7 +17,7 @@ src/
 |  └─ Url.elm
 ├─ Utils/
 ├─ Main.elm
-├─ Global.elm
+├─ Shared.elm
 └─ Ports.elm
 public/
 ├─ index.html
@@ -41,10 +41,10 @@ File | Description
 `Pages/Top.elm` | The homepage for our single page application.
 `Pages/NotFound.elm` | The page to show if we're at an invalid route.
 `Spa/Document.elm` | The kind of thing each page's `view` returns (changing this allows support for [elm-ui](https://github.com/mdgriffith/elm-ui) or [elm-css](https://github.com/rtfeldman/elm-css))
-`Spa/Page.elm` | Defines the four page types (`static`, `sandbox`, `element`, and `full`)
-`Spa/Url.elm` | Defines a type that holds route parameters, query parameters (automatically passed into the `init` function of `element` and `full` pages)
+`Spa/Page.elm` | Defines the four page types (`static`, `sandbox`, `element`, and `application`)
+`Spa/Url.elm` | Defines a type that holds route parameters, query parameters (automatically passed into the `init` function of `element` and `application` pages)
 `Main.elm` | The entrypoint to the app, that wires everything together.
-`Global.elm` | The place to define layouts and shared data between pages.
+`Shared.elm` | The place to define layouts and shared data between pages.
 `Ports.elm` | The place to communicate with any JavaScript you need.
 
 #### a look into `public`

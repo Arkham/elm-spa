@@ -1,7 +1,7 @@
 port module Ports exposing (add, build, uhhh)
 
+import Add.Application
 import Add.Element
-import Add.Full
 import Add.Sandbox
 import Add.Static
 import Generators.Pages as Pages
@@ -47,9 +47,9 @@ add { name, pageType } =
                 |> Add.Element.create
                 |> sendItBro
 
-        "full" ->
+        "application" ->
             path
-                |> Add.Full.create
+                |> Add.Application.create
                 |> sendItBro
 
         _ ->

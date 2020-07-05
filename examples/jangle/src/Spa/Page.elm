@@ -1,6 +1,6 @@
 module Spa.Page exposing
     ( Page
-    , static, sandbox, element, full
+    , static, sandbox, element, application
     , Protected
     , protectedStatic, protectedSandbox, protectedElement, protectedFull
     , Upgraded, Bundle, upgrade
@@ -9,7 +9,7 @@ module Spa.Page exposing
 {-|
 
 @docs Page
-@docs static, sandbox, element, full
+@docs static, sandbox, element, application
 @docs Protected
 @docs protectedStatic, protectedSandbox, protectedElement, protectedFull
 @docs Upgraded, Bundle, upgrade
@@ -19,7 +19,7 @@ module Spa.Page exposing
 import Api.Data exposing (Data(..))
 import Api.User exposing (User)
 import Browser.Navigation as Nav
-import Global
+import Shared
 import Spa.Document as Document exposing (Document)
 import Spa.Generated.Route as Route
 import Spa.Url exposing (Url)
@@ -27,12 +27,12 @@ import Url
 
 
 type alias Page params model msg =
-    { init : Global.Model -> Url params -> ( model, Cmd msg )
+    { init : Shared.Model -> Url params -> ( model, Cmd msg )
     , update : msg -> model -> ( model, Cmd msg )
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
-    , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> ( model, Cmd msg )
+    , save : model -> Shared.Model -> Shared.Model
+    , load : Shared.Model -> model -> ( model, Cmd msg )
     }
 
 
@@ -88,16 +88,16 @@ element page =
     }
 
 
-full :
-    { init : Global.Model -> Url params -> ( model, Cmd msg )
+application :
+    { init : Shared.Model -> Url params -> ( model, Cmd msg )
     , update : msg -> model -> ( model, Cmd msg )
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
-    , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> ( model, Cmd msg )
+    , save : model -> Shared.Model -> Shared.Model
+    , load : Shared.Model -> model -> ( model, Cmd msg )
     }
     -> Page params model msg
-full =
+application =
     identity
 
 
@@ -161,35 +161,35 @@ protectedElement page =
 
 
 protectedFull :
-    { init : User -> Global.Model -> Url params -> ( model, Cmd msg )
+    { init : User -> Shared.Model -> Url params -> ( model, Cmd msg )
     , update : msg -> model -> ( model, Cmd msg )
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
-    , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> model
+    , save : model -> Shared.Model -> Shared.Model
+    , load : Shared.Model -> model -> model
     }
     -> Page params (Protected params model) msg
 protectedFull =
-    protected >> full
+    protected >> application
 
 
 protected :
-    { init : User -> Global.Model -> Url params -> ( model, Cmd msg )
+    { init : User -> Shared.Model -> Url params -> ( model, Cmd msg )
     , update : msg -> model -> ( model, Cmd msg )
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
-    , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> model
+    , save : model -> Shared.Model -> Shared.Model
+    , load : Shared.Model -> model -> model
     }
     -> Page params (Protected params model) msg
 protected page =
     let
-        init : Global.Model -> Url params -> ( Protected params model, Cmd msg )
-        init global url =
-            case global.user of
+        init : Shared.Model -> Url params -> ( Protected params model, Cmd msg )
+        init shared url =
+            case shared.user of
                 NotAsked ->
                     ( Unprotected url
-                    , Nav.pushUrl global.key (Route.toString Route.SignIn)
+                    , Nav.pushUrl shared.key (Route.toString Route.SignIn)
                     )
 
                 Loading ->
@@ -198,11 +198,11 @@ protected page =
                     )
 
                 Success user ->
-                    page.init user global url |> Tuple.mapFirst Protected
+                    page.init user shared url |> Tuple.mapFirst Protected
 
                 Failure _ ->
                     ( Unprotected url
-                    , Nav.pushUrl global.key (Route.toString Route.SignIn)
+                    , Nav.pushUrl shared.key (Route.toString Route.SignIn)
                     )
 
         protect : (model -> value) -> value -> Protected params model -> value
@@ -223,15 +223,15 @@ protected page =
                 model_
     , view = protect page.view { title = "", body = [] }
     , subscriptions = protect page.subscriptions Sub.none
-    , save = \model_ global -> protect (\model -> page.save model global) global model_
+    , save = \model_ shared -> protect (\model -> page.save model shared) shared model_
     , load =
-        \global model_ ->
+        \shared model_ ->
             case model_ of
                 Protected model ->
-                    page.load global model |> Protected |> noEffect
+                    page.load shared model |> Protected |> noEffect
 
                 Unprotected url ->
-                    init global url
+                    init shared url
     }
 
 
@@ -240,7 +240,7 @@ protected page =
 
 
 type alias Upgraded pageParams pageModel pageMsg model msg =
-    { init : pageParams -> Global.Model -> Url.Url -> ( model, Cmd msg )
+    { init : pageParams -> Shared.Model -> Url.Url -> ( model, Cmd msg )
     , update : pageMsg -> pageModel -> ( model, Cmd msg )
     , bundle : pageModel -> Bundle model msg
     }
@@ -249,8 +249,8 @@ type alias Upgraded pageParams pageModel pageMsg model msg =
 type alias Bundle model msg =
     { view : Document msg
     , subscriptions : Sub msg
-    , save : Global.Model -> Global.Model
-    , load : Global.Model -> ( model, Cmd msg )
+    , save : Shared.Model -> Shared.Model
+    , load : Shared.Model -> ( model, Cmd msg )
     }
 
 
@@ -260,13 +260,13 @@ upgrade :
     -> Page pageParams pageModel pageMsg
     -> Upgraded pageParams pageModel pageMsg model msg
 upgrade toModel toMsg page =
-    { init = \params global url -> page.init global (Spa.Url.create params url) |> Tuple.mapBoth toModel (Cmd.map toMsg)
+    { init = \params shared url -> page.init shared (Spa.Url.create params url) |> Tuple.mapBoth toModel (Cmd.map toMsg)
     , update = \msg model -> page.update msg model |> Tuple.mapBoth toModel (Cmd.map toMsg)
     , bundle =
         \model ->
             { view = page.view model |> Document.map toMsg
             , subscriptions = page.subscriptions model |> Sub.map toMsg
             , save = page.save model
-            , load = \global -> page.load global model |> Tuple.mapBoth toModel (Cmd.map toMsg)
+            , load = \shared -> page.load shared model |> Tuple.mapBoth toModel (Cmd.map toMsg)
             }
     }

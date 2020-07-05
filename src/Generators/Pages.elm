@@ -27,8 +27,9 @@ module Spa.Generated.Pages exposing
     , view
     )
 
-import Global
+import Browser.Navigation exposing (Key)
 {{pagesImports}}
+import Shared
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route exposing (Route)
 import Spa.Page as Page
@@ -94,12 +95,12 @@ subscriptions =
     bundle >> .subscriptions
 
 
-save : Model -> Global.Model -> Global.Model
+save : Model -> Shared.Model -> Shared.Model
 save =
     bundle >> .save
 
 
-load : Model -> Global.Model -> ( Model, Cmd Msg )
+load : Model -> Shared.Model -> ( Model, Cmd Msg )
 load =
     bundle >> .load
 
@@ -197,7 +198,7 @@ pagesInit : List Path -> String
 pagesInit paths =
     Utils.function
         { name = "init"
-        , annotation = [ "Route", "Global.Model", "Url", "( Model, Cmd Msg )" ]
+        , annotation = [ "Route", "Shared.Model", "Key", "Url", "( Model, Cmd Msg )" ]
         , inputs = [ "route" ]
         , body =
             Utils.caseExpression

@@ -1,4 +1,4 @@
-module ProgramTests.Utils.Spa exposing
+module Program.Utils.Spa exposing
     ( createElementPage
     , createSandboxPage
     , createStaticPage

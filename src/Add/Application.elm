@@ -1,4 +1,4 @@
-module Add.Full exposing (create)
+module Add.Application exposing (create)
 
 import Path exposing (Path)
 
@@ -8,19 +8,16 @@ create path =
     """
 module Pages.{{name}} exposing (Params, Model, Msg, page)
 
-import Global
+import Shared
 import Html exposing (..)
 import Spa.Document exposing (Document)
 import Spa.Page as Page exposing (Page)
 import Spa.Url as Url exposing (Url)
 
-type alias Params =
-    {{params}}
-
 
 page : Page Params Model Msg
 page =
-    Page.full
+    Page.application
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -34,12 +31,16 @@ page =
 -- INIT
 
 
+type alias Params =
+    {{params}}
+
+
 type alias Model =
     {}
 
 
-init : Global.Model -> Url Params -> ( Model, Cmd Msg )
-init global { params } =
+init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
+init shared { params } =
     ( {}, Cmd.none )
 
 
@@ -48,23 +49,23 @@ init global { params } =
 
 
 type Msg
-    = NoOp
+    = ReplaceMe
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
+        ReplaceMe ->
             ( model, Cmd.none )
 
 
-save : Model -> Global.Model -> Global.Model
-save model global =
-    global
+save : Model -> Shared.Model -> Shared.Model
+save model shared =
+    shared
 
 
-load : Global.Model -> Model -> ( Model, Cmd Msg )
-load global model =
+load : Shared.Model -> Model -> ( Model, Cmd Msg )
+load shared model =
     ( model, Cmd.none )
 
 

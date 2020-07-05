@@ -11,11 +11,7 @@ module Pages.{{name}} exposing (Params, Model, Msg, page)
 import Html exposing (..)
 import Spa.Document exposing (Document)
 import Spa.Page as Page exposing (Page)
-import Spa.Url exposing (Url)
-
-
-type alias Params =
-    {{params}}
+import Spa.Url as Url exposing (Url)
 
 
 type alias Model =
@@ -35,6 +31,10 @@ page =
 
 
 -- VIEW
+
+
+type alias Params =
+    {{params}}
 
 
 view : Url Params -> Document Msg

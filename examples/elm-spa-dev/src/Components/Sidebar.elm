@@ -69,7 +69,7 @@ sections =
             , guide "Configuration"
             , guide "Routing"
             , guide "Pages"
-            , guide "Global"
+            , guide "Shared"
             , guide "Components"
             , guide "Using APIs"
             ]

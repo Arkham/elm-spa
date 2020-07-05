@@ -1,4 +1,4 @@
-module Global exposing
+module Shared exposing
     ( Flags
     , Model
     , Msg
@@ -10,9 +10,13 @@ module Global exposing
 
 import Browser.Navigation as Nav
 import Html exposing (..)
-import Html.Attributes exposing (class, href)
+import Html.Attributes as Attr exposing (class, href)
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
+
+
+
+-- INIT
 
 
 type alias Flags =
@@ -20,23 +24,28 @@ type alias Flags =
 
 
 type alias Model =
-    { key : Nav.Key
-    }
+    {}
 
 
 init : Flags -> Nav.Key -> ( Model, Cmd Msg )
-init _ key =
-    ( Model key, Cmd.none )
+init _ _ =
+    ( {}
+    , Cmd.none
+    )
+
+
+
+-- UPDATE
 
 
 type Msg
-    = NoOp
+    = ReplaceMe
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
+        ReplaceMe ->
             ( model
             , Cmd.none
             )
@@ -47,22 +56,24 @@ subscriptions model =
     Sub.none
 
 
+
+-- VIEW
+
+
 view :
     { page : Document msg
-    , global : Model
+    , shared : Model
     , toMsg : Msg -> msg
     }
     -> Document msg
-view { page, global, toMsg } =
+view { page, shared, toMsg } =
     { title = page.title
     , body =
-        [ div [ class "column spacing-medium padding-medium fill container" ]
-            [ header [ class "row spacing-small" ]
-                [ a [ class "link", href (Route.toString Route.Top) ] [ text "Home" ]
-                , a [ class "link", href (Route.toString Route.NotFound) ] [ text "Not found" ]
-                ]
-            , div [ class "flex" ] page.body
-            , footer [] [ text "built with elm-spa" ]
+        [ header []
+            [ a [ href (Route.toString Route.Top) ] [ text "Home" ]
+            , a [ href (Route.toString Route.NotFound) ] [ text "Not found" ]
             ]
+        , div [] page.body
+        , footer [] [ text "built with elm-spa" ]
         ]
     }

@@ -14,10 +14,6 @@ import Spa.Page as Page exposing (Page)
 import Spa.Url as Url exposing (Url)
 
 
-type alias Params =
-    {{params}}
-
-
 page : Page Params Model Msg
 page =
     Page.element
@@ -30,6 +26,10 @@ page =
 
 
 -- INIT
+
+
+type alias Params =
+    {{params}}
 
 
 type alias Model =
@@ -46,13 +46,13 @@ init { params } =
 
 
 type Msg
-    = NoOp
+    = ReplaceMe
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
+        ReplaceMe ->
             ( model, Cmd.none )
 
 

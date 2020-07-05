@@ -115,7 +115,7 @@ type Model
                         paths.single
                             |> Pages.pagesInit
                             |> Expect.equal (String.trim """
-init : Route -> Global.Model -> Url -> ( Model, Cmd Msg )
+init : Route -> Shared.Model -> Key -> Url -> ( Model, Cmd Msg )
 init route =
     case route of
         Route.Top ->
@@ -126,7 +126,7 @@ init route =
                         paths.multiple
                             |> Pages.pagesInit
                             |> Expect.equal (String.trim """
-init : Route -> Global.Model -> Url -> ( Model, Cmd Msg )
+init : Route -> Shared.Model -> Key -> Url -> ( Model, Cmd Msg )
 init route =
     case route of
         Route.Top ->

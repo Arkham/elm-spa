@@ -1,24 +1,24 @@
-module ProgramTests.NotFound exposing (all)
+module Program.TopTest exposing (all)
 
-import Pages.NotFound as Page
+import Pages.Top as Page
 import ProgramTest exposing (ProgramTest, expectViewHas)
-import ProgramTests.Utils.Spa
+import Program.Utils.Spa
 import Test exposing (..)
 import Test.Html.Selector exposing (text)
 
 
 start : ProgramTest Page.Model Page.Msg (Cmd Page.Msg)
 start =
-    ProgramTests.Utils.Spa.createStaticPage
+    Program.Utils.Spa.createStaticPage
         { view = Page.view
         }
 
 
 all : Test
 all =
-    describe "Pages.NotFound"
-        [ test "should say page not found" <|
+    describe "Pages.Top"
+        [ test "should say homepage" <|
             \() ->
                 start
-                    |> expectViewHas [ text "Page not found" ]
+                    |> expectViewHas [ text "Homepage" ]
         ]

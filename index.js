@@ -50,7 +50,7 @@ const toFilepath = name => path.join(folders.pages('.'), `${name.split('.').join
 const flags = { command: '', name: '', pageType: '', filepaths: [] }
 
 const isValidPageType = type =>
-  [ 'static', 'sandbox', 'element', 'full' ].some(x => x === type)
+  [ 'static', 'sandbox', 'element', 'application' ].some(x => x === type)
 
 const isValidModuleName = (name = '') => {
   const isAlphaOrUnderscoreOnly = word => word.match(/[A-Z|a-z|_]+/)[0] === word
@@ -85,16 +85,16 @@ const help = {
 `,
 
   add: `
-  ${bold('elm-spa add')} <static|sandbox|element|full> <name>
+  ${bold('elm-spa add')} <static|sandbox|element|application> <name>
 
-    Create a new page of type <static|sandbox|element|full>
+    Create a new page of type <static|sandbox|element|application>
     with the module name <name>.
 
     ${bold('examples:')}
     elm-spa add static Top
     elm-spa add sandbox Posts.Top
     elm-spa add element Posts.Id_Int
-    elm-spa add full Authors.Name_String.Posts.Post_Int
+    elm-spa add application Authors.Name_String.Posts.Post_Int
 `,
 
   build: `

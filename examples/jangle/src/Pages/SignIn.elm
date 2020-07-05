@@ -5,7 +5,7 @@ import Api.Token exposing (Token)
 import Api.User exposing (User)
 import Browser.Navigation as Nav
 import Dict
-import Global
+import Shared
 import Html exposing (..)
 import Html.Attributes exposing (class, disabled, href)
 import Http
@@ -23,7 +23,7 @@ type alias Params =
 
 page : Page Params Model Msg
 page =
-    Page.full
+    Page.application
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -45,30 +45,30 @@ type alias Model =
     }
 
 
-init : Global.Model -> Url Params -> ( Model, Cmd Msg )
-init global { query } =
-    case Api.Data.toMaybe global.user of
+init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
+init shared { query } =
+    case Api.Data.toMaybe shared.user of
         Just user ->
-            ( Model global.githubClientId Loading (Success user) global.key
-            , Nav.pushUrl global.key (Route.toString Route.Projects)
+            ( Model shared.githubClientId Loading (Success user) shared.key
+            , Nav.pushUrl shared.key (Route.toString Route.Projects)
             )
 
         Nothing ->
             case Dict.get "code" query of
                 Just code ->
-                    ( { githubClientId = global.githubClientId
+                    ( { githubClientId = shared.githubClientId
                       , token = Loading
                       , user = NotAsked
-                      , key = global.key
+                      , key = shared.key
                       }
                     , requestAuthToken code
                     )
 
                 Nothing ->
-                    ( { githubClientId = global.githubClientId
+                    ( { githubClientId = shared.githubClientId
                       , token = NotAsked
                       , user = NotAsked
-                      , key = global.key
+                      , key = shared.key
                       }
                     , Cmd.none
                     )
@@ -82,8 +82,8 @@ requestAuthToken code =
         }
 
 
-load : Global.Model -> Model -> ( Model, Cmd Msg )
-load global model =
+load : Shared.Model -> Model -> ( Model, Cmd Msg )
+load shared model =
     ( model, Cmd.none )
 
 
@@ -121,9 +121,9 @@ update msg model =
             )
 
 
-save : Model -> Global.Model -> Global.Model
-save model global =
-    { global | user = model.user }
+save : Model -> Shared.Model -> Shared.Model
+save model shared =
+    { shared | user = model.user }
 
 
 subscriptions : Model -> Sub Msg

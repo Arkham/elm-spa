@@ -4,7 +4,7 @@ import Api.Data exposing (Data)
 import Api.Project exposing (Project)
 import Api.User as User exposing (User)
 import Browser.Navigation as Nav
-import Global
+import Shared
 import Html exposing (..)
 import Html.Attributes as Attr exposing (class, classList, href)
 import Html.Events as Events
@@ -44,10 +44,10 @@ type alias ProtectedModel =
     }
 
 
-init : User -> Global.Model -> Url Params -> ( ProtectedModel, Cmd Msg )
-init user global _ =
+init : User -> Shared.Model -> Url Params -> ( ProtectedModel, Cmd Msg )
+init user shared _ =
     ( ProtectedModel
-        global.key
+        shared.key
         user
         False
         ""

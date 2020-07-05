@@ -1,4 +1,4 @@
-module Global exposing
+module Shared exposing
     ( Flags
     , Model
     , Msg
@@ -88,15 +88,15 @@ subscriptions _ =
 view :
     { route : Route
     , page : Document msg
-    , global : Model
+    , shared : Model
     , toMsg : Msg -> msg
     , isTransitioning : Bool
     }
     -> Document msg
-view { route, page, global, toMsg, isTransitioning } =
+view { route, page, shared, toMsg, isTransitioning } =
     { title = page.title
     , body =
-        Api.Data.view global.user
+        Api.Data.view shared.user
             { notAsked = page.body
             , loading = []
             , failure = text >> List.singleton

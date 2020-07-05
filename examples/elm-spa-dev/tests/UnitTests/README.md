@@ -1,2 +1,2 @@
-# tests/UnitTests
+# tests/Unit
 > Write tests for functions

@@ -2,7 +2,7 @@ module Pages.Top exposing (Model, Msg, Params, page)
 
 import Api.Data
 import Browser.Navigation as Nav
-import Global
+import Shared
 import Html exposing (..)
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
@@ -19,12 +19,12 @@ type alias Model =
 
 
 type Msg
-    = NoOp
+    = ReplaceMe
 
 
 page : Page Params Model Msg
 page =
-    Page.full
+    Page.application
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -34,31 +34,31 @@ page =
         }
 
 
-init : Global.Model -> Url Params -> ( Model, Cmd Msg )
-init global _ =
-    case Api.Data.toMaybe global.user of
+init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
+init shared _ =
+    case Api.Data.toMaybe shared.user of
         Just _ ->
-            ( {}, Nav.pushUrl global.key (Route.toString Route.Projects) )
+            ( {}, Nav.pushUrl shared.key (Route.toString Route.Projects) )
 
         Nothing ->
-            ( {}, Nav.pushUrl global.key (Route.toString Route.SignIn) )
+            ( {}, Nav.pushUrl shared.key (Route.toString Route.SignIn) )
 
 
-load : Global.Model -> Model -> ( Model, Cmd Msg )
-load global model =
+load : Shared.Model -> Model -> ( Model, Cmd Msg )
+load shared model =
     ( model, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
+        ReplaceMe ->
             ( model, Cmd.none )
 
 
-save : Model -> Global.Model -> Global.Model
-save model global =
-    global
+save : Model -> Shared.Model -> Shared.Model
+save model shared =
+    shared
 
 
 subscriptions : Model -> Sub Msg

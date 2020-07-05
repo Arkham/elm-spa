@@ -1,4 +1,4 @@
-module Global exposing
+module Shared exposing
     ( Flags
     , Model
     , Msg
@@ -32,13 +32,13 @@ init _ key =
 
 
 type Msg
-    = NoOp
+    = ReplaceMe
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
+        ReplaceMe ->
             ( model
             , Cmd.none
             )
@@ -51,7 +51,7 @@ subscriptions model =
 
 view :
     { page : Document msg
-    , global : Model
+    , shared : Model
     , toMsg : Msg -> msg
     , isTransitioning : { layout : Bool, page : Bool }
     , shouldShowSidebar : Bool

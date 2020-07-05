@@ -1,30 +1,30 @@
 module Spa.Page exposing
     ( Page
-    , static, sandbox, element, full
+    , static, sandbox, element, application
     , Upgraded, Bundle, upgrade
     )
 
 {-|
 
 @docs Page
-@docs static, sandbox, element, full
+@docs static, sandbox, element, application
 @docs Upgraded, Bundle, upgrade
 
 -}
 
-import Global
+import Shared
 import Spa.Document as Document exposing (Document)
 import Spa.Url exposing (Url)
 import Url
 
 
 type alias Page params model msg =
-    { init : Global.Model -> Url params -> ( model, Cmd msg )
+    { init : Shared.Model -> Url params -> ( model, Cmd msg )
     , update : msg -> model -> ( model, Cmd msg )
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
-    , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> ( model, Cmd msg )
+    , save : model -> Shared.Model -> Shared.Model
+    , load : Shared.Model -> model -> ( model, Cmd msg )
     }
 
 
@@ -43,13 +43,13 @@ static page =
 
 
 sandbox :
-    { init : model
+    { init : Url params -> model
     , update : msg -> model -> model
     , view : model -> Document msg
     }
     -> Page params model msg
 sandbox page =
-    { init = \_ _ -> ( page.init, Cmd.none )
+    { init = \_ url -> ( page.init url, Cmd.none )
     , update = \msg model -> ( page.update msg model, Cmd.none )
     , view = page.view
     , subscriptions = \_ -> Sub.none
@@ -75,16 +75,16 @@ element page =
     }
 
 
-full :
-    { init : Global.Model -> Url params -> ( model, Cmd msg )
+application :
+    { init : Shared.Model -> Url params -> ( model, Cmd msg )
     , update : msg -> model -> ( model, Cmd msg )
     , view : model -> Document msg
     , subscriptions : model -> Sub msg
-    , save : model -> Global.Model -> Global.Model
-    , load : Global.Model -> model -> ( model, Cmd msg )
+    , save : model -> Shared.Model -> Shared.Model
+    , load : Shared.Model -> model -> ( model, Cmd msg )
     }
     -> Page params model msg
-full page =
+application page =
     page
 
 
@@ -93,7 +93,7 @@ full page =
 
 
 type alias Upgraded pageParams pageModel pageMsg model msg =
-    { init : pageParams -> Global.Model -> Url.Url -> ( model, Cmd msg )
+    { init : pageParams -> Shared.Model -> Url.Url -> ( model, Cmd msg )
     , update : pageMsg -> pageModel -> ( model, Cmd msg )
     , bundle : pageModel -> Bundle model msg
     }
@@ -102,8 +102,8 @@ type alias Upgraded pageParams pageModel pageMsg model msg =
 type alias Bundle model msg =
     { view : Document msg
     , subscriptions : Sub msg
-    , save : Global.Model -> Global.Model
-    , load : Global.Model -> ( model, Cmd msg )
+    , save : Shared.Model -> Shared.Model
+    , load : Shared.Model -> ( model, Cmd msg )
     }
 
 
@@ -113,13 +113,13 @@ upgrade :
     -> Page pageParams pageModel pageMsg
     -> Upgraded pageParams pageModel pageMsg model msg
 upgrade toModel toMsg page =
-    { init = \params global url -> page.init global (Spa.Url.create params url) |> Tuple.mapBoth toModel (Cmd.map toMsg)
+    { init = \params shared url -> page.init shared (Spa.Url.create params url) |> Tuple.mapBoth toModel (Cmd.map toMsg)
     , update = \msg model -> page.update msg model |> Tuple.mapBoth toModel (Cmd.map toMsg)
     , bundle =
         \model ->
             { view = page.view model |> Document.map toMsg
             , subscriptions = page.subscriptions model |> Sub.map toMsg
             , save = page.save model
-            , load = \global -> page.load global model |> Tuple.mapBoth toModel (Cmd.map toMsg)
+            , load = \shared -> page.load shared model |> Tuple.mapBoth toModel (Cmd.map toMsg)
             }
     }

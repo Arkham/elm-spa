@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
-import Global exposing (Flags)
+import Shared exposing (Flags)
 import Spa.Document as Document exposing (Document)
 import Spa.Generated.Pages as Pages
 import Spa.Generated.Route as Route exposing (Route)
@@ -35,7 +35,7 @@ type alias Model =
     { url : Url
     , key : Nav.Key
     , isTransitioning : Bool
-    , global : Global.Model
+    , shared : Shared.Model
     , page : Pages.Model
     }
 
@@ -43,19 +43,19 @@ type alias Model =
 init : Flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
     let
-        ( global, globalCmd ) =
-            Global.init flags key
+        ( shared, sharedCmd ) =
+            Shared.init flags key
 
         route =
             fromUrl url
 
         ( page, pageCmd ) =
-            Pages.init route global url
+            Pages.init route shared url
     in
-    ( Model url key False global page
+    ( Model url key False shared page
     , Cmd.batch
         [ Cmd.map Pages pageCmd
-        , Cmd.map Global globalCmd
+        , Cmd.map Shared sharedCmd
         ]
     )
 
@@ -68,7 +68,7 @@ type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url
     | FadeInPage Url
-    | Global Global.Msg
+    | Shared Shared.Msg
     | Pages Pages.Msg
 
 
@@ -103,27 +103,27 @@ update msg model =
                     fromUrl url
 
                 ( page, cmd ) =
-                    Pages.init route model.global url
+                    Pages.init route model.shared url
 
-                global =
-                    Pages.save page model.global
+                shared =
+                    Pages.save page model.shared
             in
-            ( { model | url = url, page = page, global = global, isTransitioning = False }
+            ( { model | url = url, page = page, shared = shared, isTransitioning = False }
             , Cmd.map Pages cmd
             )
 
-        Global globalMsg ->
+        Shared sharedMsg ->
             let
-                ( global, globalCmd ) =
-                    Global.update globalMsg model.global
+                ( shared, sharedCmd ) =
+                    Shared.update sharedMsg model.shared
 
                 ( page, pageCmd ) =
-                    Pages.load model.page global
+                    Pages.load model.page shared
             in
-            ( { model | page = page, global = global }
+            ( { model | page = page, shared = shared }
             , Cmd.batch
                 [ Cmd.map Pages pageCmd
-                , Cmd.map Global globalCmd
+                , Cmd.map Shared sharedCmd
                 ]
             )
 
@@ -132,20 +132,20 @@ update msg model =
                 ( page, cmd ) =
                     Pages.update pageMsg model.page
 
-                global =
-                    Pages.save page model.global
+                shared =
+                    Pages.save page model.shared
             in
-            ( { model | page = page, global = global }
+            ( { model | page = page, shared = shared }
             , Cmd.map Pages cmd
             )
 
 
 view : Model -> Document Msg
 view model =
-    Global.view
+    Shared.view
         { page = Pages.view model.page |> Document.map Pages
-        , global = model.global
-        , toMsg = Global
+        , shared = model.shared
+        , toMsg = Shared
         , isTransitioning = model.isTransitioning
         , route = fromUrl model.url
         }

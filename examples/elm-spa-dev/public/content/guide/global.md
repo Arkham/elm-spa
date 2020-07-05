@@ -1,3 +1,3 @@
-# Global
+# Shared
 
-Whether your sharing layouts or information between pages, the Global module is the place to check!
+Whether your sharing layouts or information between pages, the Shared module is the place to check!

@@ -1,4 +1,4 @@
-// Initial data to pass in to Elm (linked with `Global.Flags`)
+// Initial data to pass in to Elm (linked with `Shared.Flags`)
 // https://guide.elm-lang.org/interop/flags.html
 const isLocalDevelopment = window.location.hostname === 'localhost'
 
