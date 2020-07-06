@@ -12,6 +12,7 @@ module Spa.Page exposing
 
 -}
 
+import Browser.Navigation exposing (Key)
 import Shared
 import Spa.Document as Document exposing (Document)
 import Spa.Url exposing (Url)
@@ -93,7 +94,7 @@ application page =
 
 
 type alias Upgraded pageParams pageModel pageMsg model msg =
-    { init : pageParams -> Shared.Model -> Url.Url -> ( model, Cmd msg )
+    { init : pageParams -> Shared.Model -> Key -> Url.Url -> ( model, Cmd msg )
     , update : pageMsg -> pageModel -> ( model, Cmd msg )
     , bundle : pageModel -> Bundle model msg
     }
@@ -113,7 +114,7 @@ upgrade :
     -> Page pageParams pageModel pageMsg
     -> Upgraded pageParams pageModel pageMsg model msg
 upgrade toModel toMsg page =
-    { init = \params shared url -> page.init shared (Spa.Url.create params url) |> Tuple.mapBoth toModel (Cmd.map toMsg)
+    { init = \params shared key url -> page.init shared (Spa.Url.create params key url) |> Tuple.mapBoth toModel (Cmd.map toMsg)
     , update = \msg model -> page.update msg model |> Tuple.mapBoth toModel (Cmd.map toMsg)
     , bundle =
         \model ->

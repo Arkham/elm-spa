@@ -52,7 +52,7 @@ init flags url key =
             fromUrl url
 
         ( page, pageCmd ) =
-            Pages.init route shared url
+            Pages.init route shared key url
     in
     ( Model url key shared page { layout = True, page = True } url
     , Cmd.batch
@@ -134,7 +134,7 @@ loadPage url model =
             fromUrl url
 
         ( page, cmd ) =
-            Pages.init route model.shared url
+            Pages.init route model.shared model.key url
 
         shared =
             Pages.save page model.shared
