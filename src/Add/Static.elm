@@ -8,10 +8,16 @@ create path =
     """
 module Pages.{{name}} exposing (Params, Model, Msg, page)
 
-import Html exposing (..)
 import Spa.Document exposing (Document)
 import Spa.Page as Page exposing (Page)
 import Spa.Url as Url exposing (Url)
+
+
+page : Page Params Model Msg
+page =
+    Page.static
+        { view = view
+        }
 
 
 type alias Model =
@@ -20,13 +26,6 @@ type alias Model =
 
 type alias Msg =
     Never
-
-
-page : Page Params Model Msg
-page =
-    Page.static
-        { view = view
-        }
 
 
 
@@ -40,7 +39,7 @@ type alias Params =
 view : Url Params -> Document Msg
 view { params } =
     { title = "{{name}}"
-    , body = [ text "{{name}}" ]
+    , body = []
     }
 """
         |> String.replace "{{name}}" (Path.toModulePath path)
