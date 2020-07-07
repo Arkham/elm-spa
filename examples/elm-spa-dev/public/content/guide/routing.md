@@ -14,6 +14,8 @@ File | URL
 `About/Careers.elm` | `/about/careers`
 `OurTeam.elm` | `/our-team`
 
+__Capitalization matters!__ Notice how `OurTeam` became `our-team`? Capital letters within file names are translated to dashes in URLs.
+
 ## Top Level Routes
 
 Routes like the homepage use the reserved `Top` keyword to indicate that a page should not be a static route.
@@ -21,11 +23,10 @@ Routes like the homepage use the reserved `Top` keyword to indicate that a page 
 File | URL
 :-- | :--
 `Top.elm` | `/`
-`Home/Top.elm` | `/home`
+`Example/Top.elm` | `/example`
 `Top/Top.elm` | `/top`
 
-__Edgecase supported!__ If your app needs a static `/top` route, you can create a folder named `Top` with a `Top.elm` inside of it. (Check out that third example!)
-
+__Handling Edgecases:__ You may have noticed that `Example.elm` and `Example/Top.elm` would both route to `/example`. In the case of conflicts like these, the Top.elm file will never be reached- delete it!
 
 ## Dynamic Routes
 
@@ -38,8 +39,9 @@ File | URL Example | Params
 `Posts/Id_Int.elm` | `/posts/123` | `{ id = 123 }`
   | `/posts/456` | `{ id = 456 }`
 
+You can access these dynamic parameters from the `Url Params` value passed into each page type!
 
-__Supported Parameter Types__: Only `String` and `Int` dynamic parameters are available.
+__Supported Parameters__: Only `String` and `Int` dynamic parameters are supported.
 
 ### Nested Dynamic Routes
 
@@ -53,3 +55,7 @@ URL Example | Params
 :-- | :--
 `/users/ryan/posts/123` | `{ user = "ryan", id = 123 }`
 `/users/alexa/posts/456` | `{ user = "alexa", id = 456 }`
+
+---
+
+Let's take a closer look at [Pages](/guide/pages)!
