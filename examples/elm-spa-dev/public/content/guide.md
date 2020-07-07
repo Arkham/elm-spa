@@ -15,8 +15,8 @@ It was inspired by a project in the Vue.js community, called NuxtJS- to make bui
 
 If you have ever wondered how to call a REST API, handle user authentication, create components, or organize your application- __elm-spa__ is here to help.
 
-Throughout this guide, [blue links](https://elm-lang.org) will take you to resources from other sites, while [green links](/guide/installation) will take you to resources within elm-spa.dev.
+Throughout this guide, [blue links](https://elm-lang.org) will take you to resources from other sites, while [green links](/guide/getting-started) will take you to resources within elm-spa.dev.
 
 ---
 
-Like the next section on [Installation](/guide/installation).
+Like the next section on [Getting Started](/guide/getting-started).

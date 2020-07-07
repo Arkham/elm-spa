@@ -34,7 +34,7 @@ elm-spa init <directory>
 ```
 elm-spa add <static|sandbox|element|application> <name>
 
-  Create a new page of type <static|sandbox|element|application>
+  Create a page of type <static|sandbox|element|application>
   with the module name <name>.
 
   examples:
@@ -80,7 +80,7 @@ src/
    └─ Authors/
        └─ Author_String/
            └─ Posts/
-               └─ Post_Int.elm
+               └─ Id_Int.elm
 ```
 
 When you run `elm-spa build` with these files in the `src/Pages` directory, __elm-spa__ can

@@ -87,14 +87,14 @@ const help = {
   add: `
   ${bold('elm-spa add')} <static|sandbox|element|application> <name>
 
-    Create a new page of type <static|sandbox|element|application>
+    Create a page of type <static|sandbox|element|application>
     with the module name <name>.
 
     ${bold('examples:')}
     elm-spa add static Top
     elm-spa add sandbox Posts.Top
     elm-spa add element Posts.Id_Int
-    elm-spa add application Authors.Name_String.Posts.Post_Int
+    elm-spa add application Authors.Name_String.Posts.Id_Int
 `,
 
   build: `

@@ -1,4 +1,14 @@
-# Project Structure
+# Getting Started
+
+Getting started with elm-spa is easy! Make sure you have the latest stable version of [NodeJS](https://nodejs.org/en/) installed on your system. At the time of writing, I'm using node version `12.18.1`.
+
+```terminal
+npx elm-spa init our-elm-spa
+```
+
+## Project Structure
+
+This one-time command will create a new project in a folder called `our-elm-spa`. 
 
 Here's what your folder should look like:
 
@@ -25,16 +35,21 @@ public/
 └─ style.css
 ```
 
-#### high level overview
+### The project folder
+
+There are four interesting files in the project folder:
 
 File | Description
 :-- | :--
 `elm.json` | Defines all of our Elm project dependencies.
 `package.json` | Has `build`, `dev`, and `test` scripts so anyone with [NodeJS](https://nodejs.org) installed can easily run our project.
-`src/` | Where our frontend Elm application lives
+`src/` | Where our frontend Elm application lives.
+`tests/` | Where our Elm tests live.
 `public/` | A static directory for serving HTML, JS, CSS, images, and more!
 
-#### a look into `src`
+### The `src` Folder
+
+The `src` folder will contain all your Elm code:
 
 File | Description
 :-- | :--
@@ -47,7 +62,11 @@ File | Description
 `Shared.elm` | The place to define layouts and shared data between pages.
 `Ports.elm` | The place to communicate with any JavaScript you need.
 
-#### a look into `public`
+### The `public` folder
+
+The public folder is served statically. Use this as a place to serve images, CSS, JS, and other static content.
+
+A file like `public/images/example.png` will be available under `/images/example.png`. __Include the starting slash!__ If it's missing, only top-level pages will load it correctly- leading to a confusing time.
 
 File | Description
 :-- | :--

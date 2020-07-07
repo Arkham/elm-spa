@@ -14,7 +14,7 @@
     "test:watch": "elm-test --watch",
     "test:cli": "(npm run build && cd tests && npm run test:cli:init && npm run test:cli:add && npm run test:cli:build && npm run test:cli:cleanup)",
     "test:cli:init": "./index.js init tests/demo && cd tests/demo && npm install && npm run build",
-    "test:cli:add": "cd tests/demo && ../../index.js add static Top && ../../index.js add sandbox Posts.Top && ../../index.js add element Posts.Id_Int && ../../index.js add application Authors.Name_String.Posts.Post_Int && npm run build",
+    "test:cli:add": "cd tests/demo && ../../index.js add static Top && ../../index.js add sandbox Posts.Top && ../../index.js add element Posts.Id_Int && ../../index.js add application Authors.Name_String.Posts.Id_Int && npm run build",
     "test:cli:build": "./index.js build tests/demo",
     "test:cli:cleanup": "cd tests && rm -rf demo",
     "dev": "chokidar src -c \"(npm run build || true)\""

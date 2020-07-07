@@ -64,14 +64,14 @@ sections =
     [ { title = "guide"
       , links =
             [ Link "Introduction" Route.Guide
+            , guide "Getting Started"
             , guide "Installation"
-            , guide "Project Structure"
-            , guide "Configuration"
             , guide "Routing"
             , guide "Pages"
             , guide "Shared"
             , guide "Components"
             , guide "Using APIs"
+            , guide "Using Elm UI"
             ]
       }
     ]
