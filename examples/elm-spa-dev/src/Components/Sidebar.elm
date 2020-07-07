@@ -71,7 +71,8 @@ sections =
             , guide "Shared"
             , guide "Components"
             , guide "Using APIs"
-            , guide "Using Elm UI"
+            , guide "Beyond HTML"
+            , guide "Authentication"
             ]
       }
     ]
