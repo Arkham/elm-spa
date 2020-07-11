@@ -32,12 +32,19 @@ __Handling Edgecases:__ You may have noticed that `Example.elm` and `Example/Top
 
 Sometimes it's nice to have one page that works for slightly different URLs. __elm-spa__ uses this convention in file names to indicate a dynamic route:
 
-File | URL Example | Params
-:-- | :-- | :--
-`Authors/Name_String.elm` | `/authors/ryan` | `{ name = "ryan" }`
-  | `/authors/alexa` | `{ name = "alexa" }`
-`Posts/Id_Int.elm` | `/posts/123` | `{ id = 123 }`
-  | `/posts/456` | `{ id = 456 }`
+##### `Authors/Name_String.elm`
+
+URL | Params
+:-- | :--
+`/authors/ryan` | `{ name = "ryan" }`
+`/authors/alexa` | `{ name = "alexa" }`
+
+##### `Posts/Id_Int.elm`
+
+URL | Params
+:-- | :--
+`/posts/123` | `{ id = 123 }`
+`/posts/456` | `{ id = 456 }`
 
 You can access these dynamic parameters from the `Url Params` value passed into each page type!
 
@@ -47,14 +54,13 @@ __Supported Parameters__: Only `String` and `Int` dynamic parameters are support
 
 You can also nest your dynamic routes. Here's an example:
 
-```
-Users/User_String/Posts/Post_Id.elm
-```
 
-URL Example | Params
+##### `Users/User_String/Posts/Post_Id.elm`
+
+URL | Params
 :-- | :--
-`/users/ryan/posts/123` | `{ user = "ryan", id = 123 }`
-`/users/alexa/posts/456` | `{ user = "alexa", id = 456 }`
+`/users/ryan/posts/123` | `{ user = "ryan"`<br/>`, id = 123`<br/>`}`
+`/users/alexa/posts/456` | `{ user = "alexa"`<br/>`, id = 456`<br/>`}`
 
 ---
 

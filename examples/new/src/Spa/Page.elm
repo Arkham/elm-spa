@@ -1,7 +1,6 @@
 module Spa.Page exposing
     ( Page
     , static, sandbox, element, application
-    , Upgraded, Bundle, upgrade
     )
 
 {-|
@@ -12,11 +11,9 @@ module Spa.Page exposing
 
 -}
 
-import Browser.Navigation exposing (Key)
 import Shared
-import Spa.Document as Document exposing (Document)
+import Spa.Document exposing (Document)
 import Spa.Url exposing (Url)
-import Url
 
 
 type alias Page params model msg =
@@ -86,52 +83,9 @@ application :
     }
     -> Page params model msg
 application page =
-    { init = page.init
-    , update = page.update
-    , view = page.view
-    , subscriptions = page.subscriptions
-    , save = page.save
-    , load = page.load
-    }
+    page
 
 
 ignoreEffect : model -> ( model, Cmd msg )
 ignoreEffect model =
     ( model, Cmd.none )
-
-
-
--- UPGRADING
-
-
-type alias Upgraded pageParams pageModel pageMsg model msg =
-    { init : pageParams -> Shared.Model -> Key -> Url.Url -> ( model, Cmd msg )
-    , update : pageMsg -> pageModel -> ( model, Cmd msg )
-    , bundle : pageModel -> Bundle model msg
-    }
-
-
-type alias Bundle model msg =
-    { view : Document msg
-    , subscriptions : Sub msg
-    , save : Shared.Model -> Shared.Model
-    , load : Shared.Model -> ( model, Cmd msg )
-    }
-
-
-upgrade :
-    (pageModel -> model)
-    -> (pageMsg -> msg)
-    -> Page pageParams pageModel pageMsg
-    -> Upgraded pageParams pageModel pageMsg model msg
-upgrade toModel toMsg page =
-    { init = \params shared key url -> page.init shared (Spa.Url.create params key url) |> Tuple.mapBoth toModel (Cmd.map toMsg)
-    , update = \msg model -> page.update msg model |> Tuple.mapBoth toModel (Cmd.map toMsg)
-    , bundle =
-        \model ->
-            { view = page.view model |> Document.map toMsg
-            , subscriptions = page.subscriptions model |> Sub.map toMsg
-            , save = page.save model
-            , load = \shared -> page.load shared model |> Tuple.mapBoth toModel (Cmd.map toMsg)
-            }
-    }

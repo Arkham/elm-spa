@@ -1,8 +1,6 @@
 # Pages
 
-By default, there are four kinds of pages you can create with __elm-spa__.
-
-Always choose the simplest one for the job!
+By default, there are four kinds of pages you can create with __elm-spa__. Always choose the simplest one for the job!
 
 ## Static
 

@@ -96,17 +96,17 @@ type Model
                     \_ ->
                         paths.single
                             |> Pages.pagesUpgradedValues
-                            |> Expect.equal "    { top = Pages.Top.page |> Page.upgrade Top__Model Top__Msg }"
+                            |> Expect.equal "    { top = Pages.Top.page |> upgrade Top__Model Top__Msg }"
                 , test "works with multiple paths" <|
                     \_ ->
                         paths.multiple
                             |> Pages.pagesUpgradedValues
-                            |> Expect.equal """    { top = Pages.Top.page |> Page.upgrade Top__Model Top__Msg
-    , about = Pages.About.page |> Page.upgrade About__Model About__Msg
-    , notFound = Pages.NotFound.page |> Page.upgrade NotFound__Model NotFound__Msg
-    , posts__top = Pages.Posts.Top.page |> Page.upgrade Posts__Top__Model Posts__Top__Msg
-    , posts__id_int = Pages.Posts.Id_Int.page |> Page.upgrade Posts__Id_Int__Model Posts__Id_Int__Msg
-    , authors__author_string__posts__postId_int = Pages.Authors.Author_String.Posts.PostId_Int.page |> Page.upgrade Authors__Author_String__Posts__PostId_Int__Model Authors__Author_String__Posts__PostId_Int__Msg
+                            |> Expect.equal """    { top = Pages.Top.page |> upgrade Top__Model Top__Msg
+    , about = Pages.About.page |> upgrade About__Model About__Msg
+    , notFound = Pages.NotFound.page |> upgrade NotFound__Model NotFound__Msg
+    , posts__top = Pages.Posts.Top.page |> upgrade Posts__Top__Model Posts__Top__Msg
+    , posts__id_int = Pages.Posts.Id_Int.page |> upgrade Posts__Id_Int__Model Posts__Id_Int__Msg
+    , authors__author_string__posts__postId_int = Pages.Authors.Author_String.Posts.PostId_Int.page |> upgrade Authors__Author_String__Posts__PostId_Int__Model Authors__Author_String__Posts__PostId_Int__Msg
     }"""
                 ]
             , describe "pagesInit"
@@ -115,7 +115,7 @@ type Model
                         paths.single
                             |> Pages.pagesInit
                             |> Expect.equal (String.trim """
-init : Route -> Shared.Model -> Key -> Url -> ( Model, Cmd Msg )
+init : Route -> Shared.Model -> ( Model, Cmd Msg )
 init route =
     case route of
         Route.Top ->
@@ -126,7 +126,7 @@ init route =
                         paths.multiple
                             |> Pages.pagesInit
                             |> Expect.equal (String.trim """
-init : Route -> Shared.Model -> Key -> Url -> ( Model, Cmd Msg )
+init : Route -> Shared.Model -> ( Model, Cmd Msg )
 init route =
     case route of
         Route.Top ->

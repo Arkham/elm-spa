@@ -39,9 +39,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ReplaceMe ->
-            ( model
-            , Cmd.none
-            )
+            ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg

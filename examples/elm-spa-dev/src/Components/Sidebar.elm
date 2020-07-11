@@ -61,7 +61,7 @@ sections =
                     { topic = Utils.String.sluggify label
                     }
     in
-    [ { title = "guide"
+    [ { title = "Guide"
       , links =
             [ Link "Introduction" Route.Guide
             , guide "Getting Started"

@@ -30,12 +30,11 @@ protectedSandbox options =
       \shared url ->
         case shared.user of
           Just user ->
-            options.init user url
-              |> Tuple.mapFirst Just
+            options.init user url |> Tuple.mapFirst Just
 
           Nothing ->
             ( Nothing
-            , Utils.Route.redirect url.key Route.SignIn
+            , Nav.pushUrl url.key (Route.toString Route.SignIn)
             )
   , update = -- ... conditionally call options.update
   , view = -- ... conditionally call options.view
@@ -52,7 +51,7 @@ As long as you return a `Page` type, your page will work with the rest of elm-sp
 ```elm
 -- (within an actual page)
 
-type alias Model = Maybe Model_
+type alias Model = Maybe SafeModel
 
 page : Page Params Model Msg
 page =
@@ -64,12 +63,12 @@ page =
 ```
 
 ```elm
-init : User -> Url Params -> Model_
-update : Msg -> Model_ -> Model_
-view : Model_ -> Document Msg
+init : User -> Url Params -> SafeModel
+update : Msg -> SafeModel -> SafeModel
+view : SafeModel -> Document Msg
 ```
 
-One caveat is that the `Model` type exposed by your page is used by the generated code, so your actual model will need a different name (like `Model_`).
+One caveat is that the `Model` type exposed by your page is used by the generated code, so your actual model will need a different name (like `SafeModel`).
 
 But now you know that these functions will only be called if the `User` is really logged in!
 

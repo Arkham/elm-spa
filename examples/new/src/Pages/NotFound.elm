@@ -1,4 +1,4 @@
-module Pages.NotFound exposing (Params, Model, Msg, page)
+module Pages.NotFound exposing (Model, Msg, Params, page)
 
 import Html exposing (..)
 import Spa.Document exposing (Document)
@@ -33,6 +33,6 @@ view : Url Params -> Document Msg
 view { params } =
     { title = "404"
     , body =
-        [ text "Page not found"
+        [ text "Not found"
         ]
     }

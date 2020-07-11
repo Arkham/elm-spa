@@ -1,4 +1,4 @@
-module Pages.Top exposing (Params, Model, Msg, page)
+module Pages.Top exposing (Model, Msg, Params, page)
 
 import Html exposing (..)
 import Spa.Document exposing (Document)

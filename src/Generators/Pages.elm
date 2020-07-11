@@ -27,13 +27,12 @@ module Spa.Generated.Pages exposing
     , view
     )
 
-import Browser.Navigation exposing (Key)
 {{pagesImports}}
 import Shared
-import Spa.Document exposing (Document)
+import Spa.Document as Document exposing (Document)
 import Spa.Generated.Route as Route exposing (Route)
-import Spa.Page as Page
-import Url exposing (Url)
+import Spa.Page exposing (Page)
+import Spa.Url as Url
 
 
 -- TYPES
@@ -43,25 +42,6 @@ import Url exposing (Url)
 
 
 {{pagesMsgs}}
-
-
-
--- PAGES
-
-
-type alias Upgraded params model msg =
-    Page.Upgraded params model msg Model Msg
-
-
-type alias Bundle =
-    Page.Bundle Model Msg
-
-
-
-pages :
-{{pagesUpgradedTypes}}
-pages =
-{{pagesUpgradedValues}}
 
 
 
@@ -104,6 +84,55 @@ load : Model -> Shared.Model -> ( Model, Cmd Msg )
 load =
     bundle >> .load
 
+
+
+-- UPGRADING PAGES
+
+
+type alias Upgraded params model msg =
+    { init : params -> Shared.Model -> ( Model, Cmd Msg )
+    , update : msg -> model -> ( Model, Cmd Msg )
+    , bundle : model -> Bundle
+    }
+
+
+type alias Bundle =
+    { view : Document Msg
+    , subscriptions : Sub Msg
+    , save : Shared.Model -> Shared.Model
+    , load : Shared.Model -> ( Model, Cmd Msg )
+    }
+
+
+upgrade : (model -> Model) -> (msg -> Msg) -> Page params model msg -> Upgraded params model msg
+upgrade toModel toMsg page =
+    let
+        init_ params shared =
+            page.init shared (Url.create params shared.key shared.url) |> Tuple.mapBoth toModel (Cmd.map toMsg)
+
+        update_ msg model =
+            page.update msg model |> Tuple.mapBoth toModel (Cmd.map toMsg)
+
+        bundle_ model =
+            { view = page.view model |> Document.map toMsg
+            , subscriptions = page.subscriptions model |> Sub.map toMsg
+            , save = page.save model
+            , load = load_ model
+            }
+
+        load_ model shared =
+            page.load shared model |> Tuple.mapBoth toModel (Cmd.map toMsg)
+    in
+    { init = init_
+    , update = update_
+    , bundle = bundle_
+    }
+
+
+pages :
+{{pagesUpgradedTypes}}
+pages =
+{{pagesUpgradedValues}}
 """
         |> String.replace "{{pagesImports}}" (pagesImports paths)
         |> String.replace "{{pagesModels}}" (pagesModels paths)
@@ -183,7 +212,7 @@ pagesUpgradedValues paths =
                 ( Path.toVariableName path
                 , "Pages."
                     ++ Path.toModulePath path
-                    ++ ".page |> Page.upgrade "
+                    ++ ".page |> upgrade "
                     ++ Path.toTypeName path
                     ++ "__Model "
                     ++ Path.toTypeName path
@@ -198,7 +227,7 @@ pagesInit : List Path -> String
 pagesInit paths =
     Utils.function
         { name = "init"
-        , annotation = [ "Route", "Shared.Model", "Key", "Url", "( Model, Cmd Msg )" ]
+        , annotation = [ "Route", "Shared.Model", "( Model, Cmd Msg )" ]
         , inputs = [ "route" ]
         , body =
             Utils.caseExpression

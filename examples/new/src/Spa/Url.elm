@@ -4,6 +4,7 @@ import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Url
 
+
 type alias Url params =
     { key : Key
     , params : params
@@ -28,17 +29,25 @@ toQueryDict : String -> Dict String String
 toQueryDict queryString =
     let
         second : List a -> Maybe a
-        second list =
-            list |> List.drop 1 |> List.head
+        second =
+            List.drop 1 >> List.head
 
         toTuple : List String -> Maybe ( String, String )
         toTuple list =
-            Maybe.map2 Tuple.pair
+            Maybe.map
+                (\first ->
+                    ( first
+                    , second list |> Maybe.withDefault ""
+                    )
+                )
                 (List.head list)
-                (second list |> Maybe.withDefault "" |> Just)
+
+        decode =
+            Url.percentDecode >> Maybe.withDefault ""
     in
     queryString
         |> String.split "&"
         |> List.map (String.split "=")
         |> List.filterMap toTuple
+        |> List.map (Tuple.mapBoth decode decode)
         |> Dict.fromList

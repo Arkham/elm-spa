@@ -21,19 +21,12 @@ main =
         }
 
 
-fromUrl : Url -> Route
-fromUrl =
-    Route.fromUrl >> Maybe.withDefault Route.NotFound
-
-
 
 -- INIT
 
 
 type alias Model =
-    { url : Url
-    , key : Nav.Key
-    , shared : Shared.Model
+    { shared : Shared.Model
     , page : Pages.Model
     }
 
@@ -41,16 +34,13 @@ type alias Model =
 init : Flags -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
     let
-        route =
-            fromUrl url
-
         ( shared, sharedCmd ) =
-            Shared.init flags key
+            Shared.init flags url key
 
         ( page, pageCmd ) =
-            Pages.init route shared key url
+            Pages.init (fromUrl url) shared
     in
-    ( Model url key shared page
+    ( Model shared page
     , Cmd.batch
         [ Cmd.map Shared sharedCmd
         , Cmd.map Pages pageCmd
@@ -74,7 +64,7 @@ update msg model =
     case msg of
         LinkClicked (Browser.Internal url) ->
             ( model
-            , Nav.pushUrl model.key (Url.toString url)
+            , Nav.pushUrl model.shared.key (Url.toString url)
             )
 
         LinkClicked (Browser.External href) ->
@@ -84,17 +74,17 @@ update msg model =
 
         UrlChanged url ->
             let
-                route =
-                    fromUrl url
-
-                ( page, cmd ) =
-                    Pages.init route model.shared model.key url
+                original =
+                    model.shared
 
                 shared =
-                    Pages.save page model.shared
+                    { original | url = url }
+
+                ( page, pageCmd ) =
+                    Pages.init (fromUrl url) shared
             in
-            ( { model | url = url, page = page, shared = shared }
-            , Cmd.map Pages cmd
+            ( { model | page = page, shared = Pages.save page shared }
+            , Cmd.map Pages pageCmd
             )
 
         Shared sharedMsg ->
@@ -114,27 +104,42 @@ update msg model =
 
         Pages pageMsg ->
             let
-                ( page, cmd ) =
+                ( page, pageCmd ) =
                     Pages.update pageMsg model.page
 
                 shared =
                     Pages.save page model.shared
             in
             ( { model | page = page, shared = shared }
-            , Cmd.map Pages cmd
+            , Cmd.map Pages pageCmd
             )
 
 
 view : Model -> Document Msg
 view model =
     Shared.view
-        { page = Pages.view model.page |> Document.map Pages
-        , shared = model.shared
+        { page =
+            Pages.view model.page
+                |> Document.map Pages
         , toMsg = Shared
         }
+        model.shared
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Pages.subscriptions model.page
-        |> Sub.map Pages
+    Sub.batch
+        [ Shared.subscriptions model.shared
+            |> Sub.map Shared
+        , Pages.subscriptions model.page
+            |> Sub.map Pages
+        ]
+
+
+
+-- URL
+
+
+fromUrl : Url -> Route
+fromUrl =
+    Route.fromUrl >> Maybe.withDefault Route.NotFound

@@ -8,11 +8,11 @@ module Shared exposing
     , view
     )
 
-import Browser.Navigation as Nav
-import Html exposing (..)
-import Html.Attributes as Attr exposing (class, href)
+import Browser.Navigation exposing (Key)
+import Html exposing (div)
+import Html.Attributes exposing (class)
 import Spa.Document exposing (Document)
-import Spa.Generated.Route as Route
+import Url exposing (Url)
 
 
 
@@ -24,12 +24,14 @@ type alias Flags =
 
 
 type alias Model =
-    {}
+    { url : Url
+    , key : Key
+    }
 
 
-init : Flags -> Nav.Key -> ( Model, Cmd Msg )
-init _ _ =
-    ( {}
+init : Flags -> Url -> Key -> ( Model, Cmd Msg )
+init flags url key =
+    ( Model url key
     , Cmd.none
     )
 
@@ -46,9 +48,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ReplaceMe ->
-            ( model
-            , Cmd.none
-            )
+            ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -61,19 +61,10 @@ subscriptions model =
 
 
 view :
-    { page : Document msg
-    , shared : Model
-    , toMsg : Msg -> msg
-    }
+    { page : Document msg, toMsg : Msg -> msg }
+    -> Model
     -> Document msg
-view { page, shared, toMsg } =
+view { page, toMsg } model =
     { title = page.title
-    , body =
-        [ header []
-            [ a [ href (Route.toString Route.Top) ] [ text "Home" ]
-            , a [ href (Route.toString Route.NotFound) ] [ text "Not found" ]
-            ]
-        , div [] page.body
-        , footer [] [ text "built with elm-spa" ]
-        ]
+    , body = page.body
     }
