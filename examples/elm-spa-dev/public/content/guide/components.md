@@ -47,7 +47,7 @@ href route =
 
 What's the easiest way to make a component reusable? Pass in the messages it sends! Rather than giving it it's own hardcoded `Msg` type, pass in the `msg` as an argument. 
 
-This enables the caller to decide how to handle events from components, and makes it possible to test component functions without needing to mock the entire application.
+This enables the caller to decide how to handle events from components, and makes it easier to test component functions without needing to mock the entire application.
 
 ```elm
 import Html.Events as Events
@@ -78,7 +78,9 @@ In JavaScript frameworks like React or Vue.js, it's common to have a component t
 
 Unlike in JS, our view function can only return one type of `msg`. This means using `Html.map` and `Cmd.map` every time you want to use a component. That can become a mess!
 
-Modules should be [built around data structures](https://www.youtube.com/watch?v=XpDsk374LDE), and it's easier to reuse functions there rather than nesting `update` functions:
+Modules should be [built around data structures](https://www.youtube.com/watch?v=XpDsk374LDE), and it's easier to reuse functions rather than nesting `update` functions:
+
+### Making a Carousel Component
 
 ```elm
 module Components.Carousel exposing
@@ -106,7 +108,18 @@ view :
   -> Html msg
 ```
 
-Behold– no `init` or `update` needed! Just a few, easy-to-test functions that update a data structure. Here's how you might call it in a page:
+The above example shows a file that provides:
+
+1. A new data structure– `Carousel`
+1. Functions to update that structure:
+   `next`, `previous`, and `select`
+1. The way to `view` that structure
+
+The implementation is under-the-hood, so callers won't break if you change it later. If you'd like to see the full Carousel implementation, [here it is](https://gist.github.com/ryannhg/b26c0d6a5d2bfd74643e7da6543c5170).
+
+### Using a Carousel Component
+
+Here's how you might call it in a page:
 
 ```elm
 import Components.Carousel as Carousel exposing (Carousel)
@@ -125,7 +138,7 @@ init : Model
 init =
   { testimonials =
       Carousel.create
-        { quote = "Cats have ears.", author = "Ryan" }
+        { quote = "Cats have ears", author = "Ryan" }
         [ { quote = "Dogs also have ears", author = "Alexa" }
         , { quote = "I have ears", author = "Erik" }
         ]
