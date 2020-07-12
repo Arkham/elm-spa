@@ -1,6 +1,6 @@
 # Installation
 
-If you would like to call `elm-spa` from the command line, you can install it globally via `npm`:
+You can install `elm-spa` via [npm](https://nodejs.org/):
 
 ```terminal
 npm install -g elm-spa

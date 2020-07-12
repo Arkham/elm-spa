@@ -2,8 +2,6 @@
 
 With __elm-spa__, your folder structure determines the routes for your application.
 
-This section has several examples of how this works!
-
 ## Static Routes
 
 You can create a static route like `/contact` or `/not-found` by creating an elm file in `src/Pages`:
@@ -61,6 +59,35 @@ URL | Params
 :-- | :--
 `/users/ryan/posts/123` | `{ user = "ryan"`<br/>`, id = 123`<br/>`}`
 `/users/alexa/posts/456` | `{ user = "alexa"`<br/>`, id = 456`<br/>`}`
+
+## URL Params
+
+As we'll see in the next section, every page will get access to `Url Params`– these allow you access a few things:
+
+```elm
+type alias Url params =
+  { params : params
+  , query : Dict String String
+  , key : Browser.Navigation.Key
+  , rawUrl : Url.Url
+  }
+```
+
+#### params
+
+These are based on the current route. See the "Params" examples above!
+
+#### query
+
+Query parameters for the URL. If the URL was `?name=ryan`, then `Dict.get "name" url.query == "ryan"`
+
+#### key
+
+Used for programmatic navigation with functions in [elm/browser](https://package.elm-lang.org/packages/elm/browser/latest/Browser-Navigation#pushUrl)
+
+#### rawUrl
+
+The original URL in case you need any other information.
 
 ---
 

@@ -2,9 +2,9 @@ module Pages.Guide.Topic_String exposing (Model, Msg, Params, page)
 
 import Api.Data exposing (Data)
 import Api.Markdown
+import Components.Markdown
 import Html exposing (..)
 import Html.Attributes exposing (class, href)
-import Markdown
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route exposing (Route)
 import Spa.Page as Page exposing (Page)
@@ -64,14 +64,7 @@ view model =
     { title = prettifySlug model.title ++ " | guide | elm-spa"
     , body =
         [ Api.Data.view
-            (Markdown.toHtmlWith
-                { githubFlavored = Just { tables = True, breaks = True }
-                , defaultHighlighting = Nothing
-                , sanitize = False
-                , smartypants = False
-                }
-                [ class "markdown readable column spacing-small" ]
-            )
+            Components.Markdown.view
             model.content
         ]
     }

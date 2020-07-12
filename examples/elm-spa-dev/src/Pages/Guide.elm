@@ -2,14 +2,13 @@ module Pages.Guide exposing (Model, Msg, Params, page)
 
 import Api.Data exposing (Data)
 import Api.Markdown
-import Components.Sidebar as Sidebar
+import Components.Markdown
 import Html exposing (..)
 import Html.Attributes exposing (class)
-import Markdown
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route exposing (Route)
 import Spa.Page as Page exposing (Page)
-import Spa.Url as Url exposing (Url)
+import Spa.Url exposing (Url)
 
 
 type alias Params =
@@ -62,7 +61,7 @@ view model =
     { title = "guide | elm-spa"
     , body =
         [ Api.Data.view
-            (Markdown.toHtml [ class "markdown readable column spacing-small" ])
+            Components.Markdown.view
             model.content
         ]
     }
