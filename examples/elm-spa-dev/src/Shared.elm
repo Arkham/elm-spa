@@ -105,7 +105,7 @@ viewPage { page, isTransitioning } =
 viewSidebar : { options | shouldShowSidebar : Bool, route : Route } -> Html msg
 viewSidebar { shouldShowSidebar, route } =
     aside
-        [ class "hidden-mobile fadeable"
+        [ class "hidden-mobile fadeable sticky"
         , classList
             [ ( "invisible", not shouldShowSidebar )
             , ( "no-width", not shouldShowSidebar )
