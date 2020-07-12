@@ -179,8 +179,8 @@ viewListing listing =
       ]
 ```
 
-That's it! Here are the [completed files](https://gist.github.com/ryannhg/3ce83ec17ed473717e5604c7047e4d2c) defined in this section.
+That's it! Here are the [actual files](https://gist.github.com/ryannhg/3ce83ec17ed473717e5604c7047e4d2c) used for this section.
 
 ---
 
-In our final section, we'll go over an [Authentication](/guide/authentication) ecxample.
+Next we'll go [Beyond HTML](/guide/beyond-html), to explore other view options.

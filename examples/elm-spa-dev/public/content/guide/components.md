@@ -1,6 +1,6 @@
 # Components
 
-In Elm, components don't have to be complicated! In fact, most of the time they should be boring functions:
+In Elm, components don't have to be complicated! In fact, most of the time, you can use boring functions:
 
 ```elm
 module Components.Footer exposing (view)
@@ -72,11 +72,11 @@ view options =
       ]
 ```
 
-## Getting complicated
+## Fancy Components
 
 In JavaScript frameworks like React or Vue.js, it's common to have a component track its own data, view, and handle updates to that view. In Elm, we _could_ follow that methodology with `Model/Msg` and `init/update/view`, but it's not ideal.
 
-Unlike in JS, our view function can only return one type of `msg`. This means using `Html.map` and `Cmd.map` every time you want to use a component. That can become a mess!
+Unlike in JS, our `view` functions can only return one type of `msg`. This means using `Html.map` and `Cmd.map` every time you want to use a component. That can become a mess when you begin nesting components!
 
 Modules should be [built around data structures](https://www.youtube.com/watch?v=XpDsk374LDE), and it's easier to reuse functions rather than nesting `update` functions:
 
@@ -115,7 +115,7 @@ The above example shows a file that provides:
    `next`, `previous`, and `select`
 1. The way to `view` that structure
 
-The implementation is under-the-hood, so callers won't break if you change it later. If you'd like to see the full Carousel implementation, [here it is](https://gist.github.com/ryannhg/b26c0d6a5d2bfd74643e7da6543c5170).
+The implementation for `Carousel` isn't exposed, so callers won't break if you change it later. If you'd like to see the full Carousel implementation, [here it is](https://gist.github.com/ryannhg/b26c0d6a5d2bfd74643e7da6543c5170).
 
 ### Using a Carousel Component
 

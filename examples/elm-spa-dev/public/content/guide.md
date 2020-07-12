@@ -6,17 +6,18 @@ If you have any questions after reading through this, please check out the `#elm
 
 ## what is elm-spa?
 
-__elm-spa__ is a companion CLI tool that:
+By choosing __elm-spa__ you get:
 
-1. Automatically generates URL routes
-1. Provides a common project structure
+1. A standard project structure for use across projects.
+1. Automatically wired up pages.
+1. Automatically generated routing code.
 
-It was inspired by a project in the Vue.js community, called NuxtJS- to make building real world applications easier in Elm!
+It was inspired by an awesome project in the Vue.js community, called NuxtJS. Hopefully, __elm-spa__ makes your experience building real world applications in Elm much smoother!
 
-If you have ever wondered how to call a REST API, handle user authentication, create components, or organize your application- __elm-spa__ is here to help.
+If you've ever wondered how to call a REST API, handle user authentication, create components, or organize your application- __elm-spa__ is here to help.
 
-Throughout this guide, [blue links](https://elm-lang.org) will take you to resources from other sites, while [green links](/guide/getting-started) will take you to resources within elm-spa.dev.
+Throughout this guide, [blue links](https://elm-lang.org) will take you to external resources from other sites, while [green links](/guide/getting-started) will take you to other pages on this site!
 
 ---
 
-Like the next section on [Getting Started](/guide/getting-started).
+Ready to [get started](/guide/getting-started)?

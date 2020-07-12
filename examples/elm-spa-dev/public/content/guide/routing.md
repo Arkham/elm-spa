@@ -1,6 +1,6 @@
 # Routing
 
-With __elm-spa__, your folder structure determines the routes for your application.
+With __elm-spa__, the names of pages in the `src/Pages` folder automatically generate your routes! Check out the following examples to learn more.
 
 ## Static Routes
 
@@ -24,20 +24,20 @@ File | URL
 `Example/Top.elm` | `/example`
 `Top/Top.elm` | `/top`
 
-__Handling Edgecases:__ You may have noticed that `Example.elm` and `Example/Top.elm` would both route to `/example`. In the case of conflicts like these, the Top.elm file will never be reached- delete it!
+__Reserved, but possible!__ If you actually need a `/top` route, you can still make one by using `Top.elm` within a `Top` folder. (As shown above!)
 
 ## Dynamic Routes
 
 Sometimes it's nice to have one page that works for slightly different URLs. __elm-spa__ uses this convention in file names to indicate a dynamic route:
 
-##### `Authors/Name_String.elm`
+__`Authors/Name_String.elm`__
 
 URL | Params
 :-- | :--
 `/authors/ryan` | `{ name = "ryan" }`
 `/authors/alexa` | `{ name = "alexa" }`
 
-##### `Posts/Id_Int.elm`
+__`Posts/Id_Int.elm`__
 
 URL | Params
 :-- | :--
@@ -53,7 +53,7 @@ __Supported Parameters__: Only `String` and `Int` dynamic parameters are support
 You can also nest your dynamic routes. Here's an example:
 
 
-##### `Users/User_String/Posts/Post_Id.elm`
+__`Users/User_String/Posts/Post_Id.elm`__
 
 URL | Params
 :-- | :--
@@ -75,19 +75,42 @@ type alias Url params =
 
 #### params
 
-These are based on the current route. See the "Params" examples above!
+Each dynamic page has it's own params, pulled from the URL. There are examples in the "Params" column above.
+
+```elm
+type alias Params =
+  { name : String
+  }
+
+view : Url Params -> Document Msg
+view url =
+  { title = "Author: " ++ url.params.name
+  , body = -- ...
+  }
+```
 
 #### query
 
-Query parameters for the URL. If the URL was `?name=ryan`, then `Dict.get "name" url.query == "ryan"`
+A dictionary of query parameters. Here are some examples:
+
+```elm
+-- https://elm-spa.dev
+Dict.get "name" url.query == Nothing
+
+-- https://elm-spa.dev?name=ryan
+Dict.get "name" url.query == Just "ryan"
+
+-- https://elm-spa.dev?name
+Dict.get "name" url.query == Just ""
+```
 
 #### key
 
-Used for programmatic navigation with functions in [elm/browser](https://package.elm-lang.org/packages/elm/browser/latest/Browser-Navigation#pushUrl)
+Required for programmatic navigation with `Nav.pushUrl` and other functions from [elm/browser](https://package.elm-lang.org/packages/elm/browser/latest/Browser-Navigation#pushUrl)
 
 #### rawUrl
 
-The original URL in case you need any other information.
+The original URL in case you need any other information like the protocol, port, etc.
 
 ---
 

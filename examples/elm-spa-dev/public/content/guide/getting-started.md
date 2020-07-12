@@ -10,11 +10,17 @@ npx elm-spa init our-elm-spa
 
 This one-time command will create a new project in a folder called `our-elm-spa`. 
 
-Here's what your folder should look like:
+Here's an overview of that folder:
 
 ```
 elm.json
 package.json
+
+public/
+├─ index.html
+├─ main.js
+└─ style.css
+
 src/
 ├─ Api/
 ├─ Components/
@@ -29,15 +35,14 @@ src/
 ├─ Main.elm
 ├─ Shared.elm
 └─ Ports.elm
-public/
-├─ index.html
-├─ main.js
-└─ style.css
+
+tests/
+└─ README.md
 ```
 
 ### The project folder
 
-There are four interesting files in the project folder:
+There are a few interesting things in the project folder:
 
 File | Description
 :-- | :--
@@ -66,10 +71,24 @@ File | Description
 
 The public folder is served statically. Use this as a place to serve images, CSS, JS, and other static content.
 
-A file like `public/images/example.png` will be available under `/images/example.png`. __Include the starting slash!__ If it's missing, only top-level pages will load it correctly- leading to a confusing time.
-
 File | Description
 :-- | :--
 `index.html` | The HTML loaded by the server.
 `main.js` | The JS that starts our Elm single page application.
 `style.css` | A place to add in some CSS styles.
+
+#### Getting assets
+
+Here are examples of how to access files in the public folder via URL:
+
+File Location | URL
+:-- | :---
+`public/main.js` | `/main.js`
+`public/style.css` | `/style.css`
+`public/images/puppy.png` | `/images/puppy.png`
+
+__Include the starting slash in your URL!__ If it's missing, it will look for your assets relative to the current URL, which means some pages will work and others won't. (`main.js` vs `/main.js`)
+
+---
+
+Next up is [Installation](/guide/installation), which will introduce the CLI.
