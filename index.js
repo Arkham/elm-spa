@@ -196,7 +196,7 @@ const commands = {
           .then(_ => `\n${green('✔')} Added a new ${bold(type)} page at:\n${toFilepath(name)}\n`)
           .catch(_ => `\nPlease run ${bold('elm-spa add')} in the folder with ${bold('elm.json')}\n`)
       : interactivePrompts.add()
-          .then(({ type, name }) => commands.init([ type, name ])),
+          .then(({ type, name }) => commands.add([ type, name ])),
 
   'build': (_, dir = '.') =>
     Promise.resolve(folders.pages(dir))
