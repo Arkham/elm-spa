@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const prompts = require('prompts')
 const path = require('path')
 const fs = require('fs')
 const { Elm } = require('./dist/elm.worker.js')
@@ -44,6 +45,7 @@ const saveToFolder = (prefix) => ({ filepath, content }) =>
 
 // Formatting output
 const bold = (str) => '\033[1m' + str + '\033[0m'
+const green = (str) => '\033[32m' + str + '\033[0m'
 const toFilepath = name => path.join(folders.pages('.'), `${name.split('.').join('/')}.elm`)
 
 // Flags + Validation
@@ -74,14 +76,15 @@ const help = {
 `,
 
   init: `
-  ${bold('elm-spa init')} <directory>
+  ${bold('elm-spa init')} <elm-ui|html|elm-css> <directory>
 
     Create a new elm-spa app in the <directory>
     folder specified.
 
     ${bold('examples:')}
-    elm-spa init .
-    elm-spa init my-app
+    elm-spa init html my-app
+    elm-spa init elm-ui my-elm-ui-app
+    elm-spa init elm-css my-css-app
 `,
 
   add: `
@@ -98,7 +101,7 @@ const help = {
 `,
 
   build: `
-  ${bold('elm-spa build')} [dir]
+  ${bold('elm-spa build')}
 
     Create "Generated.Route" and "Generated.Pages" modules for
     this project, based on the file names in "src/Pages"
@@ -108,8 +111,6 @@ const help = {
 
     ${bold('examples:')}
     elm-spa build
-    elm-spa build ../some/other-folder
-    elm-spa build ./help
 `
 
 }
@@ -117,20 +118,69 @@ const help = {
 const toUnixFilepath = (filepath) =>
   filepath.split(path.sep).join('/')
 
+// Fancy interactive prompts
+const interactivePrompts = {
+  'init': _ => prompts([
+    {
+      type: 'select',
+      name: 'ui',
+      message: 'UI package?',
+      choices: [
+        { title: 'elm-ui', value: 'elm-ui', description: '"What if you never had to write CSS again?"' },
+        { title: 'html', value: 'html', description: '"Use HTML in Elm!"' },
+        { title: 'elm-css', value: 'elm-css', description: '"Typed CSS in Elm."' }
+      ],
+      initial: 0
+    },
+    {
+      type: 'text',
+      name: 'name',
+      message: `What's the project name?`,
+      initial: 'my-elm-spa',
+      validate: (input) =>
+        /[a-z\-]+/.test(input) || 'Lowercase letters and dashes only.'
+    }
+  ], { onCancel: _ => process.exit(0) }),
+
+  'add': _ => prompts([
+    {
+      type: 'select',
+      name: 'type',
+      message: 'What kind of page?',
+      choices: [
+        { title: 'static', value: 'static', description: 'A simple, static page' },
+        { title: 'sandbox', value: 'sandbox', description: 'Needs to manage local state' },
+        { title: 'element', value: 'element', description: 'Needs to send Cmd msg or receive Sub msg' },
+        { title: 'application', value: 'application', description: 'Needs read-write access to Shared.Model' },
+      ],
+      initial: 0
+    },
+    {
+      type: 'text',
+      name: 'name',
+      message: `What's the module name?`,
+      hint: 'Example: "Posts.Id_Int"',
+      validate: (input) =>
+        isValidModuleName(input) || 'Must be a valid Elm module name.'
+    }
+  ], { onCancel: _ => process.exit(0) })
+}
+
 // Available commands
 const commands = {
 
-  'init': ([ folder ]) =>
-    folder && folder !== 'help'
+  'init': ([ template, folder ]) =>
+    template && folder && [ 'html', 'elm-css', 'elm-ui' ].includes(template)
       ? Promise.resolve()
           .then(_ => {
             const dest = path.join(process.cwd(), folder)
-            cp(path.join(__dirname, 'examples', 'new'), dest)
+            cp(path.join(__dirname, 'templates', template), dest)
             try { fs.renameSync(path.join(dest, '.npmignore'), path.join(dest, '.gitignore')) } catch (_) {}
           })
-          .then(_ => `\ncreated a new project in ${path.join(process.cwd(), folder)}\n`)
+          .then(_ => `\n${green('✔')} Created a new project in ${path.join(process.cwd(), folder)}\n`)
           .catch(_ => `\nUnable to initialize a project at ${path.join(process.cwd(), folder)}\n`)
-      : Promise.resolve(help.init),
+      : interactivePrompts.init()
+          .then(({ ui, name }) => commands.init([ ui, name ])),
 
   'add': ([ type, name ]) =>
     (type && name) && type !== 'help' && isValidPageType(type) && isValidModuleName(name)
@@ -143,27 +193,26 @@ const commands = {
             ensureDirectory(containingFolder)
             saveToFolder((folders.pages('.')))(file)
           })
-          .then(_ => `\nadded a new ${bold(type)} page at:\n${toFilepath(name)}\n`)
-          .catch(_ => `\nplease run ${bold('elm-spa add')} in the folder with ${bold('elm.json')}\n`)
-      : Promise.resolve(help.add),
+          .then(_ => `\n${green('✔')} Added a new ${bold(type)} page at:\n${toFilepath(name)}\n`)
+          .catch(_ => `\nPlease run ${bold('elm-spa add')} in the folder with ${bold('elm.json')}\n`)
+      : interactivePrompts.add()
+          .then(({ type, name }) => commands.init([ type, name ])),
 
-  'build': ([ dir  = '.' ] = []) =>
-    dir !== 'help'
-      ? Promise.resolve(folders.pages(dir))
-          .then(listFiles)
-          .then(names => names.filter(name => name.endsWith('.elm')))
-          .then(names => names.map(name => name.substring(folders.pages(dir).length)))
-          .then(filepaths => new Promise(
-            Elm.Main.init({ flags: { ...flags, command: 'build', filepaths: filepaths.map(toUnixFilepath) } }).ports.buildPort.subscribe
-          ))
-          .then(files => {
-            ensureDirectory(folders.generated(dir))
-            files.forEach(saveToFolder(folders.src(dir)))
-            return files
-          })
-          .then(files => `\nelm-spa generated two files:\n${files.map(({ filepath }) => '  - ' + path.join(folders.src(dir), filepath)).join('\n')}\n`)
-          .catch(_ => `\nplease run ${bold('elm-spa build')} in the folder with ${bold('elm.json')}\n`)
-      : Promise.resolve(help.build),
+  'build': (_, dir = '.') =>
+    Promise.resolve(folders.pages(dir))
+      .then(listFiles)
+      .then(names => names.filter(name => name.endsWith('.elm')))
+      .then(names => names.map(name => name.substring(folders.pages(dir).length)))
+      .then(filepaths => new Promise(
+        Elm.Main.init({ flags: { ...flags, command: 'build', filepaths: filepaths.map(toUnixFilepath) } }).ports.buildPort.subscribe
+      ))
+      .then(files => {
+        ensureDirectory(folders.generated(dir))
+        files.forEach(saveToFolder(folders.src(dir)))
+        return files
+      })
+      .then(_ => `\n${green('✔')} elm-spa build complete!\n`)
+      .catch(_ => `\nPlease run ${bold('elm-spa build')} in the folder with ${bold('elm.json')}\n`),
 
   '-v': _ => Promise.resolve(package.version),
 

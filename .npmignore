@@ -2,7 +2,6 @@ elm-stuff
 /src
 /tests
 /elm.json
-/examples/jangle
-/examples/elm-spa-dev
+/examples
 !.gitignore
 .github
