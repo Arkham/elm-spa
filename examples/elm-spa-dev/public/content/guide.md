@@ -1,18 +1,16 @@
 # Guide
 
-Welcome to the __elm-spa__ guide! This guide assumes you are somewhat familiar with Elm and have checked out [the official guide](https://guide.elm-lang.org).
+Welcome to the __elm-spa__ guide! This guide assumes you are familiar with Elm and have checked out [the official guide](https://guide.elm-lang.org).
 
-If you have any questions after reading through this, please check out the `#elm-spa-users` channel in the [official Elm Slack](https://elmlang.herokuapp.com/). There are also wonderful folks in the `#beginners` channel that are happy to help with any other Elm questions you have.
+If you have any questions after reading this, please join us the `#elm-spa-users` channel in the [Elm Slack](https://elmlang.herokuapp.com/). There are also amazing folks in the `#beginners` channel that are happy to help with any Elm questions you may have.
 
 ## what is elm-spa?
 
-By choosing __elm-spa__ you get:
+Inspired by projects like [Nuxt.js](https://nuxtjs.org/), __elm-spa__ is:
 
-1. A standard project structure for use across projects.
-1. Automatically wired up pages.
-1. Automatically generated routing code.
-
-It was inspired by an awesome project in the Vue.js community, called NuxtJS. Hopefully, __elm-spa__ makes your experience building real world applications in Elm much smoother!
+1. A common __framework__ you can use across projects.
+1. A __CLI__ that eliminates boilerplate and routing code.
+1. This __website__, with guides on building SPAs in Elm.
 
 If you've ever wondered how to call a REST API, handle user authentication, create components, or organize your application- __elm-spa__ is here to help.
 

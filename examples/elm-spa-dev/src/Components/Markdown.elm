@@ -8,7 +8,7 @@ import Markdown
 view : String -> Html msg
 view =
     Markdown.toHtmlWith
-        { githubFlavored = Just { tables = True, breaks = True }
+        { githubFlavored = Just { tables = True, breaks = False }
         , defaultHighlighting = Nothing
         , sanitize = False
         , smartypants = False

@@ -5,6 +5,7 @@ import Html.Attributes exposing (class, href)
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
 import Spa.Page as Page exposing (Page)
+import Spa.Url exposing (Url)
 
 
 page : Page Params Model Msg
@@ -19,15 +20,15 @@ type alias Params =
 
 
 type alias Model =
-    ()
+    Url Params
 
 
 type alias Msg =
     Never
 
 
-view : Document Msg
-view =
+view : Url Params -> Document Msg
+view _ =
     { title = "404"
     , body =
         [ div [ class "column spacing-tiny" ]

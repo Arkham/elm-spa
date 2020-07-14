@@ -30,13 +30,13 @@ type alias Page params model msg =
 
 
 static :
-    { view : Document msg
+    { view : Url params -> Document msg
     }
-    -> Page params () msg
+    -> Page params (Url params) msg
 static page =
-    { init = \_ _ -> ( (), Cmd.none )
-    , update = \_ _ -> ( (), Cmd.none )
-    , view = \_ -> page.view
+    { init = \_ url -> ( url, Cmd.none )
+    , update = \_ model -> ( model, Cmd.none )
+    , view = page.view
     , subscriptions = \_ -> Sub.none
     , save = always identity
     , load = \_ model -> ( model, Cmd.none )

@@ -1,7 +1,7 @@
 # Using APIs
 
-Most applications interact with a REST API or a GraphQL endpoint to access data.
-
+Most applications interact with a REST API or a GraphQL endpoint to access data. 
+For this guide, we'll be using the [Reddit REST API](https://www.reddit.com/dev/api/#GET_hot) to fetch the latest posts from [r/elm](https://www.reddit.com/r/elm).
 ## Defining a module
 
 Just like before, we'll define modules based on data structures:
@@ -12,8 +12,6 @@ module Api.Reddit.Listing exposing
   , hot, new, top
   )
 ```
-
-For the rest of this section, we'll be using the [Reddit API](https://www.reddit.com/dev/api/#GET_hot) to fetch posts from [r/elm](https://www.reddit.com/r/elm).
 
 ## Storing the data
 
@@ -35,9 +33,7 @@ The `expectJson` function is a replacement for [Http.expectJson](https://package
 
 ## Working with JSON
 
-The [elm/json](https://package.elm-lang.org/packages/elm/json/latest) package allows us to handle JSON from APIs, without crashing our application if the JSON isn't what we initially expected.
-
-We do that by creating decoders:
+The [elm/json](https://package.elm-lang.org/packages/elm/json/latest) package allows us to handle JSON from APIs, without crashing our application if the JSON isn't what we initially expected. We do that by creating decoders:
 
 ```elm
 import Json.Decode as Json
@@ -71,7 +67,7 @@ hot options =
     }
 ```
 
-The actual listings are inside of two properties, so we used `Json.at` and `Json.list` to before we use our `decoder`.
+The actual listings are located inside `data.children`, so we used `Json.at` and `Json.list` to before we use our `decoder`.
 
 ```javascript
 { "data": { "children": [ ... ] } }

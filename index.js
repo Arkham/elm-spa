@@ -63,57 +63,15 @@ const isValidModuleName = (name = '') => {
 }
 
 // Help commands
-const help = {
-  general: `
+const help = `
   ${bold('elm-spa')} – version ${package.version}
   
     ${bold('elm-spa init')} – create a new project
     ${bold('elm-spa add')} – add a new page
     ${bold('elm-spa build')} – generate routes and pages automatically
     
-    ${bold('elm-spa <command> help')} – get detailed help for a command
-    ${bold('elm-spa -v')} – print version number
-`,
-
-  init: `
-  ${bold('elm-spa init')} <elm-ui|html|elm-css> <directory>
-
-    Create a new elm-spa app in the <directory>
-    folder specified.
-
-    ${bold('examples:')}
-    elm-spa init html my-app
-    elm-spa init elm-ui my-elm-ui-app
-    elm-spa init elm-css my-css-app
-`,
-
-  add: `
-  ${bold('elm-spa add')} <static|sandbox|element|application> <name>
-
-    Create a page of type <static|sandbox|element|application>
-    with the module name <name>.
-
-    ${bold('examples:')}
-    elm-spa add static Top
-    elm-spa add sandbox Posts.Top
-    elm-spa add element Posts.Id_Int
-    elm-spa add application Authors.Name_String.Posts.Id_Int
-`,
-
-  build: `
-  ${bold('elm-spa build')}
-
-    Create "Generated.Route" and "Generated.Pages" modules for
-    this project, based on the file names in "src/Pages"
-
-    Here are more details on how that works:
-    https://www.npmjs.com/package/elm-spa#naming-conventions
-
-    ${bold('examples:')}
-    elm-spa build
+    ${bold('elm-spa version')} – print the version number
 `
-
-}
 
 const toUnixFilepath = (filepath) =>
   filepath.split(path.sep).join('/')
@@ -135,7 +93,7 @@ const interactivePrompts = {
     {
       type: 'text',
       name: 'name',
-      message: `What's the project name?`,
+      message: `What's the folder name?`,
       initial: 'my-elm-spa',
       validate: (input) =>
         /[a-z\-]+/.test(input) || 'Lowercase letters and dashes only.'
@@ -218,7 +176,7 @@ const commands = {
 
   'version': _ => Promise.resolve(package.version),
 
-  'help': _ => Promise.resolve(help.general)
+  'help': _ => Promise.resolve(help)
     
 }
 

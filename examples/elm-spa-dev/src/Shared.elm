@@ -82,7 +82,9 @@ viewNavbar =
             [ text "elm-spa" ]
         , div [ class "row spacing-small text--bigger" ]
             [ a [ class "link", href (Route.toString Route.Guide) ] [ text "guide" ]
-            , a [ class "link", href (Route.toString Route.NotFound) ] [ text "examples" ]
+
+            -- , a [ class "link", href (Route.toString Route.Tour) ] [ text "tour" ]
+            , a [ class "link", href (Route.toString Route.Examples) ] [ text "examples" ]
             ]
         ]
 
